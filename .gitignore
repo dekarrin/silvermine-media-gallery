@@ -3,3 +3,4 @@ albums/conversions/*
 albums/direct/videos/*
 albums/direct/games/*
 albums/userpics/*
+include/config.inc.php
