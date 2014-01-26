@@ -67,6 +67,7 @@ db_pass=
 # END SCRIPT VARIABLES
 # Editing below this line is NOT recommended unless you know what you're doing!
 
+
 # COMPOSITE SCRIPT VARIABLES
 
 backup_dir=$mount_point/$backup_home/$datestring
