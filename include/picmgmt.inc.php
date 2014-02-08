@@ -21,10 +21,20 @@ if($CONFIG['read_iptc_data'] ){
     include("include/iptc.inc.php");
 }
 
+
 // Add a picture to an album
-function add_picture($aid, $filepath, $filename, $position = 0, $title = '', $caption = '', $keywords = '', $user1 = '', $user2 = '', $user3 = '', $user4 = '', $category = 0, $raw_ip = '', $hdr_ip = '', $iwidth = 0, $iheight = 0)
+// DEKKY MOD START - auto mp4 conversion
+function add_picture($aid, $filepath, $filename, $position = 0, $title = '', $caption = '', $keywords = '', $user1 = '', $user2 = '', $user3 = '', $user4 = '', $category = 0, $raw_ip = '', $hdr_ip = '', $iwidth = 0, $iheight = 0, $SYS_STATE = NULL)
 {
-    global $CONFIG, $USER_DATA, $PIC_NEED_APPROVAL, $CURRENT_PIC_DATA;
+    global $CONFIG;
+	if ($SYS_STATE === NULL) {
+		global $USER_DATA, $PIC_NEED_APPROVAL, $CURRENT_PIC_DATA;
+	} else {
+		$USER_DATA = $SYS_STATE['USER_DATA'];
+		$PIC_NEED_APPROVAL = $SYS_STATE['PIC_NEED_APPROVAL'];
+		$CURRENT_PIC_DATA = $SYS_STATE['CURRENT_PIC_DATA'];
+	}
+// DEKKY MOD END
     global $lang_errors, $lang_db_input_php;
 
     $image = $CONFIG['fullpath'] . $filepath . $filename;
@@ -99,6 +109,51 @@ function add_picture($aid, $filepath, $filename, $position = 0, $title = '', $ca
                 return $result;
             }
         }
+// DEKKY MOD START - movie size fix
+    } elseif (is_movie($filename)) {
+	$id3 = new getID3();
+	$moviedata = $id3->analyze($image);
+// DEKKY MOD START - Auto mp4 conversion
+	// do not auto convert SWFs. It's very uncommon for this to be a non-interactive
+	// video.
+	if ($moviedata['fileformat'] !== 'mp4' && $moviedata['fileformat'] !== 'swf') {
+		$data = json_encode(array(
+			'aid'		=> $aid,
+			'filepath'	=> $filepath,
+			'filename'	=> $filename,
+			'position'	=> $position,
+			'title'		=> $title,
+			'caption'	=> $caption,
+			'keywords'	=> $keywords,
+			'user1'		=> $user1,
+			'user2'		=> $user2,
+			'user3'		=> $user3,
+			'user4'		=> $user4,
+			'category'	=> $category,
+			'raw_ip'	=> $raw_ip,
+			'hdr_ip'	=> $hdr_ip,
+			'iwidth'	=> $iwidth,
+			'iheight'	=> $iheight,
+			'SYS_STATE'	=> array(
+				'USER_DATA'	=> $USER_DATA,
+				'PIC_NEED_APPROVAL'	=> $PIC_NEED_APPROVAL,
+				'CURRENT_PIC_DATA'	=> $CURRENT_PIC_DATA,
+			),
+		));
+		cpg_db_query("INSERT INTO {$CONFIG['TABLE_CONVERSIONS']}
+(data) VALUES ('$data');");
+		$cid = cpg_db_last_insert_id();
+		$up_path = $CONFIG['fullpath'] . $filepath . $filename;
+		$con_path = $CONFIG['fullpath'] . 'conversions/' . $cid . '.' . pathinfo($filename, PATHINFO_EXTENSION);
+		rename($up_path, $con_path);
+		dkrn_set_convert_status($cid, CONVERT_STATUS_READY);
+		`php converter/run_mp4_daemon.php > /dev/null 2>&1 &`;
+		return 2;
+	}
+// DEKKY MOD END
+	$imagesize[0] = $moviedata['video']['resolution_x'];
+	$imagesize[1] = $moviedata['video']['resolution_y'];
+// DEKKY MOD END
     } else {
         $imagesize[0] = $iwidth;
         $imagesize[1] = $iheight;
@@ -129,15 +184,17 @@ function add_picture($aid, $filepath, $filename, $position = 0, $title = '', $ca
     }
     // Test if picture requires approval
     if (GALLERY_ADMIN_MODE) {
-        $approved = 'YES';
+// DEKKY MOD START - db y/n fix
+        $approved = '1';
     } elseif (!$USER_DATA['priv_upl_need_approval'] && $category == FIRST_USER_CAT + USER_ID) {
-        $approved = 'YES';
+        $approved = '1';
     } elseif (!$USER_DATA['pub_upl_need_approval'] && $category < FIRST_USER_CAT) {
-        $approved = 'YES';
+        $approved = '1';
     } else {
-        $approved = 'NO';
+        $approved = '0';
     }
-    $PIC_NEED_APPROVAL = ($approved == 'NO');
+    $PIC_NEED_APPROVAL = ($approved == '0');
+// DEKKY MOD END
 
     // User ID is recorded when in admin mode
     $user_id  = USER_ID;

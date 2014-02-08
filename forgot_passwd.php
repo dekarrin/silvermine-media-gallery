@@ -47,7 +47,9 @@ if ($superCage->get->keyExists('id')) {
 if (isset($CLEAN['email'])) {
     //$CLEAN['email'] = addslashes($_POST['email']);
 
-    $sql = "SELECT user_id, user_group, user_active, user_name, user_password, user_email FROM {$CONFIG['TABLE_USERS']} WHERE user_email = '{$CLEAN['email']}' AND user_active = 'YES'";
+// DEKKY MOD START - db y/n fix
+    $sql = "SELECT user_id, user_group, user_active, user_name, user_password, user_email FROM {$CONFIG['TABLE_USERS']} WHERE user_email = '{$CLEAN['email']}' AND user_active = '1'";
+// DEKKY MOD END
 
     $results = cpg_db_query($sql);
 

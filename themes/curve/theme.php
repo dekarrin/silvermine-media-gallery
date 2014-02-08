@@ -185,6 +185,11 @@ $template_gallery_admin_menu = <<<EOT
                                     <!-- BEGIN batch_add -->
                                         <li><a href="searchnew.php" title="{SEARCHNEW_TITLE}"><span>{SEARCHNEW_ICO}{SEARCHNEW_LNK}</span></a></li>
                                     <!-- END batch_add -->
+<!-- DEKKY MOD START - Media Capture -->
+                                    <!-- BEGIN media_capture -->
+                                        <li><a href="mediacapture.php" title="{MEDIACAPTURE_TITLE}"><span>{MEDIACAPTURE_ICO}{MEDIACAPTURE_LNK}</span></a></li>
+                                    <!-- END media_capture -->
+<!-- DEKKY MOD END -->
                                     <!-- BEGIN admin_tools -->
                                         <li><a href="util.php?t={TIME_STAMP}#admin_tools" title="{UTIL_TITLE}"><span>{UTIL_ICO}{UTIL_LNK}</span></a></li>
                                     <!-- END admin_tools -->
@@ -430,7 +435,9 @@ function theme_main_menu($which)
             }
 
             if (!$upload_allowed) {
-                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='YES' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
+// DEKKY MOD START - db y/n fix
+                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='1' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
+// DEKKY MOD END
                 $public_albums = cpg_db_query($query);
 
                 if (mysql_num_rows($public_albums)) {

@@ -19,6 +19,9 @@ define('IN_COPPERMINE', true);
 define('EDITPICS_PHP', true);
 
 require 'include/init.inc.php';
+// DEKKY MOD START - upload album subdirs
+require_once('include/album_subdirs.inc.php');
+// DEKKY MOD END
 
 js_include('js/editpics.js');
 
@@ -198,7 +201,9 @@ function process_post_data()
     }
 
     $user_album_set = array();
-    $result = cpg_db_query("SELECT aid FROM {$CONFIG['TABLE_ALBUMS']} WHERE category = " . (FIRST_USER_CAT + USER_ID) . " OR owner = " . USER_ID . " OR uploads = 'YES'");
+// DEKKY MOD START - db y/n fix
+    $result = cpg_db_query("SELECT aid FROM {$CONFIG['TABLE_ALBUMS']} WHERE category = " . (FIRST_USER_CAT + USER_ID) . " OR owner = " . USER_ID . " OR uploads = '1'");
+// DEKKY MOD END
     while ($row = mysql_fetch_assoc($result)) {
         $user_album_set[$row['aid']] = 1;
     }
@@ -252,7 +257,9 @@ function process_post_data()
         }
 
         // We will be selecting pid in the query as we need it in $pic array for the plugin filter
-        $query = "SELECT pid, category, filepath, filename, owner_id FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = $pid";
+// DEKKY MOD START - album subdirs
+        $query = "SELECT pid, category, filepath, filename, owner_id, p.aid AS aid FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = $pid";
+// DEKKY MOD END
         $result = cpg_db_query($query);
 
         if (!mysql_num_rows($result)) {
@@ -310,13 +317,19 @@ function process_post_data()
 
             $approved = '';
             if ($superCage->post->keyExists('approved' . $pid)) {
-                $approved = $superCage->post->getAlpha('approved' . $pid);
+// DEKKY MOD START - db y/n fix
+                $approved = $superCage->post->getDigits('approved' . $pid);
+// DEKKY MOD END
             }
 
-            if ($approved == 'YES') {
-                $update .= ", approved = 'YES'";
+// DEKKY MOD START - db y/n fix
+            if ($approved == '1') {
+                $update .= ", approved = '1'";
+// DEKKY MOD END
             } else {
-                $update .= ", approved = 'NO'";
+// DEKKY MOD START - db y/n fix
+                $update .= ", approved = '0'";
+// DEKKY MOD END
             }
         }
 
@@ -369,6 +382,12 @@ function process_post_data()
             CPGPluginAPI::action('after_delete_file', $pic);
         } else {
             cpg_db_query("UPDATE {$CONFIG['TABLE_PICTURES']} SET $update WHERE pid = $pid");
+			
+			// DEKKY MOD album subdirs start
+			if ($pic['aid'] != $aid) {
+				dkrn_move_pid_to_album($pid, $aid);
+			}
+			// DEKKY MOD end album subdirs
 
             // Executes after a file update is committed
             CPGPluginAPI::action('after_edit_file', $pid);
@@ -426,7 +445,9 @@ function form_pic_info($text)
         $loop_counter = 0;
     }
 
-    if ($CURRENT_PIC['approved'] == 'YES') {
+// DEKKY MOD START - db y/n fix
+    if ($CURRENT_PIC['approved'] == '1') {
+// DEKKY MOD END
         $pic_approval_checked = 'checked="checked"';
     } else {
         $pic_approval_checked = '';
@@ -437,7 +458,9 @@ function form_pic_info($text)
     if (GALLERY_ADMIN_MODE || MODERATOR_MODE) {
         $approve_html = <<<EOT
                           <td class="{$row_style_class}" width="40" valign="top">
-                                  <input type="checkbox" name="approved{$CURRENT_PIC['pid']}" id="approve{$CURRENT_PIC['pid']}" value="YES" {$pic_approval_checked} class="checkbox" title="{$lang_editpics_php['approve_pic']}" /><label for="approve{$CURRENT_PIC['pid']}" class="clickable_option">{$icon_array['file_approve']}</label>
+// DEKKY MOD START - db y/n fix
+                                  <input type="checkbox" name="approved{$CURRENT_PIC['pid']}" id="approve{$CURRENT_PIC['pid']}" value="1" {$pic_approval_checked} class="checkbox" title="{$lang_editpics_php['approve_pic']}" /><label for="approve{$CURRENT_PIC['pid']}" class="clickable_option">{$icon_array['file_approve']}</label>
+// DEKKY MOD END
                           </td>
 EOT;
     }
@@ -509,8 +532,10 @@ function form_options()
         echo <<<EOT
         <tr>
                 <td class="{$row_style_class}" colspan="3" align="center">
-                        <input type="radio" name="approved{$CURRENT_PIC['pid']}" id="approved{$CURRENT_PIC['pid']}yes" value="YES" class="radio" /><label for="approved{$CURRENT_PIC['pid']}yes" class="clickable_option">{$lang_editpics_php['approve']}</label>&nbsp;
-                        <input type="radio" name="approved{$CURRENT_PIC['pid']}" id="approved{$CURRENT_PIC['pid']}no" value="NO" class="radio" checked="checked" /><label for="approved{$CURRENT_PIC['pid']}no" class="clickable_option">{$lang_editpics_php['postpone_app']}</label>&nbsp;
+// DEKKY MOD START - db y/n fix
+                        <input type="radio" name="approved{$CURRENT_PIC['pid']}" id="approved{$CURRENT_PIC['pid']}yes" value="1" class="radio" /><label for="approved{$CURRENT_PIC['pid']}yes" class="clickable_option">{$lang_editpics_php['approve']}</label>&nbsp;
+                        <input type="radio" name="approved{$CURRENT_PIC['pid']}" id="approved{$CURRENT_PIC['pid']}no" value="0" class="radio" checked="checked" /><label for="approved{$CURRENT_PIC['pid']}no" class="clickable_option">{$lang_editpics_php['postpone_app']}</label>&nbsp;
+// DEKKY MOD END
                         <input type="radio" name="approved{$CURRENT_PIC['pid']}" id="approved{$CURRENT_PIC['pid']}del" value="DELETE" class="radio" /><label for="approved{$CURRENT_PIC['pid']}del" class="clickable_option">{$lang_editpics_php['del_pic']}</label>&nbsp;
                 </td>
         </tr>
@@ -607,8 +632,10 @@ function form_status($text, $name)
 {
     global $CURRENT_PIC, $lang_editpics_php, $row_style_class;
 
-    $checkYes = ($CURRENT_PIC[$name] == 'YES') ? 'checked="checked"' : '';
-    $checkNo = ($CURRENT_PIC[$name] == 'NO') ? 'checked="checked"' : '';
+// DEKKY MOD START - db y/n fix
+    $checkYes = ($CURRENT_PIC[$name] == '1') ? 'checked="checked"' : '';
+    $checkNo = ($CURRENT_PIC[$name] == '0') ? 'checked="checked"' : '';
+// DEKKY MOD END
 
     $name .= $CURRENT_PIC['pid'];
 
@@ -620,8 +647,10 @@ function form_status($text, $name)
                         $text
             </td>
             <td width="100%" class="{$row_style_class}" valign="top">
-                <input type="radio" id="approved_yes_{$name}" name="$name" value="YES" $checkYes /><label for="approved_yes_{$name}" class="clickable_option">{$lang_editpics_php['approved']}</label>&nbsp;&nbsp;
-                <input type="radio" id="approved_no_{$name}" name="$name" value="NO" $checkNo /><label for="approved_no_{$name}" class="clickable_option">{$lang_editpics_php['unapproved']}</label>
+// DEKKY MOD START - db y/n fix
+                <input type="radio" id="approved_yes_{$name}" name="$name" value="1" $checkYes /><label for="approved_yes_{$name}" class="clickable_option">{$lang_editpics_php['approved']}</label>&nbsp;&nbsp;
+                <input type="radio" id="approved_no_{$name}" name="$name" value="0" $checkNo /><label for="approved_no_{$name}" class="clickable_option">{$lang_editpics_php['unapproved']}</label>
+// DEKKY MOD END
             </td>
         </tr>
 
@@ -691,9 +720,13 @@ $link_count = 0;  // initialize
 if (UPLOAD_APPROVAL_MODE) {
 
     if (MODERATOR_MODE) {
-        $result = cpg_db_query("SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = 'NO' AND aid IN $albStr");
+// DEKKY MOD START - db y/n fix
+        $result = cpg_db_query("SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = '0' AND aid IN $albStr");
+// DEKKY MOD END
     } else {
-        $result = cpg_db_query("SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = 'NO'");
+// DEKKY MOD START - db y/n fix
+        $result = cpg_db_query("SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = '0'");
+// DEKKY MOD END
     }
 
     list($pic_count) = mysql_fetch_row($result);
@@ -703,14 +736,18 @@ if (UPLOAD_APPROVAL_MODE) {
 
         $sql =  "SELECT * " .
                 " FROM {$CONFIG['TABLE_PICTURES']} " .
-                " WHERE approved = 'NO' AND aid IN $albStr " .
+// DEKKY MOD START - db y/n fix
+                " WHERE approved = '0' AND aid IN $albStr " .
+// DEKKY MOD END
                 " ORDER BY pid " .
                 " LIMIT $start, $count";
     } else {
 
         $sql =  "SELECT * " .
                 " FROM {$CONFIG['TABLE_PICTURES']} " .
-                " WHERE approved = 'NO' " .
+// DEKKY MOD START - db y/n fix
+                " WHERE approved = '0' " .
+// DEKKY MOD END
                 " ORDER BY pid " .
                 " LIMIT $start, $count";
     }

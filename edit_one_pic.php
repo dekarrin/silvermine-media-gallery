@@ -18,6 +18,9 @@
 define('IN_COPPERMINE', true);
 define('EDITPICS_PHP', true);
 require('include/init.inc.php');
+// DEKKY MOD START - upload albums to subdirs
+require_once('include/album_subdirs.inc.php');
+// DEKKY MOD END
 
 js_include('js/edit_one_pic.js');
 
@@ -65,7 +68,9 @@ function process_post_data()
     }
 
     $user_album_set = array();
-    $result = cpg_db_query("SELECT aid FROM {$CONFIG['TABLE_ALBUMS']} WHERE category = " . (FIRST_USER_CAT + USER_ID) . " OR owner = " . USER_ID . " OR uploads = 'YES'");
+// DEKKY MOD START - db yes/no fix
+    $result = cpg_db_query("SELECT aid FROM {$CONFIG['TABLE_ALBUMS']} WHERE category = " . (FIRST_USER_CAT + USER_ID) . " OR owner = " . USER_ID . " OR uploads = '1'");
+// DEKKY MOD END
     while ($row = mysql_fetch_assoc($result)) {
         $user_album_set[$row['aid']] = 1;
     }
@@ -139,13 +144,19 @@ function process_post_data()
     $update .= ", keywords = '{$keywords}'";
 
     if (GALLERY_ADMIN_MODE) {
-        $approved = $superCage->post->getAlpha('approved');
+// DEKKY MOD START - db y/n fix
+        $approved = $superCage->post->getDigits('approved'); // dekky mod for bad database
+// DEKKY MOD END
         $update .= ", approved = '{$approved}'";
     } elseif (($new_alb['category'] < FIRST_USER_CAT) && ($aid != $pic['aid'])) {
-        $approved = $USER_DATA['pub_upl_need_approval'] ? 'NO' : 'YES';
+// DEKKY MOD START - db y/n fix
+        $approved = $USER_DATA['pub_upl_need_approval'] ? '0' : '1';
+// DEKKY MOD END
         $update .= ", approved = '{$approved}'";
     } elseif (($new_alb['category'] > FIRST_USER_CAT) && ($aid != $pic['aid']) && ($pic['category'] < FIRST_USER_CAT)) {
-        $approved = $USER_DATA['priv_upl_need_approval'] ? 'NO' : 'YES';
+// DEKKY MOD START - db y/n fix
+        $approved = $USER_DATA['priv_upl_need_approval'] ? '0' : '1';
+// DEKKY MOD END
         $update .= ", approved = '{$approved}'";
     }
 
@@ -184,6 +195,12 @@ function process_post_data()
 
     $query = "UPDATE {$CONFIG['TABLE_PICTURES']} SET $update WHERE pid='$pid' LIMIT 1";
     cpg_db_query($query);
+	
+	// DEKKY MOD album subdirs start
+	if ($pic['aid'] != $aid) {
+		dkrn_move_pid_to_album($pid, $aid);
+	}
+	// DEKKY MOD end album subdirs
 
     // Executes after a file update is committed
     CPGPluginAPI::action('after_edit_file', $pid);
@@ -481,8 +498,10 @@ EOT;
 
 if (GALLERY_ADMIN_MODE) {
 
-    $checkYes = ($CURRENT_PIC['approved'] == 'YES') ? 'checked="checked"' : '';
-    $checkNo = ($CURRENT_PIC['approved'] == 'NO') ? 'checked="checked"' : '';
+// DEKKY MOD START - db y/n fix
+    $checkYes = ($CURRENT_PIC['approved'] == '1') ? 'checked="checked"' : '';
+    $checkNo = ($CURRENT_PIC['approved'] == '0') ? 'checked="checked"' : '';
+// DEKKY MOD END
 
     echo <<< EOT
 
@@ -491,15 +510,21 @@ if (GALLERY_ADMIN_MODE) {
             {$icon_array['file_approval']}{$lang_editpics_php['approval']}
         </td>
         <td width="100%" class="tableb" valign="top">
-            <input type="radio" id="approved_yes" name="approved" value="YES" $checkYes />
+// DEKKY MOD START - db y/n fix
+            <input type="radio" id="approved_yes" name="approved" value="1" $checkYes />
+// DEKKY MOD END
             <label for="approved_yes" class="clickable_option">{$icon_array['file_approve']}{$lang_editpics_php['approved']}</label>
             &nbsp;&nbsp;
-            <input type="radio" id="approved_no" name="approved" value="NO" $checkNo />
+// DEKKY MOD START - db y/n fix
+            <input type="radio" id="approved_no" name="approved" value="0" $checkNo />
+// DEKKY MOD END
             <label for="approved_no" class="clickable_option">{$icon_array['file_disapprove']}{$lang_editpics_php['unapproved']}</label>
         </td>
     </tr>
 EOT;
-} elseif ($CURRENT_PIC['approved'] == 'NO') {
+// DEKKY MOD START - db y/n fix
+} elseif ($CURRENT_PIC['approved'] == '0') {
+// DEKKY MOD END
     echo <<< EOT
 
     <tr>

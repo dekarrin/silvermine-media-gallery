@@ -35,6 +35,12 @@ if (ini_get('register_globals') == '1' || strtolower(ini_get('register_globals')
 }
 
 require_once('include/inspekt.php');
+// DEKKY MOD START - movie size fix
+require_once('include/getid3/getid3.php');
+// DEKKY MOD END
+// DEKKY MOD START - mp4 conversion
+require_once('include/video_convert.inc.php');
+// DEKKY MOD END
 
 // Set $strict to false to make the superglobals available
 $strict = TRUE;
@@ -166,6 +172,12 @@ $CONFIG['TABLE_TEMP_MESSAGES'] = $CONFIG['TABLE_PREFIX'].'temp_messages';
 $CONFIG['TABLE_CATMAP']        = $CONFIG['TABLE_PREFIX'].'categorymap';
 $CONFIG['TABLE_LANGUAGE']      = $CONFIG['TABLE_PREFIX'].'languages';
 $CONFIG['TABLE_DICT']          = $CONFIG['TABLE_PREFIX'].'dict';
+// DEKKY MOD START - capture media
+$CONFIG['TABLE_CAPTURES']      = $CONFIG['TABLE_PREFIX'].'captures';
+// DEKKY MOD END
+// DEKKY MOD START - auto convert to mp4
+$CONFIG['TABLE_CONVERSIONS']   = $CONFIG['TABLE_PREFIX'].'conversions';
+// DEKKY MOD END
 
 // Connect to database
 $CONFIG['LINK_ID'] = cpg_db_connect();
@@ -327,7 +339,9 @@ $CONFIG['default_lang'] = $CONFIG['lang'];      // Save default language
 
 $enabled_languages_array = array();
 
-$result = cpg_db_query("SELECT lang_id FROM {$CONFIG['TABLE_LANGUAGE']} WHERE enabled='YES'");
+// DEKKY MOD START - db y/n fix
+$result = cpg_db_query("SELECT lang_id FROM {$CONFIG['TABLE_LANGUAGE']} WHERE enabled='1'");
+// DEKKY MOD END
 while ($row = mysql_fetch_assoc($result)) {
     $enabled_languages_array[] = $row['lang_id'];
 }

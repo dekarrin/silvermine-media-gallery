@@ -341,29 +341,41 @@ if (!isset($template_cat_list)) { //{THEMES}
 $template_cat_list = <<<EOT
 <!-- BEGIN header -->
         <tr>
-                <td class="tableh1" width="80%" align="left">{CATEGORY}</td>
+<!-- DEKKY MOD START - random album -->
+                <td class="tableh1" width="70%" align="left">{CATEGORY}</td>
+		<td class="tableh1" width="10%" align="center">{RANDOM}</td>
+<!-- DEKKY MOD END -->
                 <td class="tableh1" width="10%" align="center">{ALBUMS}</td>
                 <td class="tableh1" width="10%" align="center">{PICTURES}</td>
         </tr>
 <!-- END header -->
 <!-- BEGIN catrow_noalb -->
         <tr>
-                <td class="catrow_noalb" colspan="3"><table border="0"><tr><td align="left">{CAT_THUMB}</td><td align="left"><span class="catlink">{CAT_TITLE}</span>{CAT_DESC}</td></tr></table></td>
+<!-- DEKKY MOD START - random album -->
+                <td class="catrow_noalb" colspan="4"><table border="0"><tr><td align="left">{CAT_THUMB}</td><td align="left"><span class="catlink">{CAT_TITLE}</span>{CAT_DESC}</td></tr></table></td>
+<!-- DEKKY MOD END -->
         </tr>
 <!-- END catrow_noalb -->
 <!-- BEGIN catrow -->
         <tr>
                 <td class="catrow" align="left"><table border="0"><tr><td>{CAT_THUMB}</td><td><span class="catlink">{CAT_TITLE}</span>{CAT_DESC}</td></tr></table></td>
+<!-- DEKKY MOD START - random album -->
+		<td class="catrow" align="center"><span class="catlink"><a href="random.php?mode=cat&id={CAT_CID}">Random</a></span></td>
+<!-- DEKKY MOD END - random album -->
                 <td class="catrow" align="center">{ALB_COUNT}</td>
                 <td class="catrow" align="center">{PIC_COUNT}</td>
-        </tr>
+	</tr>
         <tr>
-            <td class="tableb tableb_alternate" colspan="3">{CAT_ALBUMS}</td>
+<!-- DEKKY MOD START - random album -->
+            <td class="tableb tableb_alternate" colspan="4">{CAT_ALBUMS}</td>
+<!-- DEKKY MOD END -->
         </tr>
 <!-- END catrow -->
 <!-- BEGIN footer -->
         <tr>
-                <td colspan="3" class="tableh1" align="center"><span class="statlink">{STATISTICS}</span></td>
+<!-- DEKKY MOD START - random album -->
+                <td colspan="4" class="tableh1" align="center"><span class="statlink">{STATISTICS}</span></td>
+<!-- DEKKY MOD END -->
         </tr>
 <!-- END footer -->
 <!-- BEGIN spacer -->
@@ -846,6 +858,10 @@ $template_img_navbar = <<<EOT
                 <!-- button will be added by displayimage.js -->
                 <td id="slideshow_button" align="center" valign="middle" class="navmenu" width="48"></td>
 <!-- END slideshow_button -->
+<!-- DEKKY MOD START - shuffled slideshow -->
+		<!-- button will be added by displayimage.js -->
+		<td id="shuffled_slideshow_button" align="center" valign="middle" class="navmenu" width="48"></td>
+<!-- DEKKY MOD END -->
                 <td align="center" valign="middle" class="navmenu" width="100%">{PIC_POS}</td>
 <!-- BEGIN report_file_button -->
                 <td align="center" valign="middle" class="navmenu" width="48"><a href="{REPORT_TGT}" class="navmenu_pic" title="{REPORT_TITLE}" rel="nofollow"><img src="{LOCATION}images/navbar/report.png" border="0" align="middle" alt="{REPORT_TITLE}" /></a></td>
@@ -2082,7 +2098,9 @@ function theme_main_menu($which)
             }
 
             if (!$upload_allowed) {
-                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='YES' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
+// DEKKY MOD START - db y/n fix
+                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='1' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
+// DEKKY MOD END
                 $public_albums = cpg_db_query($query);
 
                 if (mysql_num_rows($public_albums)) {
@@ -2313,7 +2331,9 @@ function theme_admin_mode_menu()
             $available_doc_folders_array = form_get_foldercontent('docs/', 'folder', '', array('images', 'js', 'style', '.svn'));
             // Query the languages table
             $help_lang = '';
-            $results = cpg_db_query("SELECT lang_id, abbr FROM {$CONFIG['TABLE_LANGUAGE']} WHERE available='YES' AND enabled='YES'");
+// DEKKY MOD START - db y/n fix
+            $results = cpg_db_query("SELECT lang_id, abbr FROM {$CONFIG['TABLE_LANGUAGE']} WHERE available='1' AND enabled='1'");
+// DEKKY MOD END
             while ($row = mysql_fetch_array($results)) {
                 if ($CONFIG['lang'] == $row['lang_id']) {
                     $help_lang = $row['abbr'];
@@ -2392,6 +2412,11 @@ function theme_admin_mode_menu()
                 '{UTIL_TITLE}' => $lang_gallery_admin_menu['util_title'],
                 '{UTIL_LNK}' => $lang_gallery_admin_menu['util_lnk'],
                 '{UTIL_ICO}' => cpg_fetch_icon('util', 1),
+// DEKKY MOD START - media capture
+		'{MEDIACAPTURE_TITLE}' => $lang_gallery_admin_menu['mediacapture_title'],
+		'{MEDIACAPTURE_LNK}' => $lang_gallery_admin_menu['mediacapture_lnk'],
+		'{MEDIACAPTURE_ICO}' => cpg_fetch_icon('most_viewed', 1),
+// DEKKY MOD END
                 '{BAN_TITLE}' => $lang_gallery_admin_menu['ban_title'],
                 '{BAN_LNK}' => $lang_gallery_admin_menu['ban_lnk'],
                 '{BAN_ICO}' => cpg_fetch_icon('ban_user', 1),
@@ -2548,6 +2573,9 @@ function theme_display_cat_list($breadcrumb, &$cat_data, $statistics)
                 '{CATEGORY}' => $lang_cat_list['category'],
                 '{ALBUMS}' => $lang_cat_list['albums'],
                 '{PICTURES}' => $lang_cat_list['pictures'],
+// DEKKY MOD START - random album
+		'{RANDOM}' => '&nbsp;',
+// DEKKY MOD END
         );
         echo template_eval($template, $params);
     }
@@ -2565,6 +2593,9 @@ function theme_display_cat_list($breadcrumb, &$cat_data, $statistics)
             echo template_eval($template_noalb, $params);
         } elseif (isset($category['cat_albums']) && ($category['cat_albums'] != '')) {
             $params = array(
+// DEKKY MOD START - random album
+		    '{CAT_CID}' => $category['cid'],
+// DEKKY MOD END
                     '{CAT_TITLE}' => $category[0],
                     '{CAT_THUMB}' => $category['cat_thumb'],
                     '{CAT_DESC}' => $category[1],
@@ -3220,13 +3251,14 @@ function theme_html_picinfo(&$info)
 ** Section <<<theme_html_picinfo>>> - END
 ******************************************************************************/
 }  //{THEMES}
-
 if (!function_exists('theme_html_picture')) {  //{THEMES}
 /******************************************************************************
 ** Section <<<theme_html_picture>>> - START
 ******************************************************************************/
 // Displays a picture
-function theme_html_picture()
+// DEKKY MOD START - size fix
+function theme_html_picture($from_gallery = false)
+// DEKKY MOD END
 {
     global $CONFIG, $CURRENT_PIC_DATA, $CURRENT_ALBUM_DATA, $USER, $LINEBREAK;
     global $album, $lang_date, $template_display_media;
@@ -3272,17 +3304,38 @@ function theme_html_picture()
 
     $image_size = array();
 
+// DEKKY MOD START - size fix
+    $pic_title = '';
+    $mime_content = cpg_get_type($CURRENT_PIC_DATA['filename']);
+	$class_str = '';
+	$size_fix_str = '';
+	$resize_fix = array('w' => $CURRENT_PIC_DATA['pwidth'], 'h' => $CURRENT_PIC_DATA['pheight']);
+	$use_gallery_size = true;
+// DEKKY MOD END
     if ($CONFIG['make_intermediate'] && cpg_picture_dimension_exceeds_intermediate_limit($CURRENT_PIC_DATA['pwidth'], $CURRENT_PIC_DATA['pheight'])) {
         $picture_url = get_pic_url($CURRENT_PIC_DATA, 'normal');
     } else {
         $picture_url = get_pic_url($CURRENT_PIC_DATA, 'fullsize');
+// DEKKY MOD START - size fix
+		if ($from_gallery) {
+			//$class_str = " gallery_image";
+			$resize_fix = dkrn_get_display_size($CURRENT_PIC_DATA['pwidth'], $CURRENT_PIC_DATA['pheight']);
+			$height_fix = ($mime_content['content'] != 'audio') ? $resize_fix['h'] : $CURRENT_PIC_DATA['pheight'];
+			$size_fix_str = "height=\"$height_fix\" width=\"{$resize_fix['w']}\"";
+			$use_gallery_size = false;
+		}
+// DEKKY MOD END
     }
-
-    $pic_title = '';
-    $mime_content = cpg_get_type($CURRENT_PIC_DATA['filename']);
 
     if ($mime_content['content']=='movie' || $mime_content['content']=='audio') {
 
+// DEKKY MOD START - movie size fix
+		$resize_fix = dkrn_get_display_size($CURRENT_PIC_DATA['pwidth'], $CURRENT_PIC_DATA['pheight']);
+		if ($mime_content['content'] == 'audio') {
+			$resize_fix['h'] = $CURRENT_PIC_DATA['pheight'];
+		}
+
+// DEKKY MOD END
         if ($CURRENT_PIC_DATA['pwidth']==0 || $CURRENT_PIC_DATA['pheight']==0) {
             $resize_method = $CONFIG['picture_use'] == "thumb" ? ($CONFIG['thumb_use'] == "ex" ? "any" : $CONFIG['thumb_use']) : $CONFIG['picture_use'];
             if ($resize_method == 'ht') {
@@ -3307,7 +3360,9 @@ function theme_html_picture()
         $ctrl_offset['rm']=0;
         $ctrl_offset_default=45;
         $ctrl_height = (isset($ctrl_offset[$mime_content['extension']]))?($ctrl_offset[$mime_content['extension']]):$ctrl_offset_default;
-        $image_size['whole']='width="'.$CURRENT_PIC_DATA['pwidth'].'" height="'.($CURRENT_PIC_DATA['pheight']+$ctrl_height).'"';
+// DEKKY MOD START - size fix
+        $image_size['whole']='width="'.$resize_fix['w'].'" height="'.($resize_fix['h']+$ctrl_height).'"';
+// DEKKY MOD END
     }
 
     if ($mime_content['content']=='image') {
@@ -3317,7 +3372,10 @@ function theme_html_picture()
             $winsizeX = $CURRENT_PIC_DATA['pwidth'] + $CONFIG['fullsize_padding_x'];  //the +'s are the mysterious FF and IE paddings
             $winsizeY = $CURRENT_PIC_DATA['pheight'] + $CONFIG['fullsize_padding_y']; //the +'s are the mysterious FF and IE paddings
             if ($CONFIG['transparent_overlay'] == 1) {
-                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\" width=\"{$image_size['width']}\" height=\"{$image_size['height']}\" class=\"image\">";
+// DEKKY MOD START - size fix
+				$cust_size_str = (!$use_gallery_size) ? ' ' . $size_fix_str : " width=\"{$image_size['width']}\" height=\"{$image_size['height']}\"";
+                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\"$cust_size_str class=\"image$class_str\">";
+// DEKKY MOD END
                 $pic_html_href_close = '</a>' . $LINEBREAK;
                 if (!USER_ID && $CONFIG['allow_unlogged_access'] <= 2) {
                     if ($CONFIG['allow_user_registration'] == 0) {
@@ -3349,20 +3407,29 @@ function theme_html_picture()
                     $pic_html = "<a href=\"javascript:;\" onclick=\"MM_openBrWindow('displayimage.php?pid=$pid&amp;fullsize=1','" . uniqid(rand()) . "','scrollbars=yes,toolbar=no,status=no,resizable=yes,width=$winsizeX,height=$winsizeY')\">";
                 }
                 $pic_title = $lang_display_image_php['view_fs'] . $LINEBREAK . '==============' . $LINEBREAK . $pic_title;
-                $pic_html .= "<img src=\"" . $picture_url . "\" {$image_size['geom']} class=\"image\" border=\"0\" alt=\"{$lang_display_image_php['view_fs']}\" /><br />";
+// DEKKY MOD START - size fix
+				$cust_size_str = (!$use_gallery_size) ? ' ' . $size_fix_str : " " . $image_size['geom'];
+                $pic_html .= "<img src=\"" . $picture_url . "\"$cust_size_str class=\"image$class_str\" border=\"0\" alt=\"{$lang_display_image_php['view_fs']}\" /><br />";
+// DEKKY MOD END
                 $pic_html .= $pic_html_href_close;
                 //PLUGIN FILTER
                 $pic_html = CPGPluginAPI::filter('html_image_reduced', $pic_html);
             }
         } else {
             if ($CONFIG['transparent_overlay'] == 1) {
-                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\" width=\"{$CURRENT_PIC_DATA['pwidth']}\" height=\"{$CURRENT_PIC_DATA['pheight']}\" class=\"image\">";
+// DEKKY MOD START - size fix
+				$cust_size_str = (!$use_gallery_size) ? ' ' . $size_fix_str : " width=\"{$CURRENT_PIC_DATA['pwidth']}\" height=\"{$CURRENT_PIC_DATA['pheight']}\"";
+                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\"$cust_size_str class=\"image$class_str\">";
+// DEKKY MOD END
                 $pic_html .= "<img src=\"images/image.gif?id=".floor(rand()*1000+rand())."\" width={$CURRENT_PIC_DATA['pwidth']} height={$CURRENT_PIC_DATA['pheight']} border=\"0\" alt=\"\" /><br />" . $LINEBREAK;
                 $pic_html .= "</td></tr></table>";
                 //PLUGIN FILTER
                 $pic_html = CPGPluginAPI::filter('html_image_overlay', $pic_html);
             } else {
-                $pic_html = "<img src=\"" . $picture_url . "\" {$image_size['geom']} class=\"image\" border=\"0\" alt=\"\" /><br />" . $LINEBREAK;
+// DEKKY MOD START - size fix
+				$cust_size_str = (!$use_gallery_size) ? ' ' . $size_fix_str : " " . $image_size['geom'];
+                $pic_html = "<img src=\"" . $picture_url . "\"$cust_size_str class=\"image$class_str\" border=\"0\" alt=\"\" /><br />" . $LINEBREAK;
+// DEKKY MOD END
                 //PLUGIN FILTER
                 $pic_html = CPGPluginAPI::filter('html_image', $pic_html);
             }
@@ -3577,6 +3644,11 @@ function theme_html_img_nav_menu() {
 
     // if set, this will override the default slideshow button to be inserted by displayimage.js
     $slideshow_btn = '';
+// DEKKY MOD START - shuffled slideshow
+	$shuffled_slideshow_tgt = "$CPG_PHP_SELF?album=$album$cat_link$date_link$uid_link&amp;pid=$pid$msg_id&amp;slideshow=".$CONFIG['slideshow_interval']."&amp;shuffle=1#top_display_media";
+	// if set, this will override the default slideshow button to be inserted by displayimage.js
+	$shuffled_slideshow_btn = '';
+// DEKKY MOD END
     // if set, this will override the default pic_info button to be inserted by displayimage.js
     $pic_info_btn = '';
 
@@ -3594,6 +3666,11 @@ function theme_html_img_nav_menu() {
         'slideshow_tgt'   => $slideshow_tgt,
         'slideshow_title' => $lang_img_nav_bar['slideshow_title'],
         'slideshow_btn'   => $slideshow_btn,
+// DEKKY MOD start - shuffled slideshow
+	'shuffled_slideshow_tgt'	=> $shuffled_slideshow_tgt,
+	'shuffled_slideshow_title'	=> $lang_img_nav_bar['shuffled_slideshow_title'],
+	'shuffled_slideshow_btn'	=> $shuffled_slideshow_btn,
+// DEKKY MOD end
         'loc' => $location,
     );
     set_js_var('buttons', $js_buttons);
@@ -3637,7 +3714,9 @@ function theme_html_rating_box()
     global $CONFIG, $CURRENT_PIC_DATA, $CURRENT_ALBUM_DATA, $THEME_DIR, $USER_DATA, $USER, $LINEBREAK;
     global $template_image_rating, $template_image_rating_oldstyle, $lang_rate_pic;
 
-    if (!(USER_CAN_RATE_PICTURES && $CURRENT_ALBUM_DATA['votes'] == 'YES')) {
+// DEKKY MOD START - db y/n fix
+    if (!(USER_CAN_RATE_PICTURES && $CURRENT_ALBUM_DATA['votes'] == '1')) {
+// DEKKY MOD END
         return '';
     } else {
         //check if the users already voted or if this user is the owner
@@ -3832,13 +3911,17 @@ function theme_html_comments($pid)
             $pending_approval = '';
             if (USER_IS_ADMIN) {
                 //display the selector approve/disapprove
-                if ($row['approval'] == 'NO') {
+// DEKKY MOD START - db y/n fix
+                if ($row['approval'] == '0') {
+// DEKKY MOD END
                     $pending_approval = cpg_fetch_icon('comment_disapprove_disabled', 0) . '<a href="reviewcom.php?pos=-{PID}&amp;msg_id={MSG_ID}&amp;form_token={FORM_TOKEN}&amp;timestamp={TIMESTAMP}&amp;what=approve" title="' . $lang_display_comments['approve'] . '">' . cpg_fetch_icon('comment_approve', 0) . '</a>';
                 } else {
                     $pending_approval = '<a href="reviewcom.php?pos=-{PID}&amp;msg_id={MSG_ID}&amp;form_token={FORM_TOKEN}&amp;timestamp={TIMESTAMP}&amp;what=disapprove" title="' . $lang_display_comments['disapprove'] . '">' . cpg_fetch_icon('comment_disapprove', 0) . '</a>' . cpg_fetch_icon('comment_approve_disabled', 0);
                 }
             } else { // user or guest is logged in - start
-                if ($row['approval'] == 'NO') { // the comment is not approved - start
+// DEKKY MOD START - db y/n fix
+                if ($row['approval'] == '0') { // the comment is not approved - start
+// DEKKY MOD END
                     if ($user_can_edit) { // the comment comes from the current visitor, display it with a warning that it needs admin approval
                         $pending_approval = cpg_fetch_icon('comment_approval', 0, $lang_display_comments['pending_approval']);
                     } else { // the comment comes from someone else - don't display it at all
@@ -3862,7 +3945,9 @@ function theme_html_comments($pid)
             }
 
             // wrap the comment into italics if it isn't approved
-            if ($row['approval'] == 'NO') {
+// DEKKY MOD START - db y/n fix
+            if ($row['approval'] == '0') {
+// DEKKY MOD END
                 $comment_body = '<em>'.$comment_body.'</em>';
                 $row['msg_author'] = $row['msg_author'];
             }
@@ -3920,7 +4005,9 @@ function theme_html_comments($pid)
 
         $html .= $tabs;
     }
-    if (USER_CAN_POST_COMMENTS && $CURRENT_ALBUM_DATA['comments'] == 'YES') {
+// DEKKY MOD START - db y/n fix
+    if (USER_CAN_POST_COMMENTS && $CURRENT_ALBUM_DATA['comments'] == '1') {
+// DEKKY MOD END
         if (USER_ID) {
             $user_name_input = '<tr><td colspan="2"><input type="hidden" name="msg_author" value="' . stripslashes(USER_NAME) . '" /></td>';
             template_extract_block($template_add_your_comment, 'user_name_input', $user_name_input);
@@ -3976,7 +4063,9 @@ function theme_html_comments($pid)
             $html .= template_eval($template_add_your_comment, $params);
         }
     } else { // user can not post comments
-        if ($CONFIG['comment_promote_registration'] == 1 && $CURRENT_ALBUM_DATA['comments'] == 'YES') {
+// DEKKY MOD START - db y/n fix
+        if ($CONFIG['comment_promote_registration'] == 1 && $CURRENT_ALBUM_DATA['comments'] == '1') {
+// DEKKY MOD END
             template_extract_block($template_add_your_comment, 'user_name_input');
             if ($CONFIG['enable_smilies'] == 1) {
                 template_extract_block($template_add_your_comment, 'input_box_smilies');
