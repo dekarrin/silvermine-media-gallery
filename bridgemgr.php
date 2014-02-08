@@ -793,9 +793,7 @@ else { // not in gallery admin mode --- start
         $encpassword = md5(addslashes($posted_var['password']));
 
 
-// DEKKY MOD START - binary DB and numeric params fix
-        $results = cpg_db_query("SELECT user_id, user_name, user_password FROM $temp_user_table WHERE user_name = '" . addslashes($posted_var['username']) . "' AND BINARY user_password = '" . $encpassword . "' AND user_active = '1' AND user_group = '1'");
-// DEKKY MOD END
+        $results = cpg_db_query("SELECT user_id, user_name, user_password FROM $temp_user_table WHERE user_name = '" . addslashes($posted_var['username']) . "' AND BINARY user_password = '" . $encpassword . "' AND user_active = 'YES' AND user_group = '1'");
         if (mysql_num_rows($results)) {
             $retrieved_data = mysql_fetch_array($results);
         }

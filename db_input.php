@@ -24,10 +24,6 @@ require('include/picmgmt.inc.php');
 require('include/mailer.inc.php');
 require('include/smilies.inc.php');
 
-// DEKKY MOD START - separate upload functionality
-require('include/upload_functs.php');
-// DEKKY MOD END
-
 /*known issue: code was edited to not count URL in comment character count. However
 this resulted in the character count not being respected at all.
 
@@ -111,17 +107,13 @@ case 'comment_update':
         cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET msg_body = '$msg_body' WHERE msg_id = '$msg_id'");
     } elseif (USER_ID) {
         if ($CONFIG['comment_approval'] == 1) {
-// DEKKY MOD START - db y/n fix
-            cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET msg_body = '$msg_body', approval = '0' WHERE msg_id = '$msg_id' AND author_id ='" . USER_ID . "' LIMIT 1");
-// DEKKY MOD END
+            cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET msg_body = '$msg_body', approval = 'NO' WHERE msg_id = '$msg_id' AND author_id ='" . USER_ID . "' LIMIT 1");
         } else {
             cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET msg_body = '$msg_body' WHERE msg_id = '$msg_id' AND author_id ='" . USER_ID . "' LIMIT 1");
         }
     } else {
         if ($CONFIG['comment_approval'] != 0) {
-// DEKKY MOD START - db y/n fix
-            cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET msg_body = '$msg_body', approval = '0' WHERE msg_id = '$msg_id' AND author_md5_id = '{$USER['ID']}' AND author_id = 0 LIMIT 1");
-// DEKKY MOD END
+            cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET msg_body = '$msg_body', approval = 'NO' WHERE msg_id = '$msg_id' AND author_md5_id = '{$USER['ID']}' AND author_id = 0 LIMIT 1");
         } else {
             cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET msg_body = '$msg_body' WHERE msg_id = '$msg_id' AND author_md5_id = '{$USER['ID']}' AND author_id = 0 LIMIT 1");
         }
@@ -168,9 +160,7 @@ case 'comment':
         }
     }
 
-// DEKKY MOD START - db y/n fix
-    $spam = '0';
-// DEKKY MOD END
+    $spam = 'NO';
 
     $msg_author = $superCage->post->getEscaped('msg_author');
     $msg_body = $superCage->post->getEscaped('msg_body');
@@ -192,9 +182,7 @@ case 'comment':
     $album_data = mysql_fetch_assoc($result);
     mysql_free_result($result);
 
-// DEKKY MOD START - db y/n fix
-    if ($album_data['comments'] != '1') {
-// DEKKY MOD END
+    if ($album_data['comments'] != 'YES') {
         cpg_die(ERROR, $lang_errors['perm_denied'], __FILE__, __LINE__);
     }
 
@@ -283,9 +271,7 @@ case 'comment':
 
                 if ($CONFIG['comment_akismet_enable'] == 0) {
                     $akismet_approval_needed = 1; // Temporarily just set comment approval to "on"
-// DEKKY MOD START - db y/n fix
-                    $spam = '1';
-// DEKKY MOD END
+                    $spam = 'YES';
                 } elseif ($CONFIG['comment_akismet_enable'] == 1) {
                     $redirect = "displayimage.php?pid=$pid";
                     pageheader($lang_display_comments['comment_rejected'], "<meta http-equiv=\"refresh\" content=\"5;url=$redirect\" />");
@@ -303,13 +289,9 @@ case 'comment':
         }
 
         if ($CONFIG['comment_approval'] != 0 || $akismet_approval_needed == 1) { // comments need approval, set approval status to "no"
-// DEKKY MOD START - db y/n fix
-            $app = '0';
-// DEKKY MOD END
+            $app = 'NO';
         } else { //comments do not need approval, we can set approval status to "yes"
-// DEKKY MOD START - db y/n fix
-            $app = '1';
-// DEKKY MOD END
+            $app = 'YES';
         }
 
         cpg_db_query("INSERT INTO {$CONFIG['TABLE_COMMENTS']} (pid, msg_author, msg_body, msg_date, author_md5_id, author_id, msg_raw_ip, msg_hdr_ip, approval, spam) VALUES ('$pid', '{$CONFIG['comments_anon_pfx']}$msg_author', '$msg_body', NOW(), '{$USER['ID']}', '0', '$raw_ip', '$hdr_ip', '$app', '$spam')");
@@ -345,9 +327,7 @@ case 'comment':
 
                 if ($CONFIG['comment_akismet_enable'] == 0) {
                     $akismet_approval_needed = 1; // Temporarily just set comment approval to "on"
-// DEKKY MOD START - db y/n fix
-                    $spam = '1';
-// DEKKY MOD END
+                    $spam = 'YES';
                 } elseif ($CONFIG['comment_akismet_enable'] == 1) {
                     $redirect = "displayimage.php?pid=$pid";
                     cpgRedirectPage($redirect, $lang_db_input_php['info'], $lang_display_comments['comment_rejected'], 5);
@@ -359,13 +339,9 @@ case 'comment':
         }
 
         if (($CONFIG['comment_approval'] == 1 && !USER_IS_ADMIN) || $akismet_approval_needed == 1) { // comments need approval, set approval status to "no"
-// DEKKY MOD START - db y/n fix
-            $app = '0';
-// DEKKY MOD END
+            $app = 'NO';
         } else { //comments do not need approval, we can set approval status to "yes"
-// DEKKY MOD START - db y/n fix
-            $app = '1';
-// DEKKY MOD END
+            $app = 'YES';
         }
 
         cpg_db_query("INSERT INTO {$CONFIG['TABLE_COMMENTS']} (pid, msg_author, msg_body, msg_date, author_md5_id, author_id, msg_raw_ip, msg_hdr_ip, approval, spam) VALUES ('$pid', '" . addslashes(USER_NAME) . "', '$msg_body', NOW(), '', '" . USER_ID . "', '$raw_ip', '$hdr_ip', '$app', '$spam')");
@@ -399,11 +375,9 @@ case 'album_update':
     $thumb = $superCage->post->getInt('thumb');
     $visibility = $superCage->post->getInt('visibility');
 
-// DEKKY MOD START - db y/n fix
-    $uploads = $superCage->post->getAlpha('uploads') == '1' ? '1' : '0';
-    $comments = $superCage->post->getAlpha('comments') == '1' ? '1' : '0';
-    $votes = $superCage->post->getAlpha('votes') == '1' ? '1' : '0';
-// DEKKY MOD END
+    $uploads = $superCage->post->getAlpha('uploads') == 'YES' ? 'YES' : 'NO';
+    $comments = $superCage->post->getAlpha('comments') == 'YES' ? 'YES' : 'NO';
+    $votes = $superCage->post->getAlpha('votes') == 'YES' ? 'YES' : 'NO';
 
     // Get the old alb_password before update
     $result = cpg_db_query("SELECT alb_password FROM {$CONFIG['TABLE_ALBUMS']} WHERE aid = $aid");

@@ -536,9 +536,7 @@ case 'albmgr':
 
         if (!empty($get_album_name)) {
             //add the album to database
-// DEKKY MOD START - db y/n fix
-            $query = "INSERT INTO {$CONFIG['TABLE_ALBUMS']} (category, title, uploads, pos, description, owner) VALUES ('$category', '$get_album_name', '0', '{$position}', '', '$user_id')";
-// DEKKY MOD END
+            $query = "INSERT INTO {$CONFIG['TABLE_ALBUMS']} (category, title, uploads, pos, description, owner) VALUES ('$category', '$get_album_name', 'NO', '{$position}', '', '$user_id')";
             cpg_db_query($query);
 
             //get the aid of added the albums
@@ -895,16 +893,12 @@ case 'user':
                     print '</strong></td>';
                     print '<td class="tableb">';
 
-// DEKKY MOD START - db y/n fix
-                    if ($user_data['user_active'] == '1') {
-// DEKKY MOD END
+                    if ($user_data['user_active'] == 'YES') {
                         // user is already active
                         print $lang_delete_php['user_already_active'];
                     } else {
                         // activate this user
-// DEKKY MOD START - db y/n fix
-                        cpg_db_query("UPDATE {$CONFIG['TABLE_USERS']} SET user_active = '1', user_actkey = '' WHERE user_id = '$key'");
-// DEKKY MOD END
+                        cpg_db_query("UPDATE {$CONFIG['TABLE_USERS']} SET user_active = 'YES', user_actkey = '' WHERE user_id = '$key'");
                         print $lang_delete_php['activated'];
 
                         if ($user_data['user_actkey']) {
@@ -963,16 +957,12 @@ case 'user':
                     print '</strong></td>';
                     print '<td class="tableb">';
 
-// DEKKY MOD START - db y/n fix
-                    if ($user_data['user_active'] == '0') {
-// DEKKY MOD END
+                    if ($user_data['user_active'] == 'NO') {
                         // user is already inactive
                         print $lang_delete_php['user_already_inactive'];
                     } else {
                         // deactivate this user
-// DEKKY MOD START - db y/n fix
-                        cpg_db_query("UPDATE {$CONFIG['TABLE_USERS']} SET user_active = '0' WHERE user_id = '$key'");
-// DEKKY MOD END
+                        cpg_db_query("UPDATE {$CONFIG['TABLE_USERS']} SET user_active = 'NO' WHERE user_id = '$key'");
                         print $lang_delete_php['deactivated'];
                     }
 

@@ -1352,15 +1352,13 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             $album_name = cpg_fetch_icon('comment', 2) . $lang_meta_album_names['lastcom'];
         }
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_COMMENTS']} AS c
                 INNER JOIN {$CONFIG['TABLE_PICTURES']} AS r ON r.pid = c.pid
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND r.approved = '1'
-                AND c.approval = '1'";
-// DEKKY MOD END
+                AND r.approved = 'YES'
+                AND c.approval = 'YES'";
 
         $result = cpg_db_query($query);
 
@@ -1377,17 +1375,15 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
         $select_columns = implode(', ', $select_column_list);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT $select_columns
                 FROM {$CONFIG['TABLE_COMMENTS']} AS c
                 INNER JOIN {$CONFIG['TABLE_PICTURES']} AS r ON r.pid = c.pid
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND r.approved = '1'
-                AND c.approval = '1'
+                AND r.approved = 'YES'
+                AND c.approval = 'YES'
                 ORDER BY msg_id $DESC
                 $limit";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
         $rowset = cpg_db_fetch_rowset($result);
@@ -1422,16 +1418,14 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             $album_name = cpg_fetch_icon('comment', 2) . $lang_meta_album_names['lastcom'] . ' - ' . $user_name;
         }
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_COMMENTS']} AS c
                 INNER JOIN {$CONFIG['TABLE_PICTURES']} AS r ON r.pid = c.pid
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
                 AND author_id = '$uid'
-                AND r.approved = '1'
-                AND c.approval = '1'";
-// DEKKY MOD END
+                AND r.approved = 'YES'
+                AND c.approval = 'YES'";
 
         $result = cpg_db_query($query);
 
@@ -1448,18 +1442,16 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
         $select_columns = implode(', ', $select_column_list);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT $select_columns
                 FROM {$CONFIG['TABLE_COMMENTS']} AS c
                 INNER JOIN {$CONFIG['TABLE_PICTURES']} AS r ON r.pid = c.pid
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
                 AND author_id = '$uid'
-                AND r.approved = '1'
-                AND c.approval = '1'
+                AND r.approved = 'YES'
+                AND c.approval = 'YES'
                 ORDER BY msg_id $DESC
                 $limit";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
         $rowset = cpg_db_fetch_rowset($result);
@@ -1486,13 +1478,11 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             $album_name = cpg_fetch_icon('last_uploads', 2) . $lang_meta_album_names['lastup'];
         }
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'";
-// DEKKY MOD END
+                AND approved = 'YES'";
 
         $result = cpg_db_query($query);
 
@@ -1503,15 +1493,13 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
         $select_columns = implode(', ', $select_column_list);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT $select_columns
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 ORDER BY ctime $DESC, pid $DESC
                 $limit";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
         $rowset = cpg_db_fetch_rowset($result);
@@ -1546,14 +1534,12 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             $album_name = cpg_fetch_icon('last_uploads', 2) . $lang_meta_album_names['lastup'] . ' - ' . $user_name;
         }
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
                 AND r.owner_id = '$uid'
-                AND approved = '1'";
-// DEKKY MOD END
+                AND approved = 'YES'";
 
         $result = cpg_db_query($query);
 
@@ -1564,16 +1550,14 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
         $select_columns = implode(', ', $select_column_list);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT $select_columns
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
                 AND r.owner_id = '$uid'
-                AND approved = '1'
+                AND approved = 'YES'
                 ORDER BY ctime $DESC, pid $DESC
                 $limit";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
         $rowset = cpg_db_fetch_rowset($result);
@@ -1600,14 +1584,12 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             $album_name = cpg_fetch_icon('most_viewed', 2) . $lang_meta_album_names['topn'];
         }
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 AND hits > 0";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
 
@@ -1618,16 +1600,14 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
         $select_columns = implode(', ', $select_column_list);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT $select_columns
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 AND hits > 0
                 ORDER BY hits $DESC, pid $ASC
                 $limit";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
         $rowset = cpg_db_fetch_rowset($result);
@@ -1654,14 +1634,12 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             $album_name = cpg_fetch_icon('top_rated', 2) . $lang_meta_album_names['toprated'];
         }
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 AND r.votes >= '{$CONFIG['min_votes_for_rating']}'";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
 
@@ -1672,16 +1650,14 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
         $select_columns = implode(', ', $select_column_list);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT $select_columns
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 AND r.votes >= '{$CONFIG['min_votes_for_rating']}'
                 ORDER BY pic_rating $DESC, r.votes $DESC, pid $DESC
                 $limit";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
         $rowset = cpg_db_fetch_rowset($result);
@@ -1708,14 +1684,12 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             $album_name = cpg_fetch_icon('last_viewed', 2) . $lang_meta_album_names['lasthits'];
         }
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 AND hits > 0";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
 
@@ -1732,16 +1706,14 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
         $select_columns = implode(', ', $select_column_list);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT $select_columns
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 AND hits > 0
                 ORDER BY mtime $DESC, pid $ASC
                 $limit";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
         $rowset = cpg_db_fetch_rowset($result);
@@ -1768,28 +1740,24 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             $album_name = cpg_fetch_icon('random', 2) . $lang_meta_album_names['random'];
         }
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'";
-// DEKKY MOD END
+                AND approved = 'YES'";
 
         $result = cpg_db_query($query);
 
         list($count) = mysql_fetch_row($result);
         mysql_free_result($result);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT pid
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 ORDER BY RAND()
                 $limit";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
 
@@ -1874,28 +1842,24 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
         $select_columns_albums = str_replace('ctime', 'MAX(ctime) AS ctime', implode(', ', $select_column_list_albums));
 
         // Keyword-linked files are not included; only native files are checked for last-updated albums
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 GROUP BY r.aid";
-// DEKKY MOD END
         $result = cpg_db_query($query);
         $count = mysql_num_rows($result);
         mysql_free_result($result);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT $select_columns_albums
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 GROUP BY r.aid
                 ORDER BY ctime DESC
                 $limit";
-// DEKKY MOD END
         $result = cpg_db_query($query);
         $rowset_aid = cpg_db_fetch_rowset($result);
         mysql_free_result($result);
@@ -1954,12 +1918,10 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             $rowset = array();
         } else {
             $album_thumbs_set = implode(',', array_unique($album_thumbs));
-// DEKKY MOD START - db y/n fix
             $query = "SELECT $select_columns_files
                     FROM {$CONFIG['TABLE_PICTURES']} AS r
-                    WHERE approved = '1'
+                    WHERE approved = 'YES'
                     AND r.pid IN ($album_thumbs_set)";
-// DEKKY MOD END
             $result = cpg_db_query($query);
             $rowset_pid = cpg_db_fetch_rowset($result);
             mysql_free_result($result);
@@ -1993,14 +1955,12 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
             $favs = implode(', ', $FAVPICS);
 
-// DEKKY MOD START - db y/n fix
             $query = "SELECT COUNT(*)
                             FROM {$CONFIG['TABLE_PICTURES']} AS r
                             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                             $RESTRICTEDWHERE
-                            AND approved = '1'
+                            AND approved = 'YES'
                             AND pid IN ($favs)";
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2009,16 +1969,14 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
             $select_columns = implode(', ', $select_column_list);
 
-// DEKKY MOD START - db y/n fix
             $query = "SELECT $select_columns
                             FROM {$CONFIG['TABLE_PICTURES']} AS r
                             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                             $RESTRICTEDWHERE
-                            AND approved = '1'
+                            AND approved = 'YES'
                             AND pid IN ($favs)
                             ORDER BY pid ASC
                             $limit";
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
             $rowset = cpg_db_fetch_rowset($result);
@@ -2044,14 +2002,12 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
         $rowset = array();
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*)
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 AND substring(from_unixtime(ctime),1,10) = '" . substr($date, 0, 10) . "'";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
 
@@ -2062,16 +2018,14 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
 
         $select_columns = implode(', ', $select_column_list);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT $select_columns
                 FROM {$CONFIG['TABLE_PICTURES']} AS r
                 INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = r.aid
                 $RESTRICTEDWHERE
-                AND approved = '1'
+                AND approved = 'YES'
                 AND substring(from_unixtime(ctime),1,10) = '" . substr($date, 0, 10) . "'
                 ORDER BY ctime $ASC, pid $ASC
                 $limit";
-// DEKKY MOD END
 
         $result = cpg_db_query($query);
         $rowset = cpg_db_fetch_rowset($result);
@@ -2153,15 +2107,13 @@ function get_pic_pos($album, $pid)
 
         $superCage = Inspekt::makeSuperCage();
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p
             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.aid = p.aid
             INNER JOIN {$CONFIG['TABLE_COMMENTS']} AS c ON c.pid = p.pid
             $RESTRICTEDWHERE
-            AND approved = '1'
-            AND approval = '1'
+            AND approved = 'YES'
+            AND approval = 'YES'
             AND msg_id > ".$superCage->get->getInt('msg_id');
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2181,16 +2133,14 @@ function get_pic_pos($album, $pid)
 
         $superCage = Inspekt::makeSuperCage();
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p
             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.aid = p.aid
             INNER JOIN {$CONFIG['TABLE_COMMENTS']} AS c ON c.pid = p.pid
             $RESTRICTEDWHERE
             AND author_id = $uid
-            AND approved = '1'
-            AND approval = '1'
+            AND approved = 'YES'
+            AND approval = 'YES'
             AND msg_id > ".$superCage->get->getInt('msg_id');
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2207,14 +2157,12 @@ function get_pic_pos($album, $pid)
         $ctime = mysql_result($result, 0);
         mysql_free_result($result);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p
             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.aid = p.aid
             $RESTRICTEDWHERE
-            AND approved = '1'
+            AND approved = 'YES'
             AND (ctime > $ctime
             OR ctime = $ctime AND pid > $pid)";
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2237,15 +2185,13 @@ function get_pic_pos($album, $pid)
         $ctime = mysql_result($result, 0);
         mysql_free_result($result);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p
             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.aid = p.aid
             $RESTRICTEDWHERE
             AND p.owner_id = $uid
-            AND approved = '1'
+            AND approved = 'YES'
             AND (ctime > $ctime
             OR ctime = $ctime AND pid > $pid)";
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2262,14 +2208,12 @@ function get_pic_pos($album, $pid)
         $hits = mysql_result($result, 0);
         mysql_free_result($result);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p
             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.aid = p.aid
             $RESTRICTEDWHERE
-            AND approved = '1'
+            AND approved = 'YES'
             AND (hits > $hits
             OR hits = $hits AND pid < $pid)";
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2286,16 +2230,14 @@ function get_pic_pos($album, $pid)
         list($pic_rating, $votes) = mysql_fetch_row($result);
         mysql_free_result($result);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p
             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.aid = p.aid
             $RESTRICTEDWHERE
-            AND approved = '1'
+            AND approved = 'YES'
             AND p.votes >= '{$CONFIG['min_votes_for_rating']}'
             AND (pic_rating > $pic_rating
             OR (pic_rating = $pic_rating AND p.votes > $votes)
             OR (pic_rating = $pic_rating AND p.votes = $votes AND pid > $pid))";
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2312,15 +2254,13 @@ function get_pic_pos($album, $pid)
         $mtime = mysql_result($result, 0);
         mysql_free_result($result);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p
             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.aid = p.aid
             $RESTRICTEDWHERE
-            AND approved = '1'
+            AND approved = 'YES'
             AND hits > 0
             AND (mtime > '$mtime'
             OR mtime = '$mtime' AND pid < $pid)";
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2355,14 +2295,12 @@ function get_pic_pos($album, $pid)
 
         $favs = implode(', ', $FAVPICS);
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p
             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.aid = p.aid
             $RESTRICTEDWHERE
-            AND approved = '1'
+            AND approved = 'YES'
             AND pid IN ($favs)
             AND pid < $pid";
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2378,14 +2316,12 @@ function get_pic_pos($album, $pid)
         // Using getRaw():  The date is sanitized in the called function
         $date = $superCage->get->keyExists('date') ? cpgValidateDate($superCage->get->getRaw('date')) : null;
 
-// DEKKY MOD START - db y/n fix
         $query = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p
             INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.aid = p.aid
             $RESTRICTEDWHERE
-            AND approved = '1'
+            AND approved = 'YES'
             AND substring(from_unixtime(ctime),1,10) = '" . substr($date, 0, 10) . "'
             AND pid < $pid";
-// DEKKY MOD END
 
             $result = cpg_db_query($query);
 
@@ -2489,9 +2425,7 @@ function cpg_get_pending_approvals()
 {
     global $CONFIG;
 
-// DEKKY MOD START - db y/n fix
-    $result = cpg_db_query("SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = '0'");
-// DEKKY MOD END
+    $result = cpg_db_query("SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = 'NO'");
 
     list($count) = mysql_fetch_row($result);
     mysql_free_result($result);
@@ -3407,32 +3341,7 @@ function display_film_strip($album, $cat, $pos,$ajax_call)
     }
 }
 
-// DEKKY MOD START - shuffled slideshow
-// if in shuffle mode, uses own algo to select image. Otherwise, just does it in order.
-require_once 'include/random.inc.php';
 
-function dkrn_get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $set_caption = true, $mode = '', $shuffled = false, $shuffled_seed = 0, $start_pos = 0) {
-	if ($shuffled) {
-		$pics = get_pic_data($album, $pic_count, $alb_name);
-		$pids = dkrn_extract_pic_pids($pics);
-		$shuffled_pics = dkrn_pic_array_shuffle($pids, $shuffled_seed, $start_pos);
-		$target_pid = $shuffled_pics[$limit1];
-		$actual_position = array_search($target_pid, $pids);
-		return get_pic_data($album, $count, $album_name, $actual_position, $limit2, $set_caption, $mode);
-	} else {
-		return get_pic_data($album, $count, $album_name, $limit1, $limit2, $set_caption, $mode);
-	}
-}
-
-function dkrn_extract_pic_pids($pic_data) {
-	$pids = array();
-	foreach ($pic_data as $pic) {
-		$pids[] = $pic['pid'];
-	}
-	return $pids;
-}
-
-// DEKKY MOD END
 /**
  * display_slideshow()
  *
@@ -3444,9 +3353,7 @@ function dkrn_extract_pic_pids($pic_data) {
  * @param integer $cat
  * @param integer $pos
  **/
-// DEKKY MOD START - shuffled slideshow
-function& display_slideshow($pos, $ajax_show = 0, $shuffled = false, $shuffle_seed = 0, $starting_position = 0)
-// DEKKY MOD END
+function& display_slideshow($pos, $ajax_show = 0)
 {
     global $CONFIG, $album, $pid, $slideshow, $USER;
 
@@ -3455,22 +3362,12 @@ function& display_slideshow($pos, $ajax_show = 0, $shuffled = false, $shuffle_se
     $Pic   = array();
     $Pid   = array();
     $Title = array();
-    // DEKKY mod start - slideshow size fix
-    $Height = array();
-    $Width = array();
-    // DEKKY mod end
-    // DEKKY mod start - full screen slideshow
-	$ActualHeight = array();
-	$ActualWidth = array();
-    // DEKKY mod end
 
     $i = 0;
     $j = 0;
 
     /** get the pic details by querying database*/
-// DEKKY MOD START - shuffled slideshow
-    $pic_data = dkrn_get_pic_data($album, $pic_count, $album_name, $pos, 1, false, '', $shuffled, $shuffle_seed, $starting_position);
-// DEKKY MOD END
+    $pic_data = get_pic_data($album, $pic_count, $album_name, $pos, 1, false);
 
     /** calculate total amount of pic a perticular album */
     if ($ajax_show == 0) {
@@ -3500,15 +3397,6 @@ function& display_slideshow($pos, $ajax_show = 0, $shuffled = false, $shuffle_se
 
         $Pid[$i]   = $picture['pid'];
         $Title[$i] = $picture['title'] ? $picture['title'] : $picture['filename'];
-// DEKKY MOD START - slideshow size fix
-	$display_size_fixed = dkrn_get_display_size($picture['pwidth'], $picture['pheight']);
-	$Height[$i] = round($display_size_fixed['h']);
-	$Width[$i] = round($display_size_fixed['w']);
-// DEKKY MOD END
-// DEKKY MOD START - full screen slideshow
-	$ActualHeight[$i] = $picture['pheight'];
-	$ActualWidth[$i] = $picture['pwidth'];
-// DEKKY MOD END
 
         $i++;
     }
@@ -3547,14 +3435,6 @@ function& display_slideshow($pos, $ajax_show = 0, $shuffled = false, $shuffle_se
         'url' => $Pic['0'],
         'title' => $Title['0'],
         'pid' => $Pid['0'],
-// DEKKY MOD START - slideshow size fix
-	'width' => $Width['0'],
-	'height' => $Height['0'],
-// DEKKY MOD END - slideshow size fix
-// DEKKY MOD START - full screen slideshow
-	'actual_width' => $ActualWidth['0'],
-	'actual_height' => $ActualHeight['0']
-// DEKKY MOD END
     );
 
     $dataJson = json_encode($dataArray);
@@ -3566,26 +3446,6 @@ function& display_slideshow($pos, $ajax_show = 0, $shuffled = false, $shuffle_se
     }
 }
 
-// DEKKY MOD START - size fix
-	function dkrn_get_display_size($w, $h) {
-		global $CONFIG;
-		$ratio = 4 / 3;
-		if ($w != 0 && $h != 0) {
-			$ratio = $w / $h;
-		}
-		$max_size = $CONFIG['picture_width'];
-		$resize_method = $CONFIG['picture_use'] == "thumb" ? ($CONFIG['thumb_use'] == "ex" ? "any" : $CONFIG['thumb_use']) : $CONFIG['picture_use'];
-		if ($resize_method == 'ht' && ($max_size < $h || $h == 0)) {
-			$h = $max_size;
-			$w = $max_size*$ratio;
-		} else if ($max_size < $w || $w == 0) {
-			$w = $max_size;
-			$h = $max_size*(1/$ratio);
-		}
-		return array('w' => $w, 'h' => $h);
-	}
-
-// DEKKY mod end - size fix
 // Return the url for a picture, allows to have pictures spreaded over multiple servers
 /**
  * get_pic_url()
@@ -4280,9 +4140,7 @@ function languageSelect($parameter)
     // get list of available languages
     $results = cpg_db_query("SELECT * FROM {$CONFIG['TABLE_LANGUAGE']}");
     while ( ($row = mysql_fetch_array($results)) ) {
-// DEKKY MOD START - db y/n fix
-        if ($row['available'] == '1' && $row['enabled'] == '1' && file_exists('lang/'.$row['lang_id'].'.php')) {
-// DEKKY MOD END
+        if ($row['available'] == 'YES' && $row['enabled'] == 'YES' && file_exists('lang/'.$row['lang_id'].'.php')) {
             $lang_language_data[$row['lang_id']] = $row;
         }
     } // while
@@ -5376,9 +5234,7 @@ function user_is_allowed($include_upload_permissions = true)
 
     // We should also whether user has upload permission to the current album. but do this only if album id is set
     if ($album_id && $include_upload_permissions) {
-// DEKKY MOD START - db y/n fix
-        $public_albums = cpg_db_query("SELECT aid FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND ((uploads='1' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET." OR alb_password != '')) OR (owner=".USER_ID.")) AND aid=$album_id");
-// DEKKY MOD END
+        $public_albums = cpg_db_query("SELECT aid FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND ((uploads='YES' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET." OR alb_password != '')) OR (owner=".USER_ID.")) AND aid=$album_id");
 
         if (count(cpg_db_fetch_rowset($public_albums))) {
             $check_approve = true;
@@ -5540,16 +5396,6 @@ if (!function_exists('json_encode')) {
  */
 function cpg_getimagesize($image, $force_cpg_function = false)
 {
-// DEKKY MOD START - movie size fix
-	if (is_movie($image)) {
-		$id3 = new getID3();
-		$mdata = $id3->analyze($image);
-		$x = $mdata['video']['resolution_x'];
-		$y = $mdata['video']['resolution_y'];
-		$type = $mdata['video']['dataformat'];
-		return array($x, $y, $type, 'height="' . $y . '" width="' . $x . '"');
-	}
-// DEKKY MOD END
     if (!function_exists('getimagesize') || $force_cpg_function) {
         // custom function borrowed from http://www.wischik.com/lu/programmer/get-image-size.html
         $f = @fopen($image, 'rb');
@@ -5842,9 +5688,7 @@ if (!function_exists('cpg_get_available_languages')) {
         unset($results);
 
         // get list of available languages
-// DEKKY MOD START - db y/n fix
-        $results = cpg_db_query("SELECT lang_id, english_name, native_name, custom_name FROM {$CONFIG['TABLE_LANGUAGE']} WHERE available='1' AND enabled='1' ");
-// DEKKY MOD END
+        $results = cpg_db_query("SELECT lang_id, english_name, native_name, custom_name FROM {$CONFIG['TABLE_LANGUAGE']} WHERE available='YES' AND enabled='YES' ");
         while ( ($row = mysql_fetch_array($results)) ) {
             if (file_exists('lang/' . $row['lang_id'] . '.php')) {
                 if ($row['custom_name'] != '') {
@@ -6068,9 +5912,7 @@ function album_selection_options($selected = 0)
     $albums = array();
     // load all albums
 
-// DEKKY MOD START - db y/n fix
-    $uploads_yes = defined('EDITPICS_PHP') || defined('UPLOAD_PHP') ? ' OR uploads = "1"' : '';
-// DEKKY MOD END
+    $uploads_yes = defined('EDITPICS_PHP') || defined('UPLOAD_PHP') ? ' OR uploads = "YES"' : '';
 
     if (GALLERY_ADMIN_MODE) {
         $result = cpg_db_query("SELECT aid, title, category FROM {$CONFIG['TABLE_ALBUMS']} ORDER BY pos");

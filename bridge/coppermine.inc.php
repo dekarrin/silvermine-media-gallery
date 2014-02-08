@@ -120,20 +120,14 @@ if (isset($bridge_lookup)) {
                     //Check the login method (username, email address or both)
                     switch($CONFIG['login_method']){
                         case 'both':
-// DEKKY MOD START - db password encoding fix, db yes/no --> 1/0 fix
-                            $sql .= "(user_name = '$username' OR user_email = '$username') AND BINARY user_password = '$encpassword' AND user_active = '1'";
-// DEKKY MOD END
+                            $sql .= "(user_name = '$username' OR user_email = '$username') AND BINARY user_password = '$encpassword' AND user_active = 'YES'";
                             break;
                         case 'email':
-// DEKKY MOD START - db password encoding fix, db yes/no --> 1/0 fix
-                            $sql .= "user_email = '$username' AND BINARY user_password = '$encpassword' AND user_active = '1'";
-// DEKKY MOD END
+                            $sql .= "user_email = '$username' AND BINARY user_password = '$encpassword' AND user_active = 'YES'";
                             break;
                         case 'username':
                         default:
-// DEKKY MOD START - db password encoding fix, db yes/no --> 1/0 fix
-                            $sql .= "user_name = '$username' AND BINARY user_password = '$encpassword' AND user_active = '1'";
-// DEKKY MOD END
+                            $sql .= "user_name = '$username' AND BINARY user_password = '$encpassword' AND user_active = 'YES'";
                             break;
                     }
 
@@ -147,20 +141,14 @@ if (isset($bridge_lookup)) {
                             //Check the login method (username, email address or both)
                             switch($CONFIG['login_method']){
                                 case 'both':
-// DEKKY MOD START - db password encoding fix, db yes/no --> 1/0 fix
-                                    $sql .= "WHERE (user_name = '$username' OR user_email = '$username') AND BINARY user_password = '$encpassword' AND user_active = '1'";
-// DEKKY MOD END
+                                    $sql .= "WHERE (user_name = '$username' OR user_email = '$username') AND BINARY user_password = '$encpassword' AND user_active = 'YES'";
                                     break;
                                 case 'email':
-// DEKKY MOD START - db password encoding fix, db yes/no --> 1/0 fix
-                                    $sql .= "WHERE user_email = '$username' AND BINARY user_password = '$encpassword' AND user_active = '1'";
-// DEKKY MOD END
+                                    $sql .= "WHERE user_email = '$username' AND BINARY user_password = '$encpassword' AND user_active = 'YES'";
                                     break;
                                 case 'username':
                                 default:
-// DEKKY MOD START - db password encoding fix, db yes/no --> 1/0 fix
-                                    $sql .= "WHERE user_name = '$username' AND BINARY user_password = '$encpassword' AND user_active = '1'";
-// DEKKY MOD END
+                                    $sql .= "WHERE user_name = '$username' AND BINARY user_password = '$encpassword' AND user_active = 'YES'";
                                     break;
                             }
                             cpg_db_query($sql, $this->link_id);
