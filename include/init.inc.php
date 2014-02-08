@@ -327,7 +327,9 @@ $CONFIG['default_lang'] = $CONFIG['lang'];      // Save default language
 
 $enabled_languages_array = array();
 
-$result = cpg_db_query("SELECT lang_id FROM {$CONFIG['TABLE_LANGUAGE']} WHERE enabled='YES'");
+// DEKKY MOD START - db y/n fix
+$result = cpg_db_query("SELECT lang_id FROM {$CONFIG['TABLE_LANGUAGE']} WHERE enabled='1'");
+// DEKKY MOD END
 while ($row = mysql_fetch_assoc($result)) {
     $enabled_languages_array[] = $row['lang_id'];
 }
