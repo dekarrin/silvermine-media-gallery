@@ -376,7 +376,7 @@ function get_subcat_data(&$cat_data)
         $sql .= "\nAND lft BETWEEN $lft AND $rgt";
     }
 
-    $sql .= "\nORDER BY r.pos, r.aid";
+    $sql .= "\nORDER BY title, r.pos, r.aid";
 
     $result = cpg_db_query($sql);
 
@@ -786,6 +786,7 @@ function list_albums()
         //$sort_code  = isset($USER['sort'])? $USER['sort'] : $CONFIG['album_sort_order'];
         //$sort_order = isset($sort_array[$sort_code]) ? $sort_array[$sort_code] : $sort_array[$CONFIG['album_sort_order']];
         $sort_order = $sort_array[$CONFIG['album_sort_order']];
+		$sort_order = "a.title, " . $sort_order;
 
         $sql = "SELECT a.aid, a.title, a.description, a.thumb, a.keyword, category, visibility, filepath, filename, url_prefix, pwidth, pheight, a.owner "
             . " FROM {$CONFIG['TABLE_ALBUMS']} AS a "
