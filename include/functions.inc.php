@@ -3341,6 +3341,29 @@ function display_film_strip($album, $cat, $pos,$ajax_call)
     }
 }
 
+// if in shuffle mode, uses own algo to select image. Otherwise, just does it in order.
+require_once 'include/random.inc.php';
+
+function dkrn_get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $set_caption = true, $mode = '', $shuffled = false, $shuffled_seed = 0, $start_pos = 0) {
+	if ($shuffled) {
+		$pics = get_pic_data($album, $pic_count, $alb_name);
+		$pids = dkrn_extract_pic_pids($pics);
+		$shuffled_pics = dkrn_pic_array_shuffle($pids, $shuffled_seed, $start_pos);
+		$target_pid = $shuffled_pics[$limit1];
+		$actual_position = array_search($target_pid, $pids);
+		return get_pic_data($album, $count, $album_name, $actual_position, $limit2, $set_caption, $mode);
+	} else {
+		return get_pic_data($album, $count, $album_name, $limit1, $limit2, $set_caption, $mode);
+	}
+}
+
+function dkrn_extract_pic_pids($pic_data) {
+	$pids = array();
+	foreach ($pic_data as $pic) {
+		$pids[] = $pic['pid'];
+	}
+	return $pids;
+}
 
 /**
  * display_slideshow()
@@ -3353,7 +3376,7 @@ function display_film_strip($album, $cat, $pos,$ajax_call)
  * @param integer $cat
  * @param integer $pos
  **/
-function& display_slideshow($pos, $ajax_show = 0)
+function& display_slideshow($pos, $ajax_show = 0, $shuffled = false, $shuffle_seed = 0, $starting_position = 0)
 {
     global $CONFIG, $album, $pid, $slideshow, $USER;
 
@@ -3371,7 +3394,7 @@ function& display_slideshow($pos, $ajax_show = 0)
     $j = 0;
 
     /** get the pic details by querying database*/
-    $pic_data = get_pic_data($album, $pic_count, $album_name, $pos, 1, false);
+    $pic_data = dkrn_get_pic_data($album, $pic_count, $album_name, $pos, 1, false, '', $shuffled, $shuffle_seed, $starting_position);
 
     /** calculate total amount of pic a perticular album */
     if ($ajax_show == 0) {

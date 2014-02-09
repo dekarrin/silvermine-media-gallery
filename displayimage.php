@@ -22,6 +22,8 @@ define('INDEX_PHP', true);
 
 require('include/init.inc.php');
 
+require_once('include/random.inc.php');
+
 if (!USER_ID && ($CONFIG['allow_unlogged_access'] <= 1)) {
 
     $redirect = 'login.php';
@@ -391,6 +393,14 @@ if (!$superCage->get->keyExists('fullsize') && !$superCage->get->keyExists('ajax
 set_js_var('position', $pos);
 set_js_var('album', $album);
 set_js_var('cat', $cat);
+
+$slideshow_shuffle_seed = $superCage->get->getDigits('seed');
+$slideshow_in_shuffle = ($superCage->get->keyExists('shuffle') && $superCage->get->getInt('shuffle') === 1);
+if (empty($slideshow_shuffle_seed) && $superCage->get->keyExists('slideshow') && $slideshow_in_shuffle) {
+	$slideshow_shuffle_seed = dkrn_get_microtime_seed();
+}
+set_js_var('ShuffleSeed', ($slideshow_in_shuffle) ? '' . $slideshow_shuffle_seed : '-1');
+
 if ($superCage->get->keyExists('msg_id')) {
     set_js_var('msg_id', $superCage->get->getInt('msg_id'));
     set_js_var('page', $superCage->get->getInt('page'));
@@ -411,7 +421,9 @@ if ($superCage->get->keyExists('film_strip')) {
 
 /** if there is value for ajax_show key in GET then it means this is an ajax call to display sideshow. */
 if ($superCage->get->keyExists('ajax_show')) {
-    display_slideshow($pos, $ajax_show);
+    //display_slideshow($pos, $ajax_show);
+	$starting_position = $superCage->get->getInt('startpos');
+    display_slideshow($pos, $ajax_show, $slideshow_in_shuffle, $slideshow_shuffle_seed, $starting_position);
     exit;
 }
 

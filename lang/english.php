@@ -277,6 +277,7 @@ $lang_thumb_view['zipdownload_username'] = 'This archive contains the zipped fil
 $lang_img_nav_bar['thumb_title'] = 'Return to the thumbnail page';
 $lang_img_nav_bar['pic_info_title'] = 'Display/hide file information';
 $lang_img_nav_bar['slideshow_title'] = 'Slideshow';
+$lang_img_nav_bar['shuffled_slideshow_title'] = 'Shuffle Slideshow';
 $lang_img_nav_bar['ecard_title'] = 'Send this file as an e-card';
 $lang_img_nav_bar['ecard_disabled'] = 'e-cards are disabled';
 $lang_img_nav_bar['ecard_disabled_msg'] = 'You don\'t have permission to send ecards'; // js-alert

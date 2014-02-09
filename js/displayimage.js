@@ -33,6 +33,8 @@ $(document).ready(function() {
     displayStars();
     // Display the slideshow buttons
     printSlideshowButton();
+	// Display the shuffled slideshow button
+	printShuffledSlideshowButton();
     // Display the pic info button
     printPicInfoButton();
 
@@ -425,6 +427,15 @@ function printSlideshowButton() {
     var btn = js_vars.buttons.slideshow_btn ? js_vars.buttons.slideshow_btn 
         : '<a href="' + js_vars.buttons.slideshow_tgt + '" class="navmenu_pic" title="' + js_vars.buttons.slideshow_title + '" rel="nofollow"><img src="' + js_vars.buttons.loc + 'images/navbar/slideshow.png" border="0" align="middle" alt="' + js_vars.buttons.slideshow_title + '" /></a>';
     $('#slideshow_button').append(btn);
+}
+
+function printShuffledSlideshowButton() {
+	// insert shuffled slideshow button as defined in theme or
+	// create default button (Only Dekky-mod-aware themes will work with
+	// this, so we'll probably always use the default button)
+	var btn = js_vars.buttons.shuffled_slideshow_btn ? js_vars.buttons.shuffled_slideshow_btn : '<a href="' + js_vars.buttons.shuffled_slideshow_tgt + '" class="navmenu_pic" title="' + js_vars.buttons.shuffled_slideshow_title + '" rel="nofollow"><img src="' + js_vars.buttons.loc + 'images/navbar/shuffled_slideshow.png" border="0" align="middle" alt="' + js_vars.buttons.shuffled_slideshow_title + '" /></a>';
+	$('#shuffled_slideshow_button').append(btn);
+			
 }
 
 function printPicInfoButton() {

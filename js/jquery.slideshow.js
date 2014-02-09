@@ -30,6 +30,8 @@ $(document).ready(function(){
         var cat     =   js_vars.cat;
         var run_slideshow = js_vars.run_slideshow;
         var Title   =   "";
+	var ShuffleSeed = js_vars.ShuffleSeed;
+	var startPos = js_vars.position;
 	var ActualWidth = 0;
 	var ActualHeight = 0;
 	var DisplayWidth = 0;
@@ -40,7 +42,12 @@ $(document).ready(function(){
      
         /** implement ajax call to get pic url and title */
         function loadImage (j){
-        $.getJSON("displayimage.php?ajax_show=1&pos="+j+"&album="+album, function(data){
+	var shuffleQuery = '';
+	if (ShuffleSeed !== '-1') {
+		shuffleQuery = '&shuffle=1&seed=' + ShuffleSeed + '&startpos=' + startPos;
+	}
+	var requestUri = "displayimage.php?ajax_show=1&pos="+j+"&album="+album+shuffleQuery;
+	$.getJSON(requestUri, function(data){
                 i.src   = data['url'];
                 Title   = data['title'];
                 Pid     = data['pid'];

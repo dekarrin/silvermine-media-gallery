@@ -846,6 +846,8 @@ $template_img_navbar = <<<EOT
                 <!-- button will be added by displayimage.js -->
                 <td id="slideshow_button" align="center" valign="middle" class="navmenu" width="48"></td>
 <!-- END slideshow_button -->
+		<!-- button will be added by displayimage.js -->
+		<td id="shuffled_slideshow_button" align="center" valign="middle" class="navmenu" width="48"></td>
                 <td align="center" valign="middle" class="navmenu" width="100%">{PIC_POS}</td>
 <!-- BEGIN report_file_button -->
                 <td align="center" valign="middle" class="navmenu" width="48"><a href="{REPORT_TGT}" class="navmenu_pic" title="{REPORT_TITLE}" rel="nofollow"><img src="{LOCATION}images/navbar/report.png" border="0" align="middle" alt="{REPORT_TITLE}" /></a></td>
@@ -3595,6 +3597,9 @@ function theme_html_img_nav_menu() {
 
     // if set, this will override the default slideshow button to be inserted by displayimage.js
     $slideshow_btn = '';
+	$shuffled_slideshow_tgt = "$CPG_PHP_SELF?album=$album$cat_link$date_link$uid_link&amp;pid=$pid$msg_id&amp;slideshow=".$CONFIG['slideshow_interval']."&amp;shuffle=1#top_display_media";
+	// if set, this will override the default slideshow button to be inserted by displayimage.js
+	$shuffled_slideshow_btn = '';
     // if set, this will override the default pic_info button to be inserted by displayimage.js
     $pic_info_btn = '';
 
@@ -3612,6 +3617,9 @@ function theme_html_img_nav_menu() {
         'slideshow_tgt'   => $slideshow_tgt,
         'slideshow_title' => $lang_img_nav_bar['slideshow_title'],
         'slideshow_btn'   => $slideshow_btn,
+	'shuffled_slideshow_tgt'	=> $shuffled_slideshow_tgt,
+	'shuffled_slideshow_title'	=> $lang_img_nav_bar['shuffled_slideshow_title'],
+	'shuffled_slideshow_btn'	=> $shuffled_slideshow_btn,
         'loc' => $location,
     );
     set_js_var('buttons', $js_buttons);
