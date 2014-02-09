@@ -3446,6 +3446,24 @@ function& display_slideshow($pos, $ajax_show = 0)
     }
 }
 
+	function dkrn_get_display_size($w, $h) {
+		global $CONFIG;
+		$ratio = 4 / 3;
+		if ($w != 0 && $h != 0) {
+			$ratio = $w / $h;
+		}
+		$max_size = $CONFIG['picture_width'];
+		$resize_method = $CONFIG['picture_use'] == "thumb" ? ($CONFIG['thumb_use'] == "ex" ? "any" : $CONFIG['thumb_use']) : $CONFIG['picture_use'];
+		if ($resize_method == 'ht' && ($max_size < $h || $h == 0)) {
+			$h = $max_size;
+			$w = $max_size*$ratio;
+		} else if ($max_size < $w || $w == 0) {
+			$w = $max_size;
+			$h = $max_size*(1/$ratio);
+		}
+		return array('w' => $w, 'h' => $h);
+	}
+
 // Return the url for a picture, allows to have pictures spreaded over multiple servers
 /**
  * get_pic_url()

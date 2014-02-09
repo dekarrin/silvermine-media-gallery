@@ -460,7 +460,7 @@ if ($superCage->get->keyExists('fullsize')) {
     $picture_title = $CURRENT_PIC_DATA['title'] ? $CURRENT_PIC_DATA['title'] : strtr(preg_replace("/(.+)\..*?\Z/", "\\1", htmlspecialchars($CURRENT_PIC_DATA['filename'])), "_", " ");
 
     $nav_menu = theme_html_img_nav_menu();
-    $picture = theme_html_picture();
+    $picture = theme_html_picture(true);
     $votes = theme_html_rating_box();
     $pic_info = html_picinfo();
     $comments = theme_html_comments($CURRENT_PIC_DATA['pid']);

@@ -3220,13 +3220,12 @@ function theme_html_picinfo(&$info)
 ** Section <<<theme_html_picinfo>>> - END
 ******************************************************************************/
 }  //{THEMES}
-
 if (!function_exists('theme_html_picture')) {  //{THEMES}
 /******************************************************************************
 ** Section <<<theme_html_picture>>> - START
 ******************************************************************************/
 // Displays a picture
-function theme_html_picture()
+function theme_html_picture($from_gallery = false)
 {
     global $CONFIG, $CURRENT_PIC_DATA, $CURRENT_ALBUM_DATA, $USER, $LINEBREAK;
     global $album, $lang_date, $template_display_media;
@@ -3272,14 +3271,24 @@ function theme_html_picture()
 
     $image_size = array();
 
+    $pic_title = '';
+    $mime_content = cpg_get_type($CURRENT_PIC_DATA['filename']);
+	$class_str = '';
+	$size_fix_str = '';
+	$resize_fix = array('w' => $CURRENT_PIC_DATA['pwidth'], 'h' => $CURRENT_PIC_DATA['pheight']);
+	$use_gallery_size = true;
     if ($CONFIG['make_intermediate'] && cpg_picture_dimension_exceeds_intermediate_limit($CURRENT_PIC_DATA['pwidth'], $CURRENT_PIC_DATA['pheight'])) {
         $picture_url = get_pic_url($CURRENT_PIC_DATA, 'normal');
     } else {
         $picture_url = get_pic_url($CURRENT_PIC_DATA, 'fullsize');
+		if ($from_gallery) {
+			//$class_str = " gallery_image";
+			$resize_fix = dkrn_get_display_size($CURRENT_PIC_DATA['pwidth'], $CURRENT_PIC_DATA['pheight']);
+			$height_fix = ($mime_content['content'] != 'audio') ? $resize_fix['h'] : $CURRENT_PIC_DATA['pheight'];
+			$size_fix_str = "height=\"$height_fix\" width=\"{$resize_fix['w']}\"";
+			$use_gallery_size = false;
+		}
     }
-
-    $pic_title = '';
-    $mime_content = cpg_get_type($CURRENT_PIC_DATA['filename']);
 
     if ($mime_content['content']=='movie' || $mime_content['content']=='audio') {
 
@@ -3307,7 +3316,7 @@ function theme_html_picture()
         $ctrl_offset['rm']=0;
         $ctrl_offset_default=45;
         $ctrl_height = (isset($ctrl_offset[$mime_content['extension']]))?($ctrl_offset[$mime_content['extension']]):$ctrl_offset_default;
-        $image_size['whole']='width="'.$CURRENT_PIC_DATA['pwidth'].'" height="'.($CURRENT_PIC_DATA['pheight']+$ctrl_height).'"';
+        $image_size['whole']='width="'.$resize_fix['w'].'" height="'.($resize_fix['h']+$ctrl_height).'"';
     }
 
     if ($mime_content['content']=='image') {
@@ -3317,7 +3326,8 @@ function theme_html_picture()
             $winsizeX = $CURRENT_PIC_DATA['pwidth'] + $CONFIG['fullsize_padding_x'];  //the +'s are the mysterious FF and IE paddings
             $winsizeY = $CURRENT_PIC_DATA['pheight'] + $CONFIG['fullsize_padding_y']; //the +'s are the mysterious FF and IE paddings
             if ($CONFIG['transparent_overlay'] == 1) {
-                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\" width=\"{$image_size['width']}\" height=\"{$image_size['height']}\" class=\"image\">";
+				$cust_size_str = (!$use_gallery_size) ? ' ' . $size_fix_str : " width=\"{$image_size['width']}\" height=\"{$image_size['height']}\"";
+                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\"$cust_size_str class=\"image$class_str\">";
                 $pic_html_href_close = '</a>' . $LINEBREAK;
                 if (!USER_ID && $CONFIG['allow_unlogged_access'] <= 2) {
                     if ($CONFIG['allow_user_registration'] == 0) {
@@ -3349,20 +3359,23 @@ function theme_html_picture()
                     $pic_html = "<a href=\"javascript:;\" onclick=\"MM_openBrWindow('displayimage.php?pid=$pid&amp;fullsize=1','" . uniqid(rand()) . "','scrollbars=yes,toolbar=no,status=no,resizable=yes,width=$winsizeX,height=$winsizeY')\">";
                 }
                 $pic_title = $lang_display_image_php['view_fs'] . $LINEBREAK . '==============' . $LINEBREAK . $pic_title;
-                $pic_html .= "<img src=\"" . $picture_url . "\" {$image_size['geom']} class=\"image\" border=\"0\" alt=\"{$lang_display_image_php['view_fs']}\" /><br />";
+				$cust_size_str = (!$use_gallery_size) ? ' ' . $size_fix_str : " " . $image_size['geom'];
+                $pic_html .= "<img src=\"" . $picture_url . "\"$cust_size_str class=\"image$class_str\" border=\"0\" alt=\"{$lang_display_image_php['view_fs']}\" /><br />";
                 $pic_html .= $pic_html_href_close;
                 //PLUGIN FILTER
                 $pic_html = CPGPluginAPI::filter('html_image_reduced', $pic_html);
             }
         } else {
             if ($CONFIG['transparent_overlay'] == 1) {
-                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\" width=\"{$CURRENT_PIC_DATA['pwidth']}\" height=\"{$CURRENT_PIC_DATA['pheight']}\" class=\"image\">";
+				$cust_size_str = (!$use_gallery_size) ? ' ' . $size_fix_str : " width=\"{$CURRENT_PIC_DATA['pwidth']}\" height=\"{$CURRENT_PIC_DATA['pheight']}\"";
+                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\"$cust_size_str class=\"image$class_str\">";
                 $pic_html .= "<img src=\"images/image.gif?id=".floor(rand()*1000+rand())."\" width={$CURRENT_PIC_DATA['pwidth']} height={$CURRENT_PIC_DATA['pheight']} border=\"0\" alt=\"\" /><br />" . $LINEBREAK;
                 $pic_html .= "</td></tr></table>";
                 //PLUGIN FILTER
                 $pic_html = CPGPluginAPI::filter('html_image_overlay', $pic_html);
             } else {
-                $pic_html = "<img src=\"" . $picture_url . "\" {$image_size['geom']} class=\"image\" border=\"0\" alt=\"\" /><br />" . $LINEBREAK;
+				$cust_size_str = (!$use_gallery_size) ? ' ' . $size_fix_str : " " . $image_size['geom'];
+                $pic_html = "<img src=\"" . $picture_url . "\"$cust_size_str class=\"image$class_str\" border=\"0\" alt=\"\" /><br />" . $LINEBREAK;
                 //PLUGIN FILTER
                 $pic_html = CPGPluginAPI::filter('html_image', $pic_html);
             }
