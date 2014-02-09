@@ -19,6 +19,7 @@ define('IN_COPPERMINE', true);
 define('EDITPICS_PHP', true);
 
 require 'include/init.inc.php';
+require_once('include/album_subdirs.inc.php');
 
 js_include('js/editpics.js');
 
@@ -252,7 +253,7 @@ function process_post_data()
         }
 
         // We will be selecting pid in the query as we need it in $pic array for the plugin filter
-        $query = "SELECT pid, category, filepath, filename, owner_id FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = $pid";
+        $query = "SELECT pid, category, filepath, filename, owner_id, p.aid AS aid FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = $pid";
         $result = cpg_db_query($query);
 
         if (!mysql_num_rows($result)) {

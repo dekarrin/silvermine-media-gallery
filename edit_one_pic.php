@@ -18,6 +18,7 @@
 define('IN_COPPERMINE', true);
 define('EDITPICS_PHP', true);
 require('include/init.inc.php');
+require_once('include/album_subdirs.inc.php');
 
 js_include('js/edit_one_pic.js');
 

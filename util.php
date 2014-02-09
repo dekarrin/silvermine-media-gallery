@@ -30,6 +30,7 @@ define('UTIL_PHP', true);
 require('include/init.inc.php');
 require('include/picmgmt.inc.php');
 require_once('include/comics.inc.php');
+require_once('include/album_subdirs.inc.php');
 
 if (!GALLERY_ADMIN_MODE) {
     cpg_die(ERROR, $lang_errors['access_denied'], __FILE__, __LINE__);
@@ -222,6 +223,15 @@ $tasks = array(
 				<br />
 				Uploads one comic from the comics dir into its own album.'
 	),
+
+	
+	'move_uploaded_to_subdirs' => array(
+		'move_uploaded_to_subdirs',
+		'Move uploaded files into category/album subdirectories','
+				Moves all uploaded files into category/album subdirectories.<br />
+                '. $lang_util_php['update_number'] . ' <input type="text" name="sub_dirs_numpics" value="'.$defpicnum.'" size="5" class="textinput" /> '.$lang_util_php['update_option'].'<br />
+                <input type="checkbox" name="sub_dirs_autorefresh" id="sub_dirs_autorefresh" checked="checked" value="1" class="checkbox" /><label for="sub_dirs_autorefresh">'.$lang_util_php['autorefresh'].'</label>'
+	),
 );
 
 if ($superCage->post->keyExists('action') && $matches = $superCage->post->getMatched('action', '/^[A-Za-z_]+$/')) {
@@ -406,6 +416,95 @@ function filename_to_title()
 
     echo '<br />' . $LINEBREAK . sprintf($lang_util_php['titles_updated'], $file_count) . '<br />' . $LINEBREAK;
 }
+
+
+function move_uploaded_to_subdirs()
+{
+	global $CONFIG, $icon_array, $lang_util_php;
+	$superCage = Inspekt::makeSuperCage();
+	if ($superCage->post->keyExists('albumid')) {
+        $albumid = $superCage->post->getInt('albumid');
+    } elseif ($superCage->get->keyExists('albumid')) {
+        $albumid = $superCage->get->getInt('albumid');
+    } else {
+        $albumid = 0;
+    }
+    $albstr = $albumid ? "WHERE P.aid = $albumid" : '';
+    if ($superCage->post->keyExists('sub_dirs_autorefresh')) {
+        $autorefresh = $superCage->post->getInt('sub_dirs_autorefresh');
+    } elseif ($superCage->get->keyExists('sub_dirs_autorefresh')) {
+        $autorefresh = $superCage->get->getInt('sub_dirs_autorefresh');
+    }
+    if ($superCage->post->keyExists('sub_dirs_numpics')) {
+        $numpics = $superCage->post->getInt('sub_dirs_numpics');
+    } elseif ($superCage->get->keyExists('sub_dirs_numpics')) {
+        $numpics = $superCage->get->getInt('sub_dirs_numpics');
+    }
+	if ($superCage->post->keyExists('startpic')) {
+        $startpic = $superCage->post->getInt('startpic');
+    } elseif ($superCage->get->keyExists('startpic')) {
+        $startpic = $superCage->get->getInt('startpic');
+    } else {
+        $startpic = 0;
+    }
+    print '<a name="admin_tool_move_to_subdirs"></a>';
+	starttable('100%', $icon_array['util'] . 'Moving files...');
+	$result = cpg_db_query("SELECT P.pid, P.aid, P.filepath, P.filename, A.category FROM {$CONFIG['TABLE_PICTURES']} AS P INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS A ON P.aid = A.aid $albstr LIMIT $startpic, $numpics");
+	$count = mysql_num_rows($result);
+    $loopCounter = 0;
+	$tablestyle = 'tableb';
+    while ($row = mysql_fetch_assoc($result)) {
+		$loopCounter++;
+		if ($loopCounter % 2 == 0) {
+			$tablestyle .= ' tableb_alternate';
+		} else {
+			$tablestyle = 'tableb';
+		}
+// Specific logic is here; entire section above may be copied to functions
+// that act on images in an entire album. Be sure to replace names of
+// html vars
+		$cid = $row['category'];
+		$aid = $row['aid'];
+		$dirs = explode('/', $row['filepath'], -1);
+		if (count($dirs) < 2 || $dirs[count($dirs) - 1] !== $aid || $dirs[count($dirs) - 2] !== $cid) {
+			echo dkrn_move_picture_to_album($row['pid'], $row['filepath'], $row['filename'], $row['aid'], $row['category']);
+		} else { // the file is in the right place
+			echo '<tr><td class="'.$tablestyle.'">' . $icon_array['cancel'] . sprintf($lang_util_php['correct_location'], '<tt>' . $row['filepath'] . $row['filename'] . '</tt>') . '</td></tr>';
+		}
+	}
+// Specific logic ends here; entire section below may be copied
+// be sure to replace names of form vars
+	if ($count == $numpics) {
+        $startpic += $numpics;
+        list($timestamp, $form_token) = getFormToken();
+        if ($autorefresh) {
+            echo <<< EOT
+            <meta http-equiv="refresh" content="1; URL=util.php?sub_dirs_numpics={$numpics}&startpic={$startpic}&albumid={$albumid}&sub_dirs_autorefresh={$autorefresh}&action=move_uploaded_to_subdirs&form_token={$form_token}&timestamp={$timestamp}#admin_tool_move_to_subdirs">
+EOT;
+        } else {
+            print <<< EOT
+            <tr>
+                <td class="tablef">
+                    <form action="util.php#admin_tool_move_to_subdirs" method="post">
+                        <input type="hidden" name="action" value="move_uploaded_to_subdirs" />
+                        <input type="hidden" name="sub_dirs_numpics" value="{$numpics}" />
+                        <input type="hidden" name="startpic" value="{$startpic}" />
+                        <input type="hidden" name="albumid" value="{$albumid}" />
+                        <input type="hidden" name="sub_dirs_autorefresh" value="{$autorefresh}" />
+                        <button type="submit" class="button" name="submit" id="submit" value="{$lang_util_php['continue']}">{$lang_util_php['continue']} {$icon_array['continue']}</button>
+                        <input type="hidden" name="form_token" value="{$form_token}" />
+                        <input type="hidden" name="timestamp" value="{$timestamp}" />
+                    </form>
+                </td>
+            </tr>
+EOT;
+        }
+    } else {
+        echo '<tr><td class="tablef">' . $lang_util_php['sub_dirs_finished'] . '</td></tr>';
+    }
+    endtable();
+}
+
 
 function update_thumbs()
 {

@@ -895,37 +895,34 @@ EOT;
         mysql_free_result($result);
         $category = $row['category'];
     }
-
-    // Pictures are moved in a directory named 10000 + USER_ID
+	
+	function create_picdir($dir) {
+		global $CONFIG, $lang_db_input_php;
+		if (!is_dir($dir)) {
+			mkdir($dir, octdec($CONFIG['default_dir_mode']));
+			if (!is_dir($dir)) {
+				echo sprintf('error|'.$lang_db_input_php['err_mkdir'].'|1', $dir);
+				exit;
+			}
+			@chmod($dir, octdec($CONFIG['default_dir_mode']));
+			$fp = fopen($dir . '/index.php', 'w');
+			fwrite($fp, ' ');
+			fclose($fp);
+		}
+	}
+	// Pictures are moved in a directory named 10000 + USER_ID
     if (USER_ID && $CONFIG['silly_safe_mode'] != 1) {
         $filepath = $CONFIG['userpics'] . (USER_ID + FIRST_USER_CAT);
         $dest_dir = $CONFIG['fullpath'] . $filepath;
-        if (!is_dir($dest_dir)) {
-            mkdir($dest_dir, octdec($CONFIG['default_dir_mode']));
-            if (!is_dir($dest_dir)) {
-                echo sprintf('error|'.$lang_db_input_php['err_mkdir'].'|1', $dest_dir);
-                exit;
-            }
-            @chmod($dest_dir, octdec($CONFIG['default_dir_mode'])); //silence the output in case chmod is disabled
-            $fp = fopen($dest_dir . '/index.php', 'w');
-            fwrite($fp, ' ');
-            fclose($fp);
-        }
+        create_picdir($dest_dir);
         // Upload pictures in a sub-directory named according to the album ID
         if ($CONFIG['upload_create_album_directory']) {
+			$filepath .= '/'.$category;
+			$dest_dir .= '/'.$category;
+			create_picdir($dest_dir);
             $filepath .= '/'.$album;
             $dest_dir .= '/'.$album;
-            if (!is_dir($dest_dir)) {
-                mkdir($dest_dir, octdec($CONFIG['default_dir_mode']));
-                if (!is_dir($dest_dir)) {
-                    echo sprintf('error|'.$lang_db_input_php['err_mkdir'].'|1', $dest_dir);
-                    exit;
-                }
-                @chmod($dest_dir, octdec($CONFIG['default_dir_mode'])); //silence the output in case chmod is disabled
-                $fp = fopen($dest_dir . '/index.php', 'w');
-                fwrite($fp, ' ');
-                fclose($fp);
-            }
+			create_picdir($dest_dir);
         }
         $dest_dir .= '/';
         $filepath .= '/';

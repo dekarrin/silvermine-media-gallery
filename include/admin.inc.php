@@ -1010,6 +1010,11 @@ $config_data = array(
       'default_value' => '$/\\\\:*?&quot;&#039;&lt;&gt;|` &amp;#@',
       'help_link'     => 'f=configuration.htm&amp;as=admin_picture_thumb_advanced_filename_forbidden_chars&amp;ae=admin_picture_thumb_advanced_filename_forbidden_chars_end',
     ),
+	'upload_create_album_directory' => array(
+		'type'			=> 'checkbox',
+		'default_value'	=> '0',
+		'help_link'		=> 'f=configuration.htm&amp;as=admin_create_album_dir&amp;ae=admin_create_album_dir_end',
+	),
     'silly_safe_mode' => array(
       'type'          => 'checkbox',
       'default_value' => '0',
