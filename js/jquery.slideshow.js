@@ -30,6 +30,10 @@ $(document).ready(function(){
         var cat     =   js_vars.cat;
         var run_slideshow = js_vars.run_slideshow;
         var Title   =   "";
+	var ActualWidth = 0;
+	var ActualHeight = 0;
+	var DisplayWidth = 0;
+	var DisplayHeight = 0;
 
         /** create a Image object */
         var i = new Image();
@@ -40,8 +44,10 @@ $(document).ready(function(){
                 i.src   = data['url'];
                 Title   = data['title'];
                 Pid     = data['pid'];
-		i.height = data['height'];
-		i.width = data['width'];
+		i.height = DisplayHeight = data['height'];
+		i.width = DisplayWidth = data['width'];
+		ActualWidth = data['actual_width'];
+		ActualHeight = data['actual_height'];
               }); 
         }
         
@@ -72,7 +78,24 @@ $(document).ready(function(){
             var temp = i.src;
             
             i.onload = function() {
-                
+		if (isFullScreen()) {
+			var sheight = screen.height;
+			var swidth = screen.width;
+			var pheight = ActualHeight;
+			var pwidth = ActualWidth;
+			var pratio = pwidth / pheight;
+			var sratio = swidth / sheight;
+			var usewidth = (pratio >= sratio); // img is longer or equal
+			var scalefactor = (usewidth) ? (swidth / pwidth) : (sheight / pheight);
+			var newWidth = Math.round(pwidth * scalefactor);
+			var newHeight = Math.round(pheight * scalefactor);
+			i.height = newHeight;
+			i.width = newWidth;
+			$("#showImage").attr({className: ''});
+		} else {
+			$("#showImage").attr({className: 'image'});
+		}
+
                 //if(i.complete){
                 $("#showImage").attr({
                     src: i.src,
@@ -106,4 +129,40 @@ $(document).ready(function(){
             self.document.location = 'displayimage.php?album='+album+'&cat='+cat+'&pid='+PidTemp+'&msg_id='+js_vars.msg_id+'&page='+js_vars.page+'#top_display_media' ;
         }
     });
+	function isFullScreen() {
+		return (document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen);
+	}
+
+	function goFullScreen(element) {
+		if (element.requestFullScreen) {
+			element.requestFullScreen();
+		} else if (element.mozRequestFullScreen) {
+			element.mozRequestFullScreen();
+		} else if (element.webkitRequestFullScreen) {
+			element.webkitRequestFullScreen();
+		}
+	}
+
+/*	$(document).bind('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
+		if (isFullScreen()) {
+			var sheight = screen.height;
+			var swidth = screen.width;
+			var pheight = ActualHeight;
+			var pwidth = ActualWidth;
+			var pratio = pwidth / pheight;
+			var sratio = swidth / sheight;
+			var usewidth = (pratio >= sratio); // img is longer or equal
+			var scalefactor = (usewidth) ? (swidth / pwidth) : (sheight / pheight);
+			var newWidth = Math.round(pwidth * scalefactor);
+			var newHeight = Math.round(pheight * scalefactor);
+			$("#showImage").attr({height: newHeight, width: newWidth, className: ''});
+		} else {
+			$("#showImage").attr({height: DisplayHeight, width: DisplayWidth, className: 'image'});
+		}
+	});*/
+
+	document.getElementById('fullscreen-ss').onclick = function() {
+		goFullScreen(document.getElementById('showImage'));
+		document.getElementById('showImage').webkitRequestFullScreen();
+	};
 });

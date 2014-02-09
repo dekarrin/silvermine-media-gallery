@@ -1054,6 +1054,7 @@ $lang_display_image_php['size'] = '%s x %s pixels';
 $lang_display_image_php['views'] = '%s times';
 $lang_display_image_php['slideshow'] = 'Slideshow';
 $lang_display_image_php['stop_slideshow'] = 'Stop Slideshow';
+$lang_display_image_php['fullscreen_slideshow'] = 'Fullscreen';
 $lang_display_image_php['view_fs'] = 'Click to view full size image';
 $lang_display_image_php['edit_pic'] = 'Edit file information';
 $lang_display_image_php['crop_pic'] = 'Crop and Rotate';

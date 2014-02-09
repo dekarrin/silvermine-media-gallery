@@ -4081,6 +4081,11 @@ EOT;
                         <a class="navmenu" style="cursor:pointer">{$lang_display_image_php['stop_slideshow']}</a>
                 </td>
         </tr>
+	<tr>
+		<td align="center" id="fullscreen-ss" class="navmenu">
+			<a class="navmenu" style="cursor:pointer">{$lang_display_image_php['fullscreen_slideshow']}</a>
+		</td>
+	</tr>
 
 EOT;
     endtable();
