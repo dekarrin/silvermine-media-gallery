@@ -327,7 +327,7 @@ $CONFIG['default_lang'] = $CONFIG['lang'];      // Save default language
 
 $enabled_languages_array = array();
 
-$result = cpg_db_query("SELECT lang_id FROM {$CONFIG['TABLE_LANGUAGE']} WHERE enabled='YES'");
+$result = cpg_db_query("SELECT lang_id FROM {$CONFIG['TABLE_LANGUAGE']} WHERE enabled='1'");
 while ($row = mysql_fetch_assoc($result)) {
     $enabled_languages_array[] = $row['lang_id'];
 }

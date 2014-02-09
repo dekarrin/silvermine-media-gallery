@@ -129,15 +129,15 @@ function add_picture($aid, $filepath, $filename, $position = 0, $title = '', $ca
     }
     // Test if picture requires approval
     if (GALLERY_ADMIN_MODE) {
-        $approved = 'YES';
+        $approved = '1';
     } elseif (!$USER_DATA['priv_upl_need_approval'] && $category == FIRST_USER_CAT + USER_ID) {
-        $approved = 'YES';
+        $approved = '1';
     } elseif (!$USER_DATA['pub_upl_need_approval'] && $category < FIRST_USER_CAT) {
-        $approved = 'YES';
+        $approved = '1';
     } else {
-        $approved = 'NO';
+        $approved = '0';
     }
-    $PIC_NEED_APPROVAL = ($approved == 'NO');
+    $PIC_NEED_APPROVAL = ($approved == '0');
 
     // User ID is recorded when in admin mode
     $user_id  = USER_ID;

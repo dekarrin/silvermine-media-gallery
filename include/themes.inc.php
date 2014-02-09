@@ -2082,7 +2082,7 @@ function theme_main_menu($which)
             }
 
             if (!$upload_allowed) {
-                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='YES' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
+                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='1' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
                 $public_albums = cpg_db_query($query);
 
                 if (mysql_num_rows($public_albums)) {
@@ -2313,7 +2313,7 @@ function theme_admin_mode_menu()
             $available_doc_folders_array = form_get_foldercontent('docs/', 'folder', '', array('images', 'js', 'style', '.svn'));
             // Query the languages table
             $help_lang = '';
-            $results = cpg_db_query("SELECT lang_id, abbr FROM {$CONFIG['TABLE_LANGUAGE']} WHERE available='YES' AND enabled='YES'");
+            $results = cpg_db_query("SELECT lang_id, abbr FROM {$CONFIG['TABLE_LANGUAGE']} WHERE available='1' AND enabled='1'");
             while ($row = mysql_fetch_array($results)) {
                 if ($CONFIG['lang'] == $row['lang_id']) {
                     $help_lang = $row['abbr'];
@@ -3637,7 +3637,7 @@ function theme_html_rating_box()
     global $CONFIG, $CURRENT_PIC_DATA, $CURRENT_ALBUM_DATA, $THEME_DIR, $USER_DATA, $USER, $LINEBREAK;
     global $template_image_rating, $template_image_rating_oldstyle, $lang_rate_pic;
 
-    if (!(USER_CAN_RATE_PICTURES && $CURRENT_ALBUM_DATA['votes'] == 'YES')) {
+    if (!(USER_CAN_RATE_PICTURES && $CURRENT_ALBUM_DATA['votes'] == '1')) {
         return '';
     } else {
         //check if the users already voted or if this user is the owner
@@ -3832,13 +3832,13 @@ function theme_html_comments($pid)
             $pending_approval = '';
             if (USER_IS_ADMIN) {
                 //display the selector approve/disapprove
-                if ($row['approval'] == 'NO') {
+                if ($row['approval'] == '0') {
                     $pending_approval = cpg_fetch_icon('comment_disapprove_disabled', 0) . '<a href="reviewcom.php?pos=-{PID}&amp;msg_id={MSG_ID}&amp;form_token={FORM_TOKEN}&amp;timestamp={TIMESTAMP}&amp;what=approve" title="' . $lang_display_comments['approve'] . '">' . cpg_fetch_icon('comment_approve', 0) . '</a>';
                 } else {
                     $pending_approval = '<a href="reviewcom.php?pos=-{PID}&amp;msg_id={MSG_ID}&amp;form_token={FORM_TOKEN}&amp;timestamp={TIMESTAMP}&amp;what=disapprove" title="' . $lang_display_comments['disapprove'] . '">' . cpg_fetch_icon('comment_disapprove', 0) . '</a>' . cpg_fetch_icon('comment_approve_disabled', 0);
                 }
             } else { // user or guest is logged in - start
-                if ($row['approval'] == 'NO') { // the comment is not approved - start
+                if ($row['approval'] == '0') { // the comment is not approved - start
                     if ($user_can_edit) { // the comment comes from the current visitor, display it with a warning that it needs admin approval
                         $pending_approval = cpg_fetch_icon('comment_approval', 0, $lang_display_comments['pending_approval']);
                     } else { // the comment comes from someone else - don't display it at all
@@ -3862,7 +3862,7 @@ function theme_html_comments($pid)
             }
 
             // wrap the comment into italics if it isn't approved
-            if ($row['approval'] == 'NO') {
+            if ($row['approval'] == '0') {
                 $comment_body = '<em>'.$comment_body.'</em>';
                 $row['msg_author'] = $row['msg_author'];
             }
@@ -3920,7 +3920,7 @@ function theme_html_comments($pid)
 
         $html .= $tabs;
     }
-    if (USER_CAN_POST_COMMENTS && $CURRENT_ALBUM_DATA['comments'] == 'YES') {
+    if (USER_CAN_POST_COMMENTS && $CURRENT_ALBUM_DATA['comments'] == '1') {
         if (USER_ID) {
             $user_name_input = '<tr><td colspan="2"><input type="hidden" name="msg_author" value="' . stripslashes(USER_NAME) . '" /></td>';
             template_extract_block($template_add_your_comment, 'user_name_input', $user_name_input);
@@ -3976,7 +3976,7 @@ function theme_html_comments($pid)
             $html .= template_eval($template_add_your_comment, $params);
         }
     } else { // user can not post comments
-        if ($CONFIG['comment_promote_registration'] == 1 && $CURRENT_ALBUM_DATA['comments'] == 'YES') {
+        if ($CONFIG['comment_promote_registration'] == 1 && $CURRENT_ALBUM_DATA['comments'] == '1') {
             template_extract_block($template_add_your_comment, 'user_name_input');
             if ($CONFIG['enable_smilies'] == 1) {
                 template_extract_block($template_add_your_comment, 'input_box_smilies');

@@ -285,7 +285,7 @@ function get_subcat_data(&$cat_data)
         FROM {$CONFIG['TABLE_ALBUMS']} AS a
         INNER JOIN {$CONFIG['TABLE_PICTURES']} AS p ON p.aid = a.aid
         WHERE a.category > " . FIRST_USER_CAT . "
-        AND approved = 'YES'";
+        AND approved = '1'";
 
     if ($FORBIDDEN_SET_DATA) {
         $sql .= 'AND a.aid NOT IN (' . implode(', ', $FORBIDDEN_SET_DATA) . ')';
@@ -408,7 +408,7 @@ function get_subcat_data(&$cat_data)
         INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS r ON r.category = c.cid
         INNER JOIN {$CONFIG['TABLE_PICTURES']} AS p ON p.aid = r.aid
         $RESTRICTEDWHERE
-        AND approved = 'YES'
+        AND approved = '1'
         AND c.depth BETWEEN $CURRENT_CAT_DEPTH + 1 AND $CURRENT_CAT_DEPTH + {$CONFIG['subcat_level']}
         GROUP BY r.aid
         ORDER BY NULL";
@@ -549,9 +549,9 @@ function get_cat_list(&$breadcrumb, &$cat_data, &$statistics)
             $sql = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']}";
 
             if ($pic_filter) {
-                $sql .= " AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE approved = 'YES' $pic_filter";
+                $sql .= " AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE approved = '1' $pic_filter";
             } else {
-                $sql .= " WHERE approved = 'YES'";
+                $sql .= " WHERE approved = '1'";
             }
 
             $result = cpg_db_query($sql);
@@ -567,9 +567,9 @@ function get_cat_list(&$breadcrumb, &$cat_data, &$statistics)
 
             if ($CONFIG['comment_approval']) {
                 if ($pic_filter) {
-                    $sql .= " AND approval = 'YES'";
+                    $sql .= " AND approval = '1'";
                 } else {
-                    $sql .= " WHERE approval = 'YES'";
+                    $sql .= " WHERE approval = '1'";
                 }
             }
 
@@ -587,9 +587,9 @@ function get_cat_list(&$breadcrumb, &$cat_data, &$statistics)
             $sql = "SELECT SUM(hits) FROM {$CONFIG['TABLE_PICTURES']}";
 
             if ($pic_filter) {
-                $sql .= " AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE approved = 'YES' $pic_filter";
+                $sql .= " AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE approved = '1' $pic_filter";
             } else {
-                $sql .= " WHERE approved = 'YES'";
+                $sql .= " WHERE approved = '1'";
             }
 
             $result = cpg_db_query($sql);
@@ -652,7 +652,7 @@ function list_users()
         $user_album_count = $user['alb_count'];
 
         if ($user_pic_count) {
-            $sql = "SELECT filepath, filename, url_prefix, pwidth, pheight " . "FROM {$CONFIG['TABLE_PICTURES']} " . "WHERE pid='$user_thumb_pid' AND approved='YES'";
+            $sql = "SELECT filepath, filename, url_prefix, pwidth, pheight " . "FROM {$CONFIG['TABLE_PICTURES']} " . "WHERE pid='$user_thumb_pid' AND approved='1'";
             $result = cpg_db_query($sql);
             if (mysql_num_rows($result)) {
                 $picture = mysql_fetch_assoc($result);
@@ -769,7 +769,7 @@ function list_albums()
         //This query will fetch album stats and keywords for the albums
         $sql = "SELECT a.aid, count( p.pid ) AS pic_count, max( p.pid ) AS last_pid, max( p.ctime ) AS last_upload, a.keyword, a.alb_hits"
                 ." FROM {$CONFIG['TABLE_ALBUMS']} AS a "
-                ." LEFT JOIN {$CONFIG['TABLE_PICTURES']} AS p ON a.aid = p.aid AND p.approved = 'YES' "
+                ." LEFT JOIN {$CONFIG['TABLE_PICTURES']} AS p ON a.aid = p.aid AND p.approved = '1' "
                 ." WHERE a.owner = {$USER_DATA['user_id']} $album_filter AND a.aid IN (".implode(', ', $current_albums).") GROUP BY a.aid $limit";
         $alb_stats_q = cpg_db_query($sql);
         $alb_stats = cpg_db_fetch_rowset($alb_stats_q);
@@ -799,7 +799,7 @@ function list_albums()
         //This query will fetch album stats and keywords for the albums
         $sql = "SELECT a.aid, count( p.pid ) AS pic_count, max( p.pid ) AS last_pid, max( p.ctime ) AS last_upload, a.keyword, a.alb_hits"
             . " FROM {$CONFIG['TABLE_ALBUMS']} AS a "
-            . " LEFT JOIN {$CONFIG['TABLE_PICTURES']} AS p ON a.aid = p.aid AND p.approved = 'YES' "
+            . " LEFT JOIN {$CONFIG['TABLE_PICTURES']} AS p ON a.aid = p.aid AND p.approved = '1' "
             . " WHERE a.category = $cat $album_filter GROUP BY a.aid "
             . " ORDER BY $sort_order $limit";
         $alb_stats_q = cpg_db_query($sql);
@@ -940,7 +940,7 @@ function album_adm_menu($aid, $cat, $owner)
     static $public_album_uploads = null;
     if ($public_album_uploads === null) {
         $public_album_uploads = array();
-        $result = cpg_db_query("SELECT a.aid FROM {$CONFIG['TABLE_ALBUMS']} AS a INNER JOIN {$CONFIG['TABLE_PICTURES']} as p ON p.aid = a.aid WHERE uploads = 'YES' AND category < ".FIRST_USER_CAT." AND (visibility = '0' OR visibility IN ".USER_GROUP_SET." OR alb_password != '') AND owner_id = ".USER_ID);
+        $result = cpg_db_query("SELECT a.aid FROM {$CONFIG['TABLE_ALBUMS']} AS a INNER JOIN {$CONFIG['TABLE_PICTURES']} as p ON p.aid = a.aid WHERE uploads = '1' AND category < ".FIRST_USER_CAT." AND (visibility = '0' OR visibility IN ".USER_GROUP_SET." OR alb_password != '') AND owner_id = ".USER_ID);
         while ($row = mysql_fetch_assoc($result)) {
             $public_album_uploads[] = $row['aid'];
         }

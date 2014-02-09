@@ -536,7 +536,7 @@ case 'albmgr':
 
         if (!empty($get_album_name)) {
             //add the album to database
-            $query = "INSERT INTO {$CONFIG['TABLE_ALBUMS']} (category, title, uploads, pos, description, owner) VALUES ('$category', '$get_album_name', 'NO', '{$position}', '', '$user_id')";
+            $query = "INSERT INTO {$CONFIG['TABLE_ALBUMS']} (category, title, uploads, pos, description, owner) VALUES ('$category', '$get_album_name', '0', '{$position}', '', '$user_id')";
             cpg_db_query($query);
 
             //get the aid of added the albums
@@ -893,12 +893,12 @@ case 'user':
                     print '</strong></td>';
                     print '<td class="tableb">';
 
-                    if ($user_data['user_active'] == 'YES') {
+                    if ($user_data['user_active'] == '1') {
                         // user is already active
                         print $lang_delete_php['user_already_active'];
                     } else {
                         // activate this user
-                        cpg_db_query("UPDATE {$CONFIG['TABLE_USERS']} SET user_active = 'YES', user_actkey = '' WHERE user_id = '$key'");
+                        cpg_db_query("UPDATE {$CONFIG['TABLE_USERS']} SET user_active = '1', user_actkey = '' WHERE user_id = '$key'");
                         print $lang_delete_php['activated'];
 
                         if ($user_data['user_actkey']) {
@@ -957,12 +957,12 @@ case 'user':
                     print '</strong></td>';
                     print '<td class="tableb">';
 
-                    if ($user_data['user_active'] == 'NO') {
+                    if ($user_data['user_active'] == '0') {
                         // user is already inactive
                         print $lang_delete_php['user_already_inactive'];
                     } else {
                         // deactivate this user
-                        cpg_db_query("UPDATE {$CONFIG['TABLE_USERS']} SET user_active = 'NO' WHERE user_id = '$key'");
+                        cpg_db_query("UPDATE {$CONFIG['TABLE_USERS']} SET user_active = '0' WHERE user_id = '$key'");
                         print $lang_delete_php['deactivated'];
                     }
 
