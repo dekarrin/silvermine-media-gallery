@@ -99,6 +99,11 @@ function add_picture($aid, $filepath, $filename, $position = 0, $title = '', $ca
                 return $result;
             }
         }
+    } elseif (is_movie($filename)) {
+	$id3 = new getID3();
+	$moviedata = $id3->analyze($image);
+	$imagesize[0] = $moviedata['video']['resolution_x'];
+	$imagesize[1] = $moviedata['video']['resolution_y'];
     } else {
         $imagesize[0] = $iwidth;
         $imagesize[1] = $iheight;

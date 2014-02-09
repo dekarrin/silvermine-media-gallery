@@ -3292,6 +3292,11 @@ function theme_html_picture($from_gallery = false)
 
     if ($mime_content['content']=='movie' || $mime_content['content']=='audio') {
 
+		$resize_fix = dkrn_get_display_size($CURRENT_PIC_DATA['pwidth'], $CURRENT_PIC_DATA['pheight']);
+		if ($mime_content['content'] == 'audio') {
+			$resize_fix['h'] = $CURRENT_PIC_DATA['pheight'];
+		}
+
         if ($CURRENT_PIC_DATA['pwidth']==0 || $CURRENT_PIC_DATA['pheight']==0) {
             $resize_method = $CONFIG['picture_use'] == "thumb" ? ($CONFIG['thumb_use'] == "ex" ? "any" : $CONFIG['thumb_use']) : $CONFIG['picture_use'];
             if ($resize_method == 'ht') {

@@ -35,6 +35,7 @@ if (ini_get('register_globals') == '1' || strtolower(ini_get('register_globals')
 }
 
 require_once('include/inspekt.php');
+require_once('include/getid3/getid3.php');
 
 // Set $strict to false to make the superglobals available
 $strict = TRUE;

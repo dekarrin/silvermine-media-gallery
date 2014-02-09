@@ -5414,6 +5414,14 @@ if (!function_exists('json_encode')) {
  */
 function cpg_getimagesize($image, $force_cpg_function = false)
 {
+	if (is_movie($image)) {
+		$id3 = new getID3();
+		$mdata = $id3->analyze($image);
+		$x = $mdata['video']['resolution_x'];
+		$y = $mdata['video']['resolution_y'];
+		$type = $mdata['video']['dataformat'];
+		return array($x, $y, $type, 'height="' . $y . '" width="' . $x . '"');
+	}
     if (!function_exists('getimagesize') || $force_cpg_function) {
         // custom function borrowed from http://www.wischik.com/lu/programmer/get-image-size.html
         $f = @fopen($image, 'rb');
