@@ -40,6 +40,8 @@ $(document).ready(function(){
                 i.src   = data['url'];
                 Title   = data['title'];
                 Pid     = data['pid'];
+		i.height = data['height'];
+		i.width = data['width'];
               }); 
         }
         
