@@ -202,9 +202,7 @@ function form_alb_thumb()
 {
     global $CONFIG, $lang_catmgr_php, $lang_modifyalb_php, $current_category, $cid, $USER_DATA;
 
-// DEKKY MOD START - yes/no -> 1/0 fix
-    $results = cpg_db_query("SELECT pid, filepath, filename, url_prefix FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE a.category = $cid AND approved = '1' ORDER BY filename");
-// DEKKY MOD END
+    $results = cpg_db_query("SELECT pid, filepath, filename, url_prefix FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE a.category = $cid AND approved = 'YES' ORDER BY filename");
 
     if (mysql_num_rows($results) == 0) {
 

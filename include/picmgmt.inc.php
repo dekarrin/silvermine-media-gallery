@@ -129,17 +129,15 @@ function add_picture($aid, $filepath, $filename, $position = 0, $title = '', $ca
     }
     // Test if picture requires approval
     if (GALLERY_ADMIN_MODE) {
-// DEKKY MOD START - db y/n fix
-        $approved = '1';
+        $approved = 'YES';
     } elseif (!$USER_DATA['priv_upl_need_approval'] && $category == FIRST_USER_CAT + USER_ID) {
-        $approved = '1';
+        $approved = 'YES';
     } elseif (!$USER_DATA['pub_upl_need_approval'] && $category < FIRST_USER_CAT) {
-        $approved = '1';
+        $approved = 'YES';
     } else {
-        $approved = '0';
+        $approved = 'NO';
     }
-    $PIC_NEED_APPROVAL = ($approved == '0');
-// DEKKY MOD END
+    $PIC_NEED_APPROVAL = ($approved == 'NO');
 
     // User ID is recorded when in admin mode
     $user_id  = USER_ID;

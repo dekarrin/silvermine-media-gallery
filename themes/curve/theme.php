@@ -430,9 +430,7 @@ function theme_main_menu($which)
             }
 
             if (!$upload_allowed) {
-// DEKKY MOD START - db y/n fix
-                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='1' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
-// DEKKY MOD END
+                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='YES' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
                 $public_albums = cpg_db_query($query);
 
                 if (mysql_num_rows($public_albums)) {
