@@ -29,6 +29,7 @@ define('UTIL_PHP', true);
 
 require('include/init.inc.php');
 require('include/picmgmt.inc.php');
+require_once('include/comics.inc.php');
 
 if (!GALLERY_ADMIN_MODE) {
     cpg_die(ERROR, $lang_errors['access_denied'], __FILE__, __LINE__);
@@ -89,6 +90,29 @@ $keyword_replace2 = sprintf(
                     );
 // $lang_util_php['keyword_replace_values']
 // $lang_common['keyword_separators']
+
+
+define('COMICS_DIR', 'comics');
+function get_comic_file() {
+	$files = scandir(COMICS_DIR);
+	if (count($files) == 2) {
+		return '';
+	} else {
+		$uploading = '.';
+		$i = 0;
+		while ($uploading == '.' || $uploading == '..') {
+			$uploading = $files[$i++];
+		}
+		return COMICS_DIR . '/' . $uploading;
+	}
+}
+
+$comic_convert_file = get_comic_file();
+$comic_convert_from = '<span style="color:red;">No comic files detected.</span>';
+if (!empty($comic_convert_file)) {
+	$comic_convert_from = "Will upload comic '$comic_convert_file'.";
+}
+
 
 // Set up array of admin tools to choose
 $tasks = array(
@@ -184,6 +208,20 @@ $tasks = array(
                 <br />
                 '. $lang_util_php['keyword_explanation']
     ),
+	
+	
+	'comic_convert' => array(
+		'comic_convert',
+		'Add captured comic files','
+				<strong>' . $comic_convert_from . ' (2)</strong><br />
+				<input type="hidden" name="comic_convert_file" value="' . $comic_convert_file . '" />
+				Title: <input type="text" name="comic_convert_title" class="textinput" /><br />
+				Author: <input type="text" name="comic_convert_author" class="textinput" /><br />
+				Keywords: <input type="text" name="comic_convert_keywords" class="textinput" /><br />
+				<input type="checkbox" name="comic_convert_delete" checked="checked" class="nobg" /> Delete after uploading<br />
+				<br />
+				Uploads one comic from the comics dir into its own album.'
+	),
 );
 
 if ($superCage->post->keyExists('action') && $matches = $superCage->post->getMatched('action', '/^[A-Za-z_]+$/')) {
@@ -990,6 +1028,35 @@ EOT;
 
     mysql_free_result($result);
 }
+
+
+function comic_convert() {
+	global $icon_array;
+	
+	$superCage = Inspekt::makeSuperCage();
+	$delete = $superCage->post->keyExists('comic_convert_delete');
+	$title = $superCage->post->keyExists('comic_convert_title') ? html_entity_decode($superCage->post->getEscaped('comic_convert_title')) : '';
+	$author = $superCage->post->keyExists('comic_convert_author') ? html_entity_decode($superCage->post->getEscaped('comic_convert_author')) : '';
+	$keywords = $superCage->post->keyExists('comic_convert_keywords') ? html_entity_decode($superCage->post->getEscaped('comic_convert_keywords')) : '';
+	$file = $superCage->post->keyExists('comic_convert_file') ? $superCage->post->getPath('comic_convert_file') : '';
+	
+	starttable('100%', $icon_array['info'] . ' Comic Assimilation', 1);
+	if (empty($title) || empty($file)) {
+		echo '    <tr><td><span style="color:red;">Invalid Form Parameters</span></td></tr>';
+	} else {
+		echo "    <tr><td><br />\n";
+		$pages = upload_comic($file, $title, $author, $keywords);
+		$s = ($pages == 1) ? '' : 's';
+		echo "        <strong>Added '$title' with $pages page$s.</strong><br />\n";
+		if ($delete) {
+			unlink($file);
+			echo "        <strong>Deleted source file '$file'.</strong><br />\n";
+		}
+		echo '    </tr></td>';
+	}
+	endtable();
+}
+
 
 
 function keyword_convert()
