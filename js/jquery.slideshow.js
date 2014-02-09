@@ -76,7 +76,9 @@ $(document).ready(function(){
                     src: i.src,
                     title: Title,
                     alt: "jQuery Logo",
-                    style: "display: none;"
+                    style: "display: none;",
+		    height: i.height,
+		    width: i.width
                 }).fadeIn();
                 
                 $("#title").html(Title);

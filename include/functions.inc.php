@@ -3362,6 +3362,8 @@ function& display_slideshow($pos, $ajax_show = 0)
     $Pic   = array();
     $Pid   = array();
     $Title = array();
+    $Height = array();
+    $Width = array();
 
     $i = 0;
     $j = 0;
@@ -3397,6 +3399,9 @@ function& display_slideshow($pos, $ajax_show = 0)
 
         $Pid[$i]   = $picture['pid'];
         $Title[$i] = $picture['title'] ? $picture['title'] : $picture['filename'];
+	$display_size_fixed = dkrn_get_display_size($picture['pwidth'], $picture['pheight']);
+	$Height[$i] = round($display_size_fixed['h']);
+	$Width[$i] = round($display_size_fixed['w']);
 
         $i++;
     }
@@ -3435,6 +3440,8 @@ function& display_slideshow($pos, $ajax_show = 0)
         'url' => $Pic['0'],
         'title' => $Title['0'],
         'pid' => $Pid['0'],
+	'width' => $Width['0'],
+	'height' => $Height['0'],
     );
 
     $dataJson = json_encode($dataArray);
