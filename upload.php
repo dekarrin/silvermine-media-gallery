@@ -970,7 +970,7 @@ EOT;
         // Create thumbnail and intermediate image and add the image into the DB
         $result = add_picture($album, $filepath, $picture_name, 0, '', '', '', '', '', '', '', $category);
 
-        if ($result !== true) {
+        if ($result !== true && $result !== 2) {
             // The file could not be placed.
             $file_placement = 'no';
         } else {

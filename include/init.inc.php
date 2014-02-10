@@ -36,6 +36,7 @@ if (ini_get('register_globals') == '1' || strtolower(ini_get('register_globals')
 
 require_once('include/inspekt.php');
 require_once('include/getid3/getid3.php');
+require_once('include/video_convert.inc.php');
 
 // Set $strict to false to make the superglobals available
 $strict = TRUE;
@@ -168,6 +169,7 @@ $CONFIG['TABLE_CATMAP']        = $CONFIG['TABLE_PREFIX'].'categorymap';
 $CONFIG['TABLE_LANGUAGE']      = $CONFIG['TABLE_PREFIX'].'languages';
 $CONFIG['TABLE_DICT']          = $CONFIG['TABLE_PREFIX'].'dict';
 $CONFIG['TABLE_CAPTURES']      = $CONFIG['TABLE_PREFIX'].'captures';
+$CONFIG['TABLE_CONVERSIONS']   = $CONFIG['TABLE_PREFIX'].'conversions';
 
 // Connect to database
 $CONFIG['LINK_ID'] = cpg_db_connect();

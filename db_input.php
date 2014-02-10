@@ -570,7 +570,11 @@ case 'picture':
     // Upload is ok
     // Create thumbnail and internediate image and add the image into the DB
     $result = add_picture($album, $filepath, $picture_name, 0, $title, $caption, $keywords, $user1, $user2, $user3, $user4, $category, $raw_ip, $hdr_ip, $superCage->post->getInt('width'), $superCage->post->getInt('height'));
-
+	$converting = false;
+	if (is_numeric($result) && $result === 2) {
+		$converting = true;
+		$result = true;
+	}
     if ($result !== true) {
         @unlink($uploaded_pic);
         cpg_die(CRITICAL_ERROR, isset($result['error']) ? $result['error'] : sprintf($lang_db_input_php['err_insert_pic'], $uploaded_pic) . '<br /><br />' . $ERROR, __FILE__, __LINE__, true);
@@ -584,12 +588,16 @@ case 'picture':
         }
         pagefooter();
     } else {
-        if (cpg_pw_protected_album_access($CURRENT_PIC_DATA['aid']) === 1) {
-            $redirect = "thumbnails.php?album=" . $CURRENT_PIC_DATA['aid'];
-        } else {
-            $redirect = "displayimage.php?pid=" . $CURRENT_PIC_DATA['pid'];
-        }
-        cpgRedirectPage($redirect, $lang_common['information'], $lang_db_input_php['upl_success'], 1);
+	if (!$converting) {
+	        if (cpg_pw_protected_album_access($CURRENT_PIC_DATA['aid']) === 1) {
+	            $redirect = "thumbnails.php?album=" . $CURRENT_PIC_DATA['aid'];
+		} else {
+       		    $redirect = "displayimage.php?pid=" . $CURRENT_PIC_DATA['pid'];
+       		}
+        	cpgRedirectPage($redirect, $lang_common['information'], $lang_db_input_php['upl_success'], 1);
+	} else {
+		cpgRedirectPage('index.php', $lang_common['information'], $lang_db_input_php['upl_success_con'], 1);
+	}
     }
 
     break;

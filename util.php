@@ -232,6 +232,14 @@ $tasks = array(
                 '. $lang_util_php['update_number'] . ' <input type="text" name="sub_dirs_numpics" value="'.$defpicnum.'" size="5" class="textinput" /> '.$lang_util_php['update_option'].'<br />
                 <input type="checkbox" name="sub_dirs_autorefresh" id="sub_dirs_autorefresh" checked="checked" value="1" class="checkbox" /><label for="sub_dirs_autorefresh">'.$lang_util_php['autorefresh'].'</label>'
 	),
+
+	'convert_videos_to_htmlv' => array(
+		'convert_videos_to_htmlv',
+		'Convert videos to HTML5','
+				Converts uploaded videos into HTML5-compatible formats.<br />
+		'. $lang_util_php['update_number'] . ' <input type="text" name="mp4_numpics" value="'.$defpicnum.'" size="5" class="textinput" /> '.$lang_util_php['update_option'].'<br />
+		<input type="checkbox" name="mp4_autorefresh" id="mp4_autorefresh" checked="checked" value="1" class="checkbox" /><label for="mp4_autorefresh">'.$lang_util_php['autorefresh'].'</label>'
+	),
 );
 
 if ($superCage->post->keyExists('action') && $matches = $superCage->post->getMatched('action', '/^[A-Za-z_]+$/')) {
@@ -416,6 +424,118 @@ function filename_to_title()
 
     echo '<br />' . $LINEBREAK . sprintf($lang_util_php['titles_updated'], $file_count) . '<br />' . $LINEBREAK;
 }
+
+
+function convert_videos_to_htmlv() {
+	global $CONFIG, $icon_array, $lang_util_php;
+	$superCage = Inspekt::makeSuperCage();
+	if ($superCage->post->keyExists('albumid')) {
+		$albumid = $superCage->post->getInt('albumid');
+	} else if ($superCage->get->keyExists('albumid')) {
+		$albumid = $superCage->get->getInt('albumid');
+	} else {
+		$albumid = 0;
+	}
+	$albstr = $albumid ? "WHERE P.aid = $albumid" : '';
+	if ($superCage->post->keyExists('mp4_autorefresh')) {
+		$autorefresh = $superCage->post->getInt('mp4_autorefresh');
+	} else if ($superCage->get->keyExists('mp4_autorefresh')) {
+		$autorefresh = $superCage->get->getInt('mp4_autorefresh');
+	}
+	if ($superCage->post->keyExists('mp4_numpics')) {
+		$numpics = $superCage->post->getInt('mp4_numpics');
+	} else if ($superCage->get->keyExists('mp4_numpics')) {
+		$numpics = $superCage->get->getInt('mp4_numpics');
+	}
+	if ($superCage->post->keyExists('startpic')) {
+		$startpic = $superCage->post->getInt('startpic');
+	} else if ($superCage->get->keyExists('startpic')) {
+		$startpic = $superCage->get->getInt('startpic');
+	} else {
+		$startpic = 0;
+	}
+
+	print '<a name="admin_tool_convert_videos_to_htmlv"></a>';
+	starttable('100%', $icon_array['util'] . 'Scheduling file conversion...');
+	$result = cpg_db_query("SELECT P.pid, P.aid, P.filepath, P.filename FROM {$CONFIG['TABLE_PICTURES']} AS P $albstr LIMIT $startpic, $numpics");
+	$count = mysql_num_rows($result);
+	$loopCounter = 0;
+	$tablestyle = 'tableb';
+	while ($row = mysql_fetch_assoc($result)) {
+		$loopCounter++;
+		if ($loopCounter % 2 == 0) {
+			$tablestyle .= ' tableb_alternate';
+		} else {
+			$tablestyle = 'tableb';
+		}
+// logic starts here (see move_uploaded_to_subdirs())
+		$pid = $row['pid'];
+		$movie_file = $CONFIG['fullpath'] . $row['filepath'] . $row['filename'];
+		$id3 = new getID3();
+		$moviedata = $id3->analyze($movie_file);
+		if ($moviedata['fileformat'] !== 'mp4') {
+			$data = json_encode(array(
+				'filename'	=> $row['filename'],
+				'filepath'	=> $row['filepath'],
+				'aid'		=> $row['aid'],
+			));
+			$r = cpg_db_query("SELECT * FROM {$CONFIG['TABLE_CONVERSIONS']}
+	WHERE pid='$pid'");
+			if (mysql_num_rows($r) != 0) {
+				echo '<tr><td class="'.$tablestyle.'">' . $icon_array['cancel'] . ' <tt>' . $row['filename'] . '</tt> was not scheduled because it is already in the queue!</td></tr>';
+			} else {
+				cpg_db_query("INSERT INTO {$CONFIG['TABLE_CONVERSIONS']}
+	(data, already_exists, pid) VALUES ('$data', '1', '$pid')");
+				$cid = cpg_db_last_insert_id();
+				$ext = pathinfo($row['filename'], PATHINFO_EXTENSION);
+				$dest = $CONFIG['fullpath'] . 'conversions/' . $cid . '.' . $ext;
+				echo '<tr><td class="'.$tablestyle.'">';
+				if (rename($movie_file, $dest)) {
+					dkrn_set_convert_status($cid, CONVERT_STATUS_READY);
+					echo $icon_array['ok'] . ' <tt>' . $row['filename'] . '</tt> ' . $lang_util_php['updated_successfully'] . '!';
+				} else {
+					echo $icon_array['stop'] .' '. sprintf($lang_util_php['error_rename'], "<tt>$movie_file</tt>", "<tt>$dest</tt>");
+				}
+				echo '</td></tr>';
+			}
+			mysql_free_result($r);
+		} else {
+			echo '<tr><td class="'.$tablestyle.'">' . $icon_array['cancel'] .' '. sprintf($lang_util_php['correct_format'], "<tt>$movie_file</tt> ") . '</td></tr>';
+		}
+// logic ends here (see move_uploaded_to_subdirs())
+	}
+	if ($count == $numpics) {
+		$startpic += $numpics;
+		list($timestamp, $form_token) = getFormToken();
+		if ($autorefresh) {
+			echo <<< EOT
+			<meta http-equiv="refresh" content="1; URL=util.php?mp4_numpics={$numpics}&startpic={$startpic}&albumid={$albumid}&mp4_autorefresh={$autorefresh}&action=convert_videos_to_htmlv&form_token={$form_token}&timestamp={$timestamp}#admin_tool_convert_videos_to_htmlv">
+EOT;
+		} else {
+			print <<< EOT
+			<tr>
+				<td class="tablef">
+					<form action="util.php#admin_tool_convert_videos_to_htmlv" method="post">
+						<input type="hidden" name="action" value="convert_videos_to_htmlv" />
+						<input type="hidden" name="mp4_numpics" value="{$numpics}" />
+						<input type="hidden" name="startpic" value="{$startpic}" />
+						<input type="hidden" name="albumid" value="{$albumid}" />
+						<input type="hidden" name="mp4_autorefresh" value="{$autorefresh}" />
+						<button type="submit" class="button" name="submit" id="submit" value="{$lang_util_php['continue']}">{$lang_util_php['continue']} {$icon_array['continue']}</button>
+						<input type="hidden" name="form_token" value="{$form_token}" />
+						<input type="hidden" name="timestamp" value="{$timestamp}" />
+					</form>
+				</td>
+			</tr>
+EOT;
+		}
+	} else {
+		`php converter/run_mp4_daemon.php > /dev/null 2>&1 &`;
+		echo '<tr><td class="tablef">' . $lang_util_php['video_conversion_finished'] . '</td></tr>';
+	}
+	endtable();
+}
+
 
 
 function move_uploaded_to_subdirs()
