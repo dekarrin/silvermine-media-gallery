@@ -498,7 +498,7 @@ function get_subcat_data(&$cat_data)
                 } else {
                     $cat_albums = '';
                 }
-                $cat_data[] = array($link, $cat['details']['description'], $album_count, $pic_count, 'cat_albums' => $cat_albums, 'cat_thumb' => $user_thumb);
+                $cat_data[] = array($link, $cat['details']['description'], $album_count, $pic_count, 'cat_albums' => $cat_albums, 'cat_thumb' => $user_thumb, 'cid' => $cid);
             }
 
         } // else CID != USER_GAL_CAT
