@@ -456,7 +456,7 @@ function get_subcat_data(&$cat_data)
                 //$users = ob_get_clean();
                 $link = str_repeat($indent, $level - 1) . "<a href=\"index.php?cat={$cid}\">{$cat['details']['name']}</a>";
                 $users         = '';
-                $cat_data[]    = array($link, str_repeat($indent, $level-1) . $cat['details']['description'], $album_count, $pic_count, 'cat_albums' => $users);
+                $cat_data[]    = array($link, str_repeat($indent, $level-1) . $cat['details']['description'], $album_count, $pic_count, 'cid' => $cid, 'cat_albums' => $users);
                 $HIDE_USER_CAT = 0;
             } else {
                 $HIDE_USER_CAT = 1;
@@ -490,7 +490,7 @@ function get_subcat_data(&$cat_data)
             $user_thumb = str_repeat($indent, $level-1) . $user_thumb;
             if ($pic_count == 0 && $album_count == 0) {
                 $user_thumb = str_repeat($indent, $level-1);
-                $cat_data[] = array($link, $cat['details']['description'], 'cat_thumb' => $user_thumb);
+                $cat_data[] = array($link, $cat['details']['description'], 'cat_thumb' => $user_thumb, 'cid' => $cid);
             } else {
                 // Check if you need to show first level album thumbnails
                 if ($level <= $CONFIG['subcat_level']) {

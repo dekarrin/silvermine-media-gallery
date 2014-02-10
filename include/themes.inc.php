@@ -341,29 +341,31 @@ if (!isset($template_cat_list)) { //{THEMES}
 $template_cat_list = <<<EOT
 <!-- BEGIN header -->
         <tr>
-                <td class="tableh1" width="80%" align="left">{CATEGORY}</td>
+                <td class="tableh1" width="70%" align="left">{CATEGORY}</td>
+		<td class="tableh1" width="10%" align="center">{RANDOM}</td>
                 <td class="tableh1" width="10%" align="center">{ALBUMS}</td>
                 <td class="tableh1" width="10%" align="center">{PICTURES}</td>
         </tr>
 <!-- END header -->
 <!-- BEGIN catrow_noalb -->
         <tr>
-                <td class="catrow_noalb" colspan="3"><table border="0"><tr><td align="left">{CAT_THUMB}</td><td align="left"><span class="catlink">{CAT_TITLE}</span>{CAT_DESC}</td></tr></table></td>
+                <td class="catrow_noalb" colspan="4"><table border="0"><tr><td align="left">{CAT_THUMB}</td><td align="left"><span class="catlink">{CAT_TITLE}</span>{CAT_DESC}</td></tr></table></td>
         </tr>
 <!-- END catrow_noalb -->
 <!-- BEGIN catrow -->
         <tr>
                 <td class="catrow" align="left"><table border="0"><tr><td>{CAT_THUMB}</td><td><span class="catlink">{CAT_TITLE}</span>{CAT_DESC}</td></tr></table></td>
+		<td class="catrow" align="center"><span class="catlink"><a href="random.php?mode=cat&id={CAT_CID}">Random</a></span></td>
                 <td class="catrow" align="center">{ALB_COUNT}</td>
                 <td class="catrow" align="center">{PIC_COUNT}</td>
-        </tr>
+	</tr>
         <tr>
-            <td class="tableb tableb_alternate" colspan="3">{CAT_ALBUMS}</td>
+            <td class="tableb tableb_alternate" colspan="4">{CAT_ALBUMS}</td>
         </tr>
 <!-- END catrow -->
 <!-- BEGIN footer -->
         <tr>
-                <td colspan="3" class="tableh1" align="center"><span class="statlink">{STATISTICS}</span></td>
+                <td colspan="4" class="tableh1" align="center"><span class="statlink">{STATISTICS}</span></td>
         </tr>
 <!-- END footer -->
 <!-- BEGIN spacer -->
@@ -2550,6 +2552,7 @@ function theme_display_cat_list($breadcrumb, &$cat_data, $statistics)
                 '{CATEGORY}' => $lang_cat_list['category'],
                 '{ALBUMS}' => $lang_cat_list['albums'],
                 '{PICTURES}' => $lang_cat_list['pictures'],
+		'{RANDOM}' => '&nbsp;',
         );
         echo template_eval($template, $params);
     }
@@ -2567,6 +2570,7 @@ function theme_display_cat_list($breadcrumb, &$cat_data, $statistics)
             echo template_eval($template_noalb, $params);
         } elseif (isset($category['cat_albums']) && ($category['cat_albums'] != '')) {
             $params = array(
+		    '{CAT_CID}' => $category['cid'],
                     '{CAT_TITLE}' => $category[0],
                     '{CAT_THUMB}' => $category['cat_thumb'],
                     '{CAT_DESC}' => $category[1],
