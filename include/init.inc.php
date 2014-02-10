@@ -167,6 +167,7 @@ $CONFIG['TABLE_TEMP_MESSAGES'] = $CONFIG['TABLE_PREFIX'].'temp_messages';
 $CONFIG['TABLE_CATMAP']        = $CONFIG['TABLE_PREFIX'].'categorymap';
 $CONFIG['TABLE_LANGUAGE']      = $CONFIG['TABLE_PREFIX'].'languages';
 $CONFIG['TABLE_DICT']          = $CONFIG['TABLE_PREFIX'].'dict';
+$CONFIG['TABLE_CAPTURES']      = $CONFIG['TABLE_PREFIX'].'captures';
 
 // Connect to database
 $CONFIG['LINK_ID'] = cpg_db_connect();

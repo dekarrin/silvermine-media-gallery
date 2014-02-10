@@ -185,6 +185,9 @@ $template_gallery_admin_menu = <<<EOT
                                     <!-- BEGIN batch_add -->
                                         <li><a href="searchnew.php" title="{SEARCHNEW_TITLE}"><span>{SEARCHNEW_ICO}{SEARCHNEW_LNK}</span></a></li>
                                     <!-- END batch_add -->
+                                    <!-- BEGIN media_capture -->
+                                        <li><a href="mediacapture.php" title="{MEDIACAPTURE_TITLE}"><span>{MEDIACAPTURE_ICO}{MEDIACAPTURE_LNK}</span></a></li>
+                                    <!-- END media_capture -->
                                     <!-- BEGIN admin_tools -->
                                         <li><a href="util.php?t={TIME_STAMP}#admin_tools" title="{UTIL_TITLE}"><span>{UTIL_ICO}{UTIL_LNK}</span></a></li>
                                     <!-- END admin_tools -->

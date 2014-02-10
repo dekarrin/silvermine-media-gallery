@@ -209,6 +209,8 @@ $lang_gallery_admin_menu['searchnew_title'] = 'Go to the batch add process';
 $lang_gallery_admin_menu['searchnew_lnk'] = 'Batch add files';
 $lang_gallery_admin_menu['util_title'] = 'Go to the admin tools';
 $lang_gallery_admin_menu['util_lnk'] = 'Admin Tools';
+$lang_gallery_admin_menu['mediacapture_title'] = 'Download media from external websites';
+$lang_gallery_admin_menu['mediacapture_lnk'] = 'Capture Media';
 $lang_gallery_admin_menu['key_lnk'] = 'Keyword Dictionary';
 $lang_gallery_admin_menu['ban_title'] = 'Go to the banned users';
 $lang_gallery_admin_menu['ban_lnk'] = 'Ban Users';
@@ -2591,5 +2593,21 @@ $lang_plugin_php['link_target_description'] = 'Changes the way external links ar
 $lang_plugin_php['link_target_extra'] = 'This plugin has an impact mostly on the "Powered by Coppermine" link at the bottom of the gallery output.';
 $lang_plugin_php['link_target_recommendation'] = 'It is recommended not to use this plugin to avoid bossing your users around: opening links in a new window means bossing around your site visitors.';
 }
-
+//-----------------------
+// File: mediacapture.php
+//-----------------------
+if (defined('MEDIACAPTURE_PHP')) {
+$lang_media_capture_php['page_title'] = 'Media Capture';
+$lang_media_capture_php['msg_item_added'] = 'Successfully added \'%s\'.';
+$lang_media_capture_php['msg_item_deleted'] = 'Successfully deleted \'%s\'.';
+$lang_media_capture_php['msg_item_edited'] = 'Successfully updated \'%s\'.';
+$lang_media_capture_php['table_title_title'] = 'Title';
+$lang_media_capture_php['table_author_title'] = 'Author';
+$lang_media_capture_php['table_url_title'] = 'URL';
+$lang_media_capture_php['form_add_btn'] = 'Add Capture';
+$lang_media_capture_php['form_edit_btn'] = 'Update';
+$lang_media_capture_php['form_del_btn'] = 'Delete';
+$lang_media_capture_php['capture_btn'] = 'Start Capture';
+$lang_media_capture_php['capture_started'] = 'Capture process started.';
+}
 ?>
