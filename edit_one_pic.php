@@ -186,6 +186,10 @@ function process_post_data()
     $query = "UPDATE {$CONFIG['TABLE_PICTURES']} SET $update WHERE pid='$pid' LIMIT 1";
     cpg_db_query($query);
 
+	if ($pic['aid'] != $aid) {
+		dkrn_move_pid_to_album($pid, $aid);
+	}
+
     // Executes after a file update is committed
     CPGPluginAPI::action('after_edit_file', $pid);
 
