@@ -371,6 +371,10 @@ function process_post_data()
         } else {
             cpg_db_query("UPDATE {$CONFIG['TABLE_PICTURES']} SET $update WHERE pid = $pid");
 
+		if ($pic['aid'] != $aid) {
+			dkrn_move_pid_to_album($pid, $aid);
+		}
+
             // Executes after a file update is committed
             CPGPluginAPI::action('after_edit_file', $pid);
         }
