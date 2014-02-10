@@ -79,6 +79,14 @@ foreach (range(1, 4) as $i) {
 EOT;
 }
 
+$media_type_options = '';
+$result = cpg_db_query("SELECT cid, name FROM {$CONFIG['TABLE_CATEGORIES']} WHERE cid > 1;");
+while (($row = mysql_fetch_assoc($result)) !== false) {
+	$media_type_options .= <<<EOT
+ <label for="media_{$row['cid']} class="clickable_option">{$row['name']}</label><input type="checkbox" name="media_{$row['cid']}" id="media_{$row['cid']}" checked="checked" />
+EOT;
+}
+mysql_free_result($result);
 $text .= <<< EOT
         <tr>
             <td class="tableb" align="center">
@@ -90,6 +98,9 @@ $text .= <<< EOT
                 <tr>
                         <td class="tableb">
                                 <table align="center" width="60%">
+					<tr>
+						<td colspan="2"><label for="media_type">Media Type: </label>{$media_type_options}</td>
+					</tr>
                                         <tr>
                                                 <td class="tableh2">{$lang_search_php['imgfields']}:</td>
                                                 <td align="center" class="tableh2">{$lang_search_php['age']}:</td>
@@ -133,13 +144,6 @@ $ip
                                                 <td><input type="checkbox" name="album_title" id="album_title" class="checkbox" /><label for="album_title" class="clickable_option">{$lang_search_php['album_title']}</label></td>
                                                 <td>&nbsp;</td>
                                         </tr>
-                                        <tr>
-                                                <td><input type="checkbox" name="category_title" id="category_title" class="checkbox" /><label for="category_title" class="clickable_option">{$lang_search_php['category_title']}</label></td>
-                                                <td>&nbsp;</td>
-                                        </tr>
-                                </table>
-                        </td>
-                </tr>
 EOT;
 
 

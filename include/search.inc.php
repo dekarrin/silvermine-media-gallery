@@ -29,6 +29,21 @@ $sort_order = isset($sort_array[$sort_code]) ? $sort_array[$sort_code] : $sort_a
 
 $allowed = array('title', 'caption', 'keywords', 'filename', 'pic_raw_ip', 'pic_hdr_ip', 'user1', 'user2', 'user3', 'user4');
 
+$media_types = array();
+$result = cpg_db_query("SELECT cid,name FROM {$CONFIG['TABLE_CATEGORIES']} WHERE cid > 1;");
+while (($row = mysql_fetch_assoc($result)) !== false) {
+	$media_types[$row['name']] = $row['cid'];
+}
+mysql_free_result($result);
+
+$selected_media_types = array();
+foreach ($media_types as $mt) {
+	if ($superCage->get->keyExists('media_' . $mt)) {
+		$selected_media_types[] = $mt;
+	}
+}
+
+
 global $cpg_udb;
 // Use actual column name for search by owner name
 if ($cpg_udb->can_join_tables && $USER['search']['params']['owner_name']) {
@@ -113,20 +128,41 @@ if ($search_string && isset($search_params['params'])) {
 
         $sql .= Inspekt::isInt($USER['search']['params']['newer_than']) ? ' AND ( ctime > '.time().' - '.( $USER['search']['params']['newer_than'] * 60*60*24).')' : '';
         $sql .= Inspekt::isInt($USER['search']['params']['older_than']) ? ' AND ( ctime < '.time().' - '.( $USER['search']['params']['older_than'] * 60*60*24).')' : '';
-        $sql .=  " AND approved = 'YES' $FORBIDDEN_SET";
+        $sql .=  " AND approved = '1' $FORBIDDEN_SET";
 
-        if ($superCage->get->keyExists('album_title')) {
+	print_r($media_types);
+        if ($superCage->get->keyExists('album_title') || array_key_exists('Manga', $media_types)) {
                 $album_query = "SELECT aid, title, description FROM `{$CONFIG['TABLE_ALBUMS']}` AS p"
-                        ." WHERE (`title` " . implode(" $type `title` ",$albcat_terms) . ") $FORBIDDEN_SET";
+                        ." WHERE (`title` " . implode(" $type `title` ",$albcat_terms) . ") ";
+		/**
+		 */
+
+		$album_query .= " AND (";
+		$first_smt = true;
+		foreach ($selected_media_types as $smt) {
+			if (!$first_smt) {
+				$album_query .= " OR ";
+			} else {
+				$first_smt = false;
+			}
+			$album_query .= "category = \"$smt\"";
+		}
+		$album_query .= ') ' . $FORBIDDEN_SET;
+
+		/**
+		*/
+
                 $result = cpg_db_query($album_query);
                 if (mysql_num_rows($result) > 0) {
                         starttable('100%', $lang_meta_album_names['album_search'],2);
                         while ($alb = mysql_fetch_assoc($result)) {
-                                $thumb_query = "SELECT filepath, filename, url_prefix, pwidth, pheight "
-                                        ." FROM `{$CONFIG['TABLE_PICTURES']}` "
-                                        ." WHERE (`aid` = '{$alb['aid']}') "
-                                        ." AND approved = 'YES' "
-                                        ." ORDER BY `pid` DESC";
+                                $thumb_query = "SELECT p.filepath, p.filename, p.url_prefix, p.pwidth, p.pheight "
+                                        ." FROM `{$CONFIG['TABLE_PICTURES']}` AS p"
+										." INNER JOIN `{$CONFIG['TABLE_ALBUMS']}` AS a"
+										." ON p.pid = a.thumb"
+                                        ." WHERE (p.`aid` = '{$alb['aid']}') "
+                                        ." AND p.approved = '1' "
+                                        ." ORDER BY p.`pid` DESC";
                                 $thumb_result = cpg_db_query($thumb_query);
                                 $thumb = mysql_fetch_assoc($thumb_result);
                                 // TODO: query above only pulls in last_pid in each album, not correct album thumb as set by user

@@ -73,6 +73,12 @@ if ($superCage->get->keyExists('search')) {
     // find out if a parameter has been submitted at all
     $allowed = array('title', 'caption', 'keywords', 'filename', 'pic_raw_ip', 'pic_hdr_ip', 'user1', 'user2', 'user3', 'user4', 'type', 'owner_name', 'newer_than', 'older_than');
 
+    $result = cpg_db_query("SELECT cid FROM {$CONFIG['TABLE_CATEGORIES']} WHERE cid > 1;");
+    while (($row = mysql_fetch_assoc($result)) !== false) {
+	$allowed[] = 'media_' . $row['cid'];
+    }
+    mysql_free_result($result);
+
     foreach ($allowed as $key) {
         if ($superCage->get->keyExists($key)) {
             $USER['search']['params'][$key] = $superCage->get->getEscaped($key);
