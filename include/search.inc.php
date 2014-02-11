@@ -102,7 +102,7 @@ if ($search_string && isset($search_params['params'])) {
                 foreach ($split_search as $index => $string) {
                         if (($index & 1) && strlen($string)) {
                                 $fields = array();
-                                if ($superCage->get->keyExists('album_title') || $superCage->get->keyExists('category_title')) $albcat_terms[] = " LIKE '%$string%'";
+                                if ($superCage->get->keyExists('album_title') || $superCage->get->keyExists('category_title') || array_key_exists('Manga', $media_types)) $albcat_terms[] = " LIKE '%$string%'";
                                 foreach ($search_params['params'] as $param => $value) {
                                         if (in_array($param, $allowed)) $fields[] = "$param LIKE '%$string%'";
                                 }
@@ -113,7 +113,7 @@ if ($search_string && isset($search_params['params'])) {
                                         if (strlen($word)) {
                                                 $word = addslashes($word);
                                                 $fields = array();
-                                                if ($superCage->get->keyExists('album_title') || $superCage->get->keyExists('category_title')) $albcat_terms[] = " LIKE '%$word%'";
+                                                if ($superCage->get->keyExists('album_title') || $superCage->get->keyExists('category_title') || array_key_exists('Manga', $media_types)) $albcat_terms[] = " LIKE '%$word%'";
                                                 foreach ($search_params['params'] as $param => $value) {
                                                         if (in_array($param, $allowed)) $fields[] = "$param LIKE '%$word%'";
                                                 }
