@@ -477,7 +477,7 @@ class core_udb {
                     . "FROM {$CONFIG['TABLE_ALBUMS']} AS a "
                         . "INNER JOIN {$this->usertable} AS u ON u.{$f['user_id']} = a.category - " . FIRST_USER_CAT . " "
                         . "INNER JOIN {$CONFIG['TABLE_PICTURES']} AS p ON p.aid = a.aid "
-                    . "WHERE ((ISNULL(approved) OR approved='YES') AND category > " . FIRST_USER_CAT . ") $FORBIDDEN_SET GROUP BY user_id "
+                    . "WHERE ((ISNULL(approved) OR approved='1') AND category > " . FIRST_USER_CAT . ") $FORBIDDEN_SET GROUP BY user_id "
                     . "ORDER BY category "
                     . "LIMIT $lower_limit, $users_per_page ";
             $result = cpg_db_query($sql);
@@ -493,7 +493,7 @@ class core_udb {
             $sql  = "SELECT category - 10000 AS user_id "
                     . "FROM {$CONFIG['TABLE_ALBUMS']} AS a "
                         . "INNER JOIN {$CONFIG['TABLE_PICTURES']} AS p ON p.aid = a.aid "
-                    . "WHERE ((ISNULL(approved) OR approved='YES') "
+                    . "WHERE ((ISNULL(approved) OR approved='1') "
                         . "AND category > " . FIRST_USER_CAT . ") $FORBIDDEN_SET "
                     . "GROUP BY category "
                     . "LIMIT $lower_limit, $users_per_page ";
@@ -525,7 +525,7 @@ class core_udb {
                         . "MAX(galleryicon) AS gallery_pid "
                     . "FROM {$CONFIG['TABLE_ALBUMS']} AS a "
                         . "INNER JOIN {$CONFIG['TABLE_PICTURES']} AS p ON p.aid = a.aid "
-                    . "WHERE ((ISNULL(approved) OR approved='YES') AND category > " . FIRST_USER_CAT . ") $FORBIDDEN_SET "
+                    . "WHERE ((ISNULL(approved) OR approved='1') AND category > " . FIRST_USER_CAT . ") $FORBIDDEN_SET "
                     . "GROUP BY user_id "
                     . "ORDER BY category "
                     . "LIMIT $lower_limit, $users_per_page ";
@@ -699,7 +699,7 @@ class core_udb {
         // Check for user in users table
         $sql =  "SELECT {$this->field['user_id']} AS user_id, {$this->field['username']} AS user_name "
             . "FROM {$this->usertable} "
-            . "WHERE {$this->field['username']} = '$username' AND BINARY {$this->field['password']} = '$encpassword'";
+            . "WHERE {$this->field['username']} = '$username' AND {$this->field['password']} = '$encpassword'";
         $results = cpg_db_query($sql);
         if (mysql_num_rows($results)) {
             $USER_DATA = mysql_fetch_assoc($results);
