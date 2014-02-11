@@ -148,10 +148,10 @@ if ($get_data_rejected==0) { // individual approval start
     // if all verifications have passed, execute the change and output the result; else, display an error message
     if ($get_data_rejected == 0) {
         if ($single_approval_array['what'] == 'approve') {
-            $query_approval = 'YES';
+            $query_approval = '1';
             $title = $lang_reviewcom_php['comment_approved'];
         } else {
-            $query_approval = 'NO';
+            $query_approval = '0';
             $title = $lang_reviewcom_php['comment_unapproved'];
         }
         cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET `approval` = '{$query_approval}' WHERE msg_id = {$single_approval_array['msg_id']}");
@@ -203,7 +203,7 @@ if ($superCage->post->keyExists('total_message_id_collector')) {
     foreach ($total_message_id_array as $message_id_check) {
         if ($superCage->post->getInt('status_approved_yes'.$message_id_check) != '') {
             $approved_yes_set .= $superCage->post->getInt('status_approved_yes'.$message_id_check) . ',';
-            if ($superCage->post->getInt('spam'.$message_id_check) == 'YES') {
+            if ($superCage->post->getInt('spam'.$message_id_check) == '1') {
                 // A comment that Akismet has detected as SPAM has been approved by the admin. Let's put the ID into the ham array
                 $akismet_ham_array[] = $message_id_check;
             }
@@ -217,11 +217,11 @@ if ($superCage->post->keyExists('total_message_id_collector')) {
     $nb_com_yes = 0;
     $nb_com_no = 0;
     if ($approved_yes_set != '') {
-        cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET `approval` = 'YES' WHERE msg_id IN ($approved_yes_set)");
+        cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET `approval` = '1' WHERE msg_id IN ($approved_yes_set)");
         $nb_com_yes = mysql_affected_rows();
     }
     if ($approved_no_set != '') {
-        cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET `approval` = 'NO' WHERE msg_id IN ($approved_no_set)");
+        cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET `approval` = '0' WHERE msg_id IN ($approved_no_set)");
         $nb_com_no = mysql_affected_rows();
     }
 }
@@ -233,7 +233,7 @@ if ($superCage->post->keyExists('cid_array')) {
     $cid_set = '';
     foreach ($cid_array as $cid) {
         $cid_set .= ($cid_set == '') ? '(' . $cid : ', ' . $cid;
-        if ($superCage->post->getAlpha('with_selected') == 'approve' && $superCage->post->getInt('spam'.$cid) == 'YES') {
+        if ($superCage->post->getAlpha('with_selected') == 'approve' && $superCage->post->getInt('spam'.$cid) == '1') {
             $akismet_ham_array[] = $cid;
         }
     }
@@ -248,10 +248,10 @@ if ($superCage->post->keyExists('cid_array')) {
         cpg_db_query("DELETE FROM {$CONFIG['TABLE_COMMENTS']} WHERE msg_id IN $cid_set");
         $nb_com_del = mysql_affected_rows();
     } elseif ($superCage->post->getAlpha('with_selected') == 'approve') {
-        cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET `approval` = 'YES' WHERE msg_id IN $cid_set");
+        cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET `approval` = '1' WHERE msg_id IN $cid_set");
         $nb_com_yes = mysql_affected_rows();
     } elseif ($superCage->post->getAlpha('with_selected') == 'disapprove') {
-        cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET `approval` = 'NO' WHERE msg_id IN $cid_set");
+        cpg_db_query("UPDATE {$CONFIG['TABLE_COMMENTS']} SET `approval` = '0' WHERE msg_id IN $cid_set");
         $nb_com_no = mysql_affected_rows();
     }
 }
@@ -493,7 +493,7 @@ if (!isset($get_sort) || !isset($sort_codes[$get_sort])) {
     $sort = $get_sort;
 }
 if ($CONFIG['display_comment_approval_only'] == 1) {
-    $only_comments_needing_approval = "AND approval='NO'";
+    $only_comments_needing_approval = "AND approval='0'";
 } else {
     $only_comments_needing_approval = '';
 }
@@ -525,14 +525,14 @@ while ($row = mysql_fetch_array($result)) {
     $thumb_link = 'displayimage.php?pos=' . - $row['pid'];
     $msg_date = localised_date($row['msg_date'], $lang_date['scientific']);
     $msg_body = bb_decode(process_smilies($row['msg_body']));
-    if ($row['approval'] == 'YES') {
+    if ($row['approval'] == '1') {
         $comment_approval_status = '<input name="approved'.$row['msg_id'].'" id="approved'.$row['msg_id'].'yes" type="radio" value="1" checked="checked" onchange="approveCommentEnable('.$row['msg_id'].');" /><label for="approved'.$row['msg_id'].'yes" class="clickable_option">' . $lang_common['yes'].'</label><br />' . $LINEBREAK;
         $comment_approval_status .= '<input name="approved'.$row['msg_id'].'" id="approved'.$row['msg_id'].'no" type="radio" value="0" onchange="approveCommentEnable('.$row['msg_id'].');" /><label for="approved'.$row['msg_id'].'no" class="clickable_option">' .$lang_common['no'].'</label>';
         $checkbox_status = '';
     } else {
         $comment_approval_status = '<input name="approved'.$row['msg_id'].'" id="approved'.$row['msg_id'].'yes" type="radio" value="1" onchange="approveCommentEnable('.$row['msg_id'].');" /><label for="approved'.$row['msg_id'].'yes" class="clickable_option">' .$lang_common['yes'].'</label><br />' . $LINEBREAK;
         $comment_approval_status .= '<input name="approved'.$row['msg_id'].'" id="approved'.$row['msg_id'].'no" type="radio" value="0" checked="checked" onchange="approveCommentEnable('.$row['msg_id'].');" /><label for="approved'.$row['msg_id'].'no" class="clickable_option">' .$lang_common['no'].'</label>';
-        if ($row['spam'] == 'YES') {
+        if ($row['spam'] == '1') {
             $checkbox_status = 'checked="checked"';
             $default_action_with_selected['do_nothing'] = 'checked="checked"';
             $default_action_with_selected['delete'] = '';
@@ -545,7 +545,7 @@ while ($row = mysql_fetch_array($result)) {
     $comment_approval_status .= '<input type="hidden" name="status_approved_yes'.$row['msg_id'].'" id="status_approved_yes'.$row['msg_id'].'" value="" />';
     $comment_approval_status .= '<input type="hidden" name="status_approved_no'.$row['msg_id'].'" id="status_approved_no'.$row['msg_id'].'" value="" />';
     if ($CONFIG['comment_akismet_api_key'] != '') {
-        if ($row['spam'] == 'YES') {
+        if ($row['spam'] == '1') {
             $akismet_status = cpg_fetch_icon('ignore', 0, $lang_reviewcom_php['is_spam']);
         } else {
             $akismet_status = cpg_fetch_icon('ok', 0, $lang_reviewcom_php['is_not_spam']);

@@ -469,7 +469,7 @@ EOT;
         } else {
             $disk_usage_output = theme_display_bar($user['disk_usage'],$user['group_quota'],150,'', '', '&nbsp;'.$lang_byte_units[1],'green','green');
         }
-        if ($user['user_active'] == 'NO') {
+        if ($user['user_active'] == '0') {
             //$user['group_name'] = '<i>' . $lang_usermgr_php['inactive'] . '</i>';
             $user['status'] = cpg_fetch_icon('offline', 0, $lang_usermgr_php['status_inactive']);
             $action = 'activate';
@@ -503,7 +503,7 @@ EOT;
         if ($lim_user == 0) {
             $result = cpg_db_query("SELECT COUNT(*) FROM {$CONFIG['TABLE_COMMENTS']} WHERE author_id = {$user['user_id']}"); // display all comments for the admin
         } else {
-            $result = cpg_db_query("SELECT COUNT(*) FROM {$CONFIG['TABLE_COMMENTS']} WHERE author_id = {$user['user_id']} AND approval = 'YES' "); // only display approved comments for non-admin
+            $result = cpg_db_query("SELECT COUNT(*) FROM {$CONFIG['TABLE_COMMENTS']} WHERE author_id = {$user['user_id']} AND approval = '1' "); // only display approved comments for non-admin
         }
         $commentCount = mysql_fetch_array($result);
         $user['comment_num'] = $commentCount[0];
@@ -764,7 +764,7 @@ function edit_user($user_id)
 
         if (mysql_num_rows(cpg_db_query("SELECT user_name FROM {$CONFIG['TABLE_BANNED']} WHERE user_name = '" . addslashes($user_data['user_name']) . "' AND brute_force=0 LIMIT 1"))){
             $user_status = $lang_usermgr_php['user_is_banned'];
-        } elseif ($user_data['user_active'] == 'YES') {
+        } elseif ($user_data['user_active'] == '1') {
             $user_status = $lang_usermgr_php['status_active'];
         } else {
             $user_status = $lang_usermgr_php['status_inactive'];
@@ -855,8 +855,8 @@ EOT;
 
             case 'yesno' :
                 $value = $user_data[$element[1]];
-                $yes_selected = ($value == 'YES' || $op == 'new_user') ? 'checked="checked"' : '';
-                $no_selected = ($value == 'NO') ? 'checked="checked"' : '';
+                $yes_selected = ($value == '1' || $op == 'new_user') ? 'checked="checked"' : '';
+                $no_selected = ($value == '0') ? 'checked="checked"' : '';
 
                 echo <<< EOT
             <tr>
@@ -864,9 +864,9 @@ EOT;
                             {$element[2]}
             </td>
                     <td class="{$row_style_class}" valign="top">
-                        <input type="radio" id="yes" name="{$element[1]}" value="YES" $yes_selected /><label for="yes" class="clickable_option">{$lang_common['yes']}</label>
+                        <input type="radio" id="yes" name="{$element[1]}" value="1" $yes_selected /><label for="yes" class="clickable_option">{$lang_common['yes']}</label>
                         &nbsp;&nbsp;
-                        <input type="radio" id="no" name="{$element[1]}" value="NO" $no_selected /><label for="no" class="clickable_option">{$lang_common['no']}</label>
+                        <input type="radio" id="no" name="{$element[1]}" value="0" $no_selected /><label for="no" class="clickable_option">{$lang_common['no']}</label>
                     </td>
             </tr>
 
@@ -920,7 +920,7 @@ EOT;
                             <label for="send_login_data">{$element[2]}</label>
             </td>
                     <td class="{$row_style_class} valign="top"">
-                        <input type="checkbox" id="send_login_data" name="{$element[1]}" value="YES" />
+                        <input type="checkbox" id="send_login_data" name="{$element[1]}" value="1" />
                     </td>
             </tr>
 
@@ -1041,7 +1041,7 @@ function update_user($user_id)
           "user_group_list = '$user_group_list'";
 
     if (!empty($user_password)) $sql_update .= ", user_password = '".(md5($user_password))."'";
-    if ($user_active == 'YES') $sql_update .= ", user_actkey = ''";
+    if ($user_active == '1') $sql_update .= ", user_actkey = ''";
     $sql_update .= " WHERE user_id = '$user_id'";
 
     cpg_db_query($sql_update);
@@ -1062,7 +1062,7 @@ function update_user($user_id)
         if (!cpg_mail(trim($user_email), $lang_usermgr_php['send_login_email_subject'], nl2br(strtr($lang_usermgr_php['send_login_data_email'], $template_vars)))) {
             cpg_die(CRITICAL_ERROR, $lang_usermgr_php['failed_sending_email'], __FILE__, __LINE__);
         }
-    } elseif ($user_data['user_actkey'] && $user_data['user_active'] == 'NO' && $user_active == 'YES') {
+    } elseif ($user_data['user_actkey'] && $user_data['user_active'] == '0' && $user_active == '1') {
         // send activation confirmation email (only once)
         require('include/mailer.inc.php');
 

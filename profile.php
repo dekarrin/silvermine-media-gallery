@@ -49,7 +49,7 @@ function cpgUserThumb($uid)
 {
     global $CONFIG, $FORBIDDEN_SET;
 
-    $query = "SELECT COUNT(*), MAX(pid) FROM {$CONFIG['TABLE_PICTURES']} AS p WHERE owner_id = '$uid' AND approved = 'YES' $FORBIDDEN_SET";
+    $query = "SELECT COUNT(*), MAX(pid) FROM {$CONFIG['TABLE_PICTURES']} AS p WHERE owner_id = '$uid' AND approved = '1' $FORBIDDEN_SET";
     $result = cpg_db_query($query);
     list($picture_count, $thumb_pid) = mysql_fetch_row($result);
     mysql_free_result($result);
@@ -92,7 +92,7 @@ function cpgUserLastComment($uid)
 {
     global $CONFIG, $FORBIDDEN_SET;
 
-    $result = cpg_db_query("SELECT COUNT(*), MAX(msg_id) FROM {$CONFIG['TABLE_COMMENTS']} AS c INNER JOIN {$CONFIG['TABLE_PICTURES']} AS p ON p.pid = c.pid WHERE approval = 'YES' AND author_id = '$uid' $FORBIDDEN_SET");
+    $result = cpg_db_query("SELECT COUNT(*), MAX(msg_id) FROM {$CONFIG['TABLE_COMMENTS']} AS c INNER JOIN {$CONFIG['TABLE_PICTURES']} AS p ON p.pid = c.pid WHERE approval = '1' AND author_id = '$uid' $FORBIDDEN_SET");
     list($comment_count, $lastcom_id) = mysql_fetch_row($result);
     mysql_free_result($result);
 
@@ -435,7 +435,7 @@ if ($superCage->post->keyExists('change_password') && USER_ID && UDB_INTEGRATION
     $new_pass = md5($new_pass);
     $current_pass = md5($current_pass);
 
-    $sql = "UPDATE {$CONFIG['TABLE_USERS']} SET user_password = '$new_pass' WHERE user_id = '" . USER_ID . "' AND BINARY user_password = '$current_pass'";
+    $sql = "UPDATE {$CONFIG['TABLE_USERS']} SET user_password = '$new_pass' WHERE user_id = '" . USER_ID . "' AND user_password = '$current_pass'";
     $result = cpg_db_query($sql);
 
     if (!mysql_affected_rows($CONFIG['LINK_ID'])) {
@@ -484,7 +484,7 @@ case 'edit_profile' :
         $group_list = '<br /><em>(' . substr($group_list, 0, -2) . ')</em>';
     }
 
-    if ($user_data['user_active'] == 'YES') {
+    if ($user_data['user_active'] == '1') {
         $user_status = $lang_usermgr_php['status_active'];
     } else {
         $user_status = $lang_usermgr_php['status_inactive'];
@@ -733,9 +733,9 @@ default:
 
     if (mysql_num_rows($result)) {
         $user_status = $lang_register_php['banned'];
-    } elseif (isset($user_data['user_active']) && $user_data['user_active'] == 'YES') {
+    } elseif (isset($user_data['user_active']) && $user_data['user_active'] == '1') {
         $user_status = $lang_usermgr_php['status_active'];
-    } elseif (isset($user_data['user_active']) && $user_data['user_active'] == 'NO') {
+    } elseif (isset($user_data['user_active']) && $user_data['user_active'] == '0') {
         $user_status = $lang_usermgr_php['status_inactive'];
     } else {
         $user_status = '';

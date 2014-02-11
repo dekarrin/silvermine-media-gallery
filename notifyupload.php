@@ -31,7 +31,7 @@ if ($CONFIG['upl_notify_admin_email'] && $superCage->post->keyExists('album') &&
     $album = $superCage->post->getInt('album');
 
     if (!GALLERY_ADMIN_MODE) {
-        $result = cpg_db_query("SELECT category FROM {$CONFIG['TABLE_ALBUMS']} WHERE aid='$album' and (uploads = 'YES' OR category = '" . (USER_ID + FIRST_USER_CAT) . "' OR owner = '" . USER_ID . "')");
+        $result = cpg_db_query("SELECT category FROM {$CONFIG['TABLE_ALBUMS']} WHERE aid='$album' and (uploads = '1' OR category = '" . (USER_ID + FIRST_USER_CAT) . "' OR owner = '" . USER_ID . "')");
         if (mysql_num_rows($result)) {
             $row = mysql_fetch_array($result);
             mysql_free_result($result);
@@ -49,16 +49,16 @@ if ($CONFIG['upl_notify_admin_email'] && $superCage->post->keyExists('album') &&
     if (false !== $category) {
         // Test if picture requires approval
         if (GALLERY_ADMIN_MODE) {
-            $approved = 'YES';
+            $approved = '1';
         } elseif (!$USER_DATA['priv_upl_need_approval'] && $category == FIRST_USER_CAT + USER_ID) {
-            $approved = 'YES';
+            $approved = '1';
         } elseif (!$USER_DATA['pub_upl_need_approval'] && $category < FIRST_USER_CAT) {
-            $approved = 'YES';
+            $approved = '1';
         } else {
-            $approved = 'NO';
+            $approved = '0';
         }
 
-        $PIC_NEED_APPROVAL = ($approved == 'NO');
+        $PIC_NEED_APPROVAL = ($approved == '0');
 
         if ($PIC_NEED_APPROVAL) {
             cpg_mail('admin', sprintf($lang_db_input_php['notify_admin_email_subject'], $CONFIG['gallery_name']), make_clickable(sprintf($lang_db_input_php['notify_admin_email_body'], USER_NAME, $CONFIG['ecards_more_pic_target'].(substr($CONFIG["ecards_more_pic_target"], -1) == '/' ? '' : '/') .'editpics.php?mode=upload_approval')));

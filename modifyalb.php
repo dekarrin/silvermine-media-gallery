@@ -167,8 +167,8 @@ function form_yes_no($text, $name)
     }
 
     $value = isset($ALBUM_DATA[$name]) ? $ALBUM_DATA[$name] : false;
-    $yes_selected = $value == 'YES' ? 'checked="checked"' : '';
-    $no_selected = $value == 'NO' ? 'checked="checked"' : '';
+    $yes_selected = $value == '1' ? 'checked="checked"' : '';
+    $no_selected = $value == '0' ? 'checked="checked"' : '';
 
     echo <<< EOT
     <tr>
@@ -176,10 +176,10 @@ function form_yes_no($text, $name)
             $text
         </td>
         <td valign="top">
-            <input type="radio" id="{$name}1" name="$name" value="YES" $yes_selected />
+            <input type="radio" id="{$name}1" name="$name" value="1" $yes_selected />
             <label for="{$name}1" class="clickable_option">{$lang_common['yes']}</label>
             &nbsp;&nbsp;
-            <input type="radio" id="{$name}0" name="$name" value="NO" $no_selected />
+            <input type="radio" id="{$name}0" name="$name" value="0" $no_selected />
             <label for="{$name}0" class="clickable_option">{$lang_common['no']}</label>
         </td>
     </tr>
@@ -283,7 +283,7 @@ function form_alb_thumb($text, $name)
         $keyword = "OR (keywords LIKE '%{$ALBUM_DATA['keyword']}%')";
     }
 
-    $query = "SELECT pid, filepath, filename, url_prefix FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = 'YES' AND (aid = '{$CLEAN['album']}' $keyword ) ORDER BY filename";
+    $query = "SELECT pid, filepath, filename, url_prefix FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = '1' AND (aid = '{$CLEAN['album']}' $keyword ) ORDER BY filename";
 
     $results = cpg_db_query($query);
 

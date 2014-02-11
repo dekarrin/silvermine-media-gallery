@@ -68,7 +68,7 @@ EOT;
 
         $favs = implode(', ', $FAVPICS);
 
-        $result = cpg_db_query("SELECT filepath, filename FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = 'YES' AND pid IN ($favs)");
+        $result = cpg_db_query("SELECT filepath, filename FROM {$CONFIG['TABLE_PICTURES']} WHERE approved = '1' AND pid IN ($favs)");
         $rowset = cpg_db_fetch_rowset($result);
 
         foreach ($rowset as $key => $row) {

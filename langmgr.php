@@ -60,7 +60,7 @@ if ($superCage->post->keyExists('submit')) {
     $posted_lang_id_array = $superCage->post->getEscaped('lang_id');
     foreach ($posted_lang_id_array as $posted_lang_id) {
         // Create the query
-        if ($superCage->post->getAlpha('new_'.$posted_lang_id) == 'YES') {
+        if ($superCage->post->getAlpha('new_'.$posted_lang_id) == '1') {
             $query = "INSERT INTO `".$CONFIG['TABLE_LANGUAGE']. "` ( `lang_id` , `english_name` , `native_name` , `custom_name` , `flag` , `available` , `enabled` , `complete` ) VALUES (";
             $query .= "'".$posted_lang_id."', ";
             $query .= "'".$superCage->post->getEscaped('english_name_'.$posted_lang_id)."', ";
@@ -71,20 +71,20 @@ if ($superCage->post->keyExists('submit')) {
             } else {
                 $query .= "'', ";
             }
-            if ($superCage->post->getAlpha('available_'.$posted_lang_id) == 'YES') {
-                $query .= "'YES', ";
+            if ($superCage->post->getAlpha('available_'.$posted_lang_id) == '1') {
+                $query .= "'1', ";
             } else {
-                $query .= "'NO', ";
+                $query .= "'0', ";
             }
-            if ($superCage->post->getAlpha('enable_'.$posted_lang_id) == 'YES') {
-                $query .= "'YES', ";
+            if ($superCage->post->getAlpha('enable_'.$posted_lang_id) == '1') {
+                $query .= "'1', ";
             } else {
-                $query .= "'NO', ";
+                $query .= "'0', ";
             }
-            if ($superCage->post->getAlpha('complete_'.$posted_lang_id) == 'YES') {
-                $query .= "'YES', ";
+            if ($superCage->post->getAlpha('complete_'.$posted_lang_id) == '1') {
+                $query .= "'1', ";
             } else {
-                $query .= "'NO', ";
+                $query .= "'0', ";
             }
             $query = rtrim(trim($query), ',');
             $query .= ");";
@@ -96,20 +96,20 @@ if ($superCage->post->keyExists('submit')) {
             if ($superCage->post->getAlpha('flag_'.$posted_lang_id) != '' && $superCage->post->getAlpha('flag_'.$posted_lang_id) != $lang_langmgr_php['pick_a_flag']) {
                 $query .= "`flag` = '".$superCage->post->getAlpha('flag_'.$posted_lang_id)."', ";
             }
-            if ($superCage->post->getAlpha('available_'.$posted_lang_id) == 'YES') {
-                $query .= "`available` = 'YES', ";
+            if ($superCage->post->getAlpha('available_'.$posted_lang_id) == '1') {
+                $query .= "`available` = '1', ";
             } else {
-                $query .= "`available` = 'NO', ";
+                $query .= "`available` = '0', ";
             }
-            if ($superCage->post->getAlpha('enable_'.$posted_lang_id) == 'YES') {
-                $query .= "`enabled` = 'YES', ";
+            if ($superCage->post->getAlpha('enable_'.$posted_lang_id) == '1') {
+                $query .= "`enabled` = '1', ";
             } else {
-                $query .= "`enabled` = 'NO', ";
+                $query .= "`enabled` = '0', ";
             }
-            if ($superCage->post->getAlpha('complete_'.$posted_lang_id) == 'YES') {
-                $query .= "`complete` = 'YES', ";
+            if ($superCage->post->getAlpha('complete_'.$posted_lang_id) == '1') {
+                $query .= "`complete` = '1', ";
             } else {
-                $query .= "`complete` = 'NO', ";
+                $query .= "`complete` = '0', ";
             }
             // Strip the whitespace and coma from the query
             $query = rtrim(trim($query), ',');
@@ -122,7 +122,7 @@ if ($superCage->post->keyExists('submit')) {
     $submit_default_id = $superCage->post->getEscaped('is_default');
     if ($submit_default_id != DEFAULT_LANGUAGE) { // only write the change if the submit default language differs from the current default language
         // Check if the "new" default language is enabled in the first place
-        if ($superCage->post->getAlpha('enable_'.$submit_default_id) == 'YES') {
+        if ($superCage->post->getAlpha('enable_'.$submit_default_id) == '1') {
             $CONFIG['lang'] = $CONFIG['lang_config'];
             cpg_config_set('lang', $submit_default_id);
             $CONFIG['default_lang'] = $submit_default_id;
@@ -169,7 +169,7 @@ while ($row = mysql_fetch_array($results)) {
         if (in_array($lang_language_data[$row['lang_id']]['lang_id'], $lang_file_orphan_array) == TRUE) {
             unset($lang_file_orphan_array[array_search($lang_language_data[$row['lang_id']]['lang_id'],$lang_file_orphan_array)]);
         }
-        $lang_language_data[$row['lang_id']]['new'] = 'NO';
+        $lang_language_data[$row['lang_id']]['new'] = '0';
 } // while
 mysql_free_result($results);
 unset($row);
@@ -181,10 +181,10 @@ foreach ($lang_file_orphan_array as $orphans) {
     $lang_language_data[$orphans]['native_name'] = '';
     $lang_language_data[$orphans]['custom_name'] = '';
     $lang_language_data[$orphans]['flag'] = '';
-    $lang_language_data[$orphans]['available'] = 'NO';
-    $lang_language_data[$orphans]['enabled'] = 'NO';
-    $lang_language_data[$orphans]['complete'] = 'NO';
-    $lang_language_data[$orphans]['new'] = 'YES';
+    $lang_language_data[$orphans]['available'] = '0';
+    $lang_language_data[$orphans]['enabled'] = '0';
+    $lang_language_data[$orphans]['complete'] = '0';
+    $lang_language_data[$orphans]['new'] = '1';
 }
 
 // sort the array by English name
@@ -248,15 +248,15 @@ foreach ($lang_language_data as $language) {
     $version_output = '';
     $filesize_output = '';
     $additional_output = '';
-    if ($language['available'] == 'YES' || in_array($language['lang_id'], $lang_file_array) == TRUE) {
+    if ($language['available'] == '1' || in_array($language['lang_id'], $lang_file_array) == TRUE) {
         // Open the file to see if they're complete translations
         $handle = @fopen('lang/'. $language['lang_id'] . '.php', 'r');
         if ($handle == FALSE) {
             // We haven't been able to open the file, so let's drop it from the list
-            $language['available'] = 'NO';
-            $language['broken'] = 'YES';
+            $language['available'] = '0';
+            $language['broken'] = '1';
         } else {
-            $language['broken'] = 'NO';
+            $language['broken'] = '0';
             //$filesize = filesize('lang/'. $language['lang_id'] . '.php');
             $blob = @fread($handle, 2000);
             $blob = str_replace('<?php','',$blob);
@@ -274,9 +274,9 @@ foreach ($lang_language_data as $language) {
             }
             $versionCompare = version_compare($language['version'],COPPERMINE_VERSION);
             if ($versionCompare == 0) {
-                $language['complete'] = 'YES';
+                $language['complete'] = '1';
             } else {
-                $language['complete'] = 'NO';
+                $language['complete'] = '0';
                 $version_warning = $lang_langmgr_php['version_does_not_match'];
             }
             // Perform the lookup for the native language name
@@ -330,45 +330,45 @@ foreach ($lang_language_data as $language) {
             $default_checked = '';
         }
         // Completeness --- start
-        if ($language['complete'] == 'YES') {
+        if ($language['complete'] == '1') {
             $completeness_output = cpg_fetch_icon('ok', 0);
-            $completeness_output .= '<input type="hidden" name="complete_'.$language['lang_id'].'" id="complete_' . $language['lang_id'] .'" value="YES" />';
+            $completeness_output .= '<input type="hidden" name="complete_'.$language['lang_id'].'" id="complete_' . $language['lang_id'] .'" value="1" />';
         } else {
             $completeness_output = cpg_fetch_icon('cancel', 0);
-            $completeness_output .= '<input type="hidden" name="complete_'.$language['lang_id'].'" id="complete_' . $language['lang_id'] .'" value="NO" />';
+            $completeness_output .= '<input type="hidden" name="complete_'.$language['lang_id'].'" id="complete_' . $language['lang_id'] .'" value="0" />';
         }
         // Completeness --- end
-        if ($language['available'] == 'YES') { // availability --- start
+        if ($language['available'] == '1') { // availability --- start
             if (in_array($language['lang_id'], $lang_file_array) == TRUE) {
                 // Language file is in database and in lang folder                $availability_output = cpg_fetch_icon('ok', 0, 'lang/'.$language['lang_id'].'.php ' . $lang_langmgr_php['exists_in_db_and_file']);
-                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="YES" />';
+                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="1" />';
                 $enable_greyed_out = '';
             } else {
                 //  Language file is in database, but not in lang folder                $availability_output = cpg_fetch_icon('stop', 0, 'lang/'.$language['lang_id'].'.php '.$lang_langmgr_php['missing']);
-                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="NO" />';
+                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="0" />';
                 $enable_greyed_out = 'disabled="disabled"';
             }
         } else {
             if (in_array($language['lang_id'], $lang_file_array) == TRUE) {
                 // Language file is not database but in lang folder                $availability_output = cpg_fetch_icon('add', 0, 'lang/'.$language['lang_id'].'.php ' . $lang_langmgr_php['exists_as_file_only']);
-                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="YES" />';
+                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="1" />';
                 $enable_greyed_out = '';
             } else {
                 //  Language file is not database nor in lang folder - this case should never be true                $availability_output = cpg_fetch_icon('stop', 0, 'lang/'.$language['lang_id'].'.php ' . $lang_langmgr_php['missing']);
-                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="NO" />';
+                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="0" />';
                 $enable_greyed_out = 'disabled="disabled"';
             }
-            if ($language['broken'] == 'YES') {
+            if ($language['broken'] == '1') {
                 $availability_output = cpg_fetch_icon('stop', 0, 'lang/'.$language['lang_id'].'.php ' . $lang_langmgr_php['broken']);
-                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="NO" />';
+                $availability_output .= '<input type="hidden" name="available_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="0" />';
                 $enable_greyed_out = 'disabled="disabled"';
             }
         }    // availability --- end
         //  Flag new records accordingly --- start
-        if ($language['new'] == 'YES') {
-            $new_output = '<input type="hidden" name="new_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="YES" />';
+        if ($language['new'] == '1') {
+            $new_output = '<input type="hidden" name="new_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="1" />';
         } else {
-            $new_output = '<input type="hidden" name="new_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="NO" />';
+            $new_output = '<input type="hidden" name="new_'.$language['lang_id'].'" id="available_' . $language['lang_id'] .'" value="0" />';
         }
         //  Flag new records accordingly --- end
         // Populate credits section
@@ -473,13 +473,13 @@ EOT;
 
         <td class="{$cellstyle}">
 EOT;
-        if ($language['enabled'] == 'YES') {
+        if ($language['enabled'] == '1') {
             $enable_checked = 'checked="checked"';
         } else {
             $enable_checked = '';
         }
         print <<< EOT
-            <input type="checkbox" name="enable_{$language['lang_id']}" id="enable_{$language['lang_id']}" value="YES" class="checkbox" {$enable_checked} {$enable_greyed_out} />
+            <input type="checkbox" name="enable_{$language['lang_id']}" id="enable_{$language['lang_id']}" value="1" class="checkbox" {$enable_checked} {$enable_greyed_out} />
         </td>
     </tr>
     <tr>

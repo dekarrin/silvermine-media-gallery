@@ -73,7 +73,7 @@ if(!checkFormToken()){
 $row = mysql_fetch_assoc($result);
 mysql_free_result($result);
 
-if (!USER_CAN_RATE_PICTURES || $row['votes_allowed'] == 'NO') {
+if (!USER_CAN_RATE_PICTURES || $row['votes_allowed'] == '0') {
 
     //send back voting failure to ajax request
     $send_back = array(

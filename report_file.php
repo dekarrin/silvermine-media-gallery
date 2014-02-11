@@ -81,7 +81,7 @@ $row = mysql_fetch_array($result);
 $thumb_pic_url = get_pic_url($row, 'thumb');
 
 if ($what == 'comment') {
-    $result = cpg_db_query("SELECT msg_id, msg_author, msg_body, UNIX_TIMESTAMP(msg_date) AS msg_date, author_id, author_md5_id, msg_raw_ip, msg_hdr_ip, approval FROM {$CONFIG['TABLE_COMMENTS']} WHERE msg_id='$cid' AND approval = 'YES' AND pid='$pid'");
+    $result = cpg_db_query("SELECT msg_id, msg_author, msg_body, UNIX_TIMESTAMP(msg_date) AS msg_date, author_id, author_md5_id, msg_raw_ip, msg_hdr_ip, approval FROM {$CONFIG['TABLE_COMMENTS']} WHERE msg_id='$cid' AND approval = '1' AND pid='$pid'");
     if (!mysql_num_rows($result)) {
         cpg_die(ERROR, $lang_errors['non_exist_comment'], __FILE__, __LINE__);
     }
