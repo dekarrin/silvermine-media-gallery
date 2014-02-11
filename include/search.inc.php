@@ -113,7 +113,7 @@ if ($search_string && isset($search_params['params'])) {
 
         $sql .= Inspekt::isInt($USER['search']['params']['newer_than']) ? ' AND ( ctime > '.time().' - '.( $USER['search']['params']['newer_than'] * 60*60*24).')' : '';
         $sql .= Inspekt::isInt($USER['search']['params']['older_than']) ? ' AND ( ctime < '.time().' - '.( $USER['search']['params']['older_than'] * 60*60*24).')' : '';
-        $sql .=  " AND approved = 'YES' $FORBIDDEN_SET";
+        $sql .=  " AND approved = '1' $FORBIDDEN_SET";
 
         if ($superCage->get->keyExists('album_title')) {
                 $album_query = "SELECT aid, title, description FROM `{$CONFIG['TABLE_ALBUMS']}` AS p"
@@ -175,7 +175,7 @@ if ($search_string && isset($search_params['params'])) {
                                 $thumb_query = "SELECT filepath, filename, url_prefix, pwidth, pheight "
                                         ." FROM `{$CONFIG['TABLE_PICTURES']}` "
                                         ." WHERE (`aid` = '{$album['aid']}') "
-                                        ." AND approved = 'YES' "
+                                        ." AND approved = '1' "
                                         ." ORDER BY `pid` DESC";
                                 $thumb_result = cpg_db_query($thumb_query);
                                 $thumb = mysql_fetch_assoc($thumb_result);
