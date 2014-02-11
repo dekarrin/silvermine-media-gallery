@@ -2079,7 +2079,7 @@ function theme_main_menu($which)
             }
 
             if (!$upload_allowed) {
-                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='YES' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
+                $query = "SELECT null FROM {$CONFIG['TABLE_ALBUMS']} WHERE category < " . FIRST_USER_CAT . " AND uploads='1' AND (visibility = '0' OR visibility IN ".USER_GROUP_SET.") AND aid = '$album'";
                 $public_albums = cpg_db_query($query);
 
                 if (mysql_num_rows($public_albums)) {
@@ -2310,7 +2310,7 @@ function theme_admin_mode_menu()
             $available_doc_folders_array = form_get_foldercontent('docs/', 'folder', '', array('images', 'js', 'style', '.svn'));
             // Query the languages table
             $help_lang = '';
-            $results = cpg_db_query("SELECT lang_id, abbr FROM {$CONFIG['TABLE_LANGUAGE']} WHERE available='YES' AND enabled='YES'");
+            $results = cpg_db_query("SELECT lang_id, abbr FROM {$CONFIG['TABLE_LANGUAGE']} WHERE available='1' AND enabled='1'");
             while ($row = mysql_fetch_array($results)) {
                 if ($CONFIG['lang'] == $row['lang_id']) {
                     $help_lang = $row['abbr'];
@@ -3223,7 +3223,7 @@ function theme_html_picinfo(&$info)
 ** Section <<<theme_html_picture>>> - START
 ******************************************************************************/
 // Displays a picture
-function theme_html_picture()
+function theme_html_picture($from_gallery = false)
 {
     global $CONFIG, $CURRENT_PIC_DATA, $CURRENT_ALBUM_DATA, $USER, $LINEBREAK;
     global $album, $lang_date, $template_display_media;
@@ -3268,11 +3268,14 @@ function theme_html_picture()
     $CURRENT_PIC_DATA['menu'] = html_picture_menu(); //((USER_ADMIN_MODE && $CURRENT_ALBUM_DATA['category'] == FIRST_USER_CAT + USER_ID) || ($CONFIG['users_can_edit_pics'] && $CURRENT_PIC_DATA['owner_id'] == USER_ID && USER_ID != 0) || GALLERY_ADMIN_MODE) ? html_picture_menu($pid) : '';
 
     $image_size = array();
-
+	
     if ($CONFIG['make_intermediate'] && cpg_picture_dimension_exceeds_intermediate_limit($CURRENT_PIC_DATA['pwidth'], $CURRENT_PIC_DATA['pheight'])) {
         $picture_url = get_pic_url($CURRENT_PIC_DATA, 'normal');
     } else {
         $picture_url = get_pic_url($CURRENT_PIC_DATA, 'fullsize');
+		if ($from_gallery) {
+			$class_str = " gallery_image";
+		}
     }
 
     $pic_title = '';
@@ -3314,7 +3317,7 @@ function theme_html_picture()
             $winsizeX = $CURRENT_PIC_DATA['pwidth'] + $CONFIG['fullsize_padding_x'];  //the +'s are the mysterious FF and IE paddings
             $winsizeY = $CURRENT_PIC_DATA['pheight'] + $CONFIG['fullsize_padding_y']; //the +'s are the mysterious FF and IE paddings
             if ($CONFIG['transparent_overlay'] == 1) {
-                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\" width=\"{$image_size['width']}\" height=\"{$image_size['height']}\" class=\"image\">";
+                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\" width=\"{$image_size['width']}\" height=\"{$image_size['height']}\" class=\"image$class_str\">";
                 $pic_html_href_close = '</a>' . $LINEBREAK;
                 if (!USER_ID && $CONFIG['allow_unlogged_access'] <= 2) {
                     if ($CONFIG['allow_user_registration'] == 0) {
@@ -3346,27 +3349,27 @@ function theme_html_picture()
                     $pic_html = "<a href=\"javascript:;\" onclick=\"MM_openBrWindow('displayimage.php?pid=$pid&amp;fullsize=1','" . uniqid(rand()) . "','scrollbars=yes,toolbar=no,status=no,resizable=yes,width=$winsizeX,height=$winsizeY')\">";
                 }
                 $pic_title = $lang_display_image_php['view_fs'] . $LINEBREAK . '==============' . $LINEBREAK . $pic_title;
-                $pic_html .= "<img src=\"" . $picture_url . "\" {$image_size['geom']} class=\"image\" border=\"0\" alt=\"{$lang_display_image_php['view_fs']}\" /><br />";
+                $pic_html .= "<img src=\"" . $picture_url . "\" {$image_size['geom']} class=\"image$class_str\" border=\"0\" alt=\"{$lang_display_image_php['view_fs']}\" /><br />";
                 $pic_html .= $pic_html_href_close;
                 //PLUGIN FILTER
                 $pic_html = CPGPluginAPI::filter('html_image_reduced', $pic_html);
             }
         } else {
             if ($CONFIG['transparent_overlay'] == 1) {
-                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\" width=\"{$CURRENT_PIC_DATA['pwidth']}\" height=\"{$CURRENT_PIC_DATA['pheight']}\" class=\"image\">";
+                $pic_html = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td background=\"" . $picture_url . "\" width=\"{$CURRENT_PIC_DATA['pwidth']}\" height=\"{$CURRENT_PIC_DATA['pheight']}\" class=\"image$class_str\">";
                 $pic_html .= "<img src=\"images/image.gif?id=".floor(rand()*1000+rand())."\" width={$CURRENT_PIC_DATA['pwidth']} height={$CURRENT_PIC_DATA['pheight']} border=\"0\" alt=\"\" /><br />" . $LINEBREAK;
                 $pic_html .= "</td></tr></table>";
                 //PLUGIN FILTER
                 $pic_html = CPGPluginAPI::filter('html_image_overlay', $pic_html);
             } else {
-                $pic_html = "<img src=\"" . $picture_url . "\" {$image_size['geom']} class=\"image\" border=\"0\" alt=\"\" /><br />" . $LINEBREAK;
+                $pic_html = "<img src=\"" . $picture_url . "\" {$image_size['geom']} class=\"image$class_str\" border=\"0\" alt=\"\" /><br />" . $LINEBREAK;
                 //PLUGIN FILTER
                 $pic_html = CPGPluginAPI::filter('html_image', $pic_html);
             }
         }
     } elseif ($mime_content['content']=='document') {
         $pic_thumb_url = get_pic_url($CURRENT_PIC_DATA,'thumb');
-        $pic_html = "<a href=\"{$picture_url}\" target=\"_blank\" class=\"document_link\"><img src=\"".$pic_thumb_url."\" border=\"0\" class=\"image\" /></a><br />" . $LINEBREAK;
+        $pic_html = "<a href=\"{$picture_url}\" target=\"_blank\" class=\"document_link\"><img src=\"".$pic_thumb_url."\" border=\"0\" class=\"image$class_str\" /></a><br />" . $LINEBREAK;
         //PLUGIN FILTER
         $pic_html = CPGPluginAPI::filter('html_document', $pic_html);
     } else {
@@ -3634,7 +3637,7 @@ function theme_html_rating_box()
     global $CONFIG, $CURRENT_PIC_DATA, $CURRENT_ALBUM_DATA, $THEME_DIR, $USER_DATA, $USER, $LINEBREAK;
     global $template_image_rating, $template_image_rating_oldstyle, $lang_rate_pic;
 
-    if (!(USER_CAN_RATE_PICTURES && $CURRENT_ALBUM_DATA['votes'] == 'YES')) {
+    if (!(USER_CAN_RATE_PICTURES && $CURRENT_ALBUM_DATA['votes'] == '1')) {
         return '';
     } else {
         //check if the users already voted or if this user is the owner
@@ -3829,13 +3832,13 @@ function theme_html_comments($pid)
             $pending_approval = '';
             if (USER_IS_ADMIN) {
                 //display the selector approve/disapprove
-                if ($row['approval'] == 'NO') {
+                if ($row['approval'] == '0') {
                     $pending_approval = cpg_fetch_icon('comment_disapprove_disabled', 0) . '<a href="reviewcom.php?pos=-{PID}&amp;msg_id={MSG_ID}&amp;form_token={FORM_TOKEN}&amp;timestamp={TIMESTAMP}&amp;what=approve" title="' . $lang_display_comments['approve'] . '">' . cpg_fetch_icon('comment_approve', 0) . '</a>';
                 } else {
                     $pending_approval = '<a href="reviewcom.php?pos=-{PID}&amp;msg_id={MSG_ID}&amp;form_token={FORM_TOKEN}&amp;timestamp={TIMESTAMP}&amp;what=disapprove" title="' . $lang_display_comments['disapprove'] . '">' . cpg_fetch_icon('comment_disapprove', 0) . '</a>' . cpg_fetch_icon('comment_approve_disabled', 0);
                 }
             } else { // user or guest is logged in - start
-                if ($row['approval'] == 'NO') { // the comment is not approved - start
+                if ($row['approval'] == '0') { // the comment is not approved - start
                     if ($user_can_edit) { // the comment comes from the current visitor, display it with a warning that it needs admin approval
                         $pending_approval = cpg_fetch_icon('comment_approval', 0, $lang_display_comments['pending_approval']);
                     } else { // the comment comes from someone else - don't display it at all
@@ -3859,7 +3862,7 @@ function theme_html_comments($pid)
             }
 
             // wrap the comment into italics if it isn't approved
-            if ($row['approval'] == 'NO') {
+            if ($row['approval'] == '0') {
                 $comment_body = '<em>'.$comment_body.'</em>';
                 $row['msg_author'] = $row['msg_author'];
             }
@@ -3917,7 +3920,7 @@ function theme_html_comments($pid)
 
         $html .= $tabs;
     }
-    if (USER_CAN_POST_COMMENTS && $CURRENT_ALBUM_DATA['comments'] == 'YES') {
+    if (USER_CAN_POST_COMMENTS && $CURRENT_ALBUM_DATA['comments'] == '1') {
         if (USER_ID) {
             $user_name_input = '<tr><td colspan="2"><input type="hidden" name="msg_author" value="' . stripslashes(USER_NAME) . '" /></td>';
             template_extract_block($template_add_your_comment, 'user_name_input', $user_name_input);
@@ -3973,7 +3976,7 @@ function theme_html_comments($pid)
             $html .= template_eval($template_add_your_comment, $params);
         }
     } else { // user can not post comments
-        if ($CONFIG['comment_promote_registration'] == 1 && $CURRENT_ALBUM_DATA['comments'] == 'YES') {
+        if ($CONFIG['comment_promote_registration'] == 1 && $CURRENT_ALBUM_DATA['comments'] == '1') {
             template_extract_block($template_add_your_comment, 'user_name_input');
             if ($CONFIG['enable_smilies'] == 1) {
                 template_extract_block($template_add_your_comment, 'input_box_smilies');
