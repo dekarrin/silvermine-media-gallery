@@ -89,7 +89,7 @@ if ($superCage->post->keyExists('export')) {
 		$dl_cfg .= "$author-$title $url\n";
 	}
 	file_put_contents('/www/manga_downloader/manga.cfg', $dl_cfg);
-	`/www/manga_downloader/download_manga.sh > /dev/null 2>&1 & echo $!`;
+	`/www/manga_downloader/download_manga.sh > /www/logs/media_capture.log 2>&1 & echo $!`;
 	cpg_db_query('DELETE FROM '.$CONFIG['TABLE_CAPTURES'].' WHERE 1');
 	msg_box($lang_common['information'], $lang_media_capture_php['capture_started']);
 }
