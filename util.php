@@ -96,12 +96,12 @@ $keyword_replace2 = sprintf(
 define('COMICS_DIR', 'comics');
 function get_comic_file() {
 	$files = scandir(COMICS_DIR);
-	if (count($files) == 2) {
+	if (count($files) == 3) {
 		return '';
 	} else {
 		$uploading = '.';
 		$i = 0;
-		while ($uploading == '.' || $uploading == '..') {
+		while ($uploading == '.' || $uploading == '..' || $uploading == 'index.php') {
 			$uploading = $files[$i++];
 		}
 		return COMICS_DIR . '/' . $uploading;
