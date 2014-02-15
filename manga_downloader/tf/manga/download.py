@@ -40,11 +40,6 @@ ANTI_OVERLOAD = 2
 MAX_ERRORS = 10
 TIMEOUT = 15
 
-def out(stuff):
-	f = open('/www/manga_downloader/status.txt', 'a')
-	f.write(stuff + "\n")
-	f.close()
-
 class DownloadError(Exception):
 	def __init__(self, url, msg, code):
 		self.url = url
@@ -58,7 +53,7 @@ class Downloader:
 	Handles flooding control and common HTTP errors.
 	"""
 	
-	def __init__(self, timeout, antiFlood, antiOverload, maxErrors):
+	def __init__(self, timeout, antiFlood, antiOverload, maxErrors, printer):
 		"""Allocate a new Downloader.
 		
 		Arguments:
@@ -67,6 +62,8 @@ class Downloader:
 		antiOverload -- additional time to wait if the server is overloaded.
 		maxErrors -- the maximum number of repeated non-handled errors that
 		can occur before the download fails.
+		printer -- object to use for writing output. Must have println()
+		method that accepts one string and prints it as a line of output.
 		"""
 		self.__sameErrorCount = 0
 		self.__timeout = timeout
@@ -75,6 +72,7 @@ class Downloader:
 		self.__antiOverloadWaitTime = antiOverload
 		self.__url = None
 		self.__finalWait = False
+		self._out = printer
 		
 	def download(self, url):
 		"""Download the resource at the URL and return it."""
@@ -111,8 +109,8 @@ class Downloader:
 		
 	def __handleTimeout(self):
 		"""Display timeout status to user. Do not halt execuation."""
-		out("Timed out")
-		out("Retrying...")
+		self._out.println("Timed out")
+		self._out.println("Retrying...")
 		
 	def __handleHTTPError(self, e):
 		"""Raise a DownloadError if the status code is 404; pass it on
@@ -137,29 +135,29 @@ class Downloader:
 		
 	def __waitTwoMinutes(self):
 		"""Wait for two minutes."""
-		out("Waiting 2 minutes before final attempt...")
+		self._out.println("Waiting 2 minutes before final attempt...")
 		time.sleep(120)
 		
 	def __handleServerOverload(self):
 		"""Wait for the server to stop being overloaded."""
-		out("Server overloaded.")
+		self._out.println("Server overloaded.")
 		self.__waitForAntiOverload()
 		
 	def __handleServerError(self, e):
 		"""Display the error and wait as if the server were overloaded."""
-		out(str(e))
+		self._out.println(str(e))
 		self.__waitForAntiOverload()
 		
 	def __waitForAntiOverload(self):
 		waitTime = self.__antiOverloadWaitTime + random.randint(0, 5)
-		out("Trying again in %d seconds..." % (waitTime))
+		self._out.println("Trying again in %d seconds..." % (waitTime))
 		time.sleep(waitTime)
 
 class TextDownloader(Downloader):
 	
 	"""Download text data through an HTTP request."""
 	
-	def __init__(self, encoding, timeout, antiFlood, antiOverload, maxErrors):
+	def __init__(self, encoding, timeout, antiFlood, antiOverload, maxErrors, printer):
 		"""Allocate a new TextDownloader.
 		
 		Arguments:
@@ -169,8 +167,9 @@ class TextDownloader(Downloader):
 		antiOverload -- additional time to wait if the server is overloaded.
 		maxErrors -- the maximum number of repeated non-handled errors that
 		can occur before the download fails.
+		printer -- object for printing output; must have println(str) method.
 		"""
-		super().__init__(timeout, antiFlood, antiOverload, maxErrors)
+		super().__init__(timeout, antiFlood, antiOverload, maxErrors, printer)
 		self.__encoding = encoding
 		
 	def download(self, url):
@@ -184,11 +183,12 @@ class GalleryDownloader:
 	
 	"""Download a single gallery one page at a time."""
 	
-	def __init__(self, url):
+	def __init__(self, url, printer):
 		"""Allocate a new GalleryDownloader for a gallery.
 		
 		Arguments:
 		url -- the url of the first page of the gallery.
+		printer -- object that prints output. Must have println(str).
 		"""
 		self.__pageUrl = url
 		self.__currentPage = 1
@@ -196,6 +196,7 @@ class GalleryDownloader:
 		self.__imageUrl = None
 		self.__lastDownloaded = None
 		self.__pageContent = None
+		self._out = printer
 		if re.match(E_HENTAI_URL_REGEX, url) is not None:
 			self.__nextPageUrlRegex = E_HENTAI_NEXT_PAGE_URL_REGEX
 			self.__imageUrlRegex = E_HENTAI_IMAGE_URL_REGEX
@@ -226,7 +227,7 @@ class GalleryDownloader:
 		"""
 		if self.__lastDownloaded == self.__pageCount:
 			raise StopIteration
-		out("Downloading page %d of %d..." % (self.__currentPage, self.__pageCount))
+		self._out.println("Downloading page %d of %d..." % (self.__currentPage, self.__pageCount))
 		imageData = None
 		errors = 0
 		while True:  # try it five times at most.
@@ -238,12 +239,12 @@ class GalleryDownloader:
 			except DownloadError as e:
 				errors += 1
 				if errors > 5:
-					out("HTTP %d when accessing %s" % (e.code, e.url))
-				#	out(self.__pageContent)
+					self._out.println("HTTP %d when accessing %s" % (e.code, e.url))
+				#	self._out.println(self.__pageContent)
 					raise e
 				else:
-					out("Download failed.")
-					out("Retrying in 60 seconds...")
+					self._out.println("Download failed.")
+					self._out.println("Retrying in 60 seconds...")
 					time.sleep(60)
 			if imageData is not None:
 				break
@@ -252,7 +253,7 @@ class GalleryDownloader:
 		
 	def __downloadMetadata(self):
 		"""Download the current comic page and extract metadata from it."""
-		out("Downloading metadata...")
+		self._out.println("Downloading metadata...")
 		self.__downloadPage()
 		self.__extractPageCount()
 		
@@ -264,14 +265,14 @@ class GalleryDownloader:
 		as if the download had gone through.
 		"""
 		if self.__lastDownloaded != self.__currentPage:
-			td = TextDownloader("utf-8", TIMEOUT, ANTI_FLOOD, ANTI_OVERLOAD, MAX_ERRORS)
+			td = TextDownloader("utf-8", TIMEOUT, ANTI_FLOOD, ANTI_OVERLOAD, MAX_ERRORS, self._out)
 			text = td.download(self.__pageUrl)
 			self.__pageContent = text
 			self.__lastDownloaded = self.__currentPage
 			
 	def __downloadImage(self):
 		"""Download and return the image pointed to by the state variable."""
-		d = Downloader(TIMEOUT, ANTI_FLOOD, ANTI_OVERLOAD, MAX_ERRORS)
+		d = Downloader(TIMEOUT, ANTI_FLOOD, ANTI_OVERLOAD, MAX_ERRORS, self._out)
 		data = d.download(self.__imageUrl)
 		return data
 		
