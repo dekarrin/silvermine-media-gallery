@@ -13,3 +13,6 @@ backup_server.sh
 
 # Ignore daemon lock file
 converter/dekky_mp4_daemon.lock
+
+# Media capture config file
+manga_downloader/manga.cfg
