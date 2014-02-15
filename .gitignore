@@ -17,3 +17,6 @@ converter/dekky_mp4_daemon.lock
 # Media capture files
 manga_downloader/manga.cfg
 manga_downloader/status.txt
+
+# All log files
+logs/*.log
