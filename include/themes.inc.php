@@ -676,9 +676,10 @@ $template_thumb_view_title_row = <<<EOT
         <table width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
                 <td style="vertical-align:top" class="statlink">
-                    <h2>{ALBUM_NAME}</h2>
+                    <h2>{ALBUM_NAME}<span style="margin-left:25px;font-size:small"><a style="background-color:#555555" href="random.php?id={ALBUM_ID}&mode=image">Random</a></span></h2>
                 </td>
                 <td style="text-align:right;" class="sortorder_cell" id="sortorder_cell">
+                    
 <!-- BEGIN admin_buttons -->
                     <div class="buttonlist">
                         <ul>
