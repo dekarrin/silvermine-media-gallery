@@ -146,6 +146,14 @@ function dkrn_get_all_info($in_dir) {
 	
 }
 
+function dkrn_get_video_thumb_name($video_path) {
+	global $CONFIG;
+	$basename = basename($video_path);
+	$filename = mb_substr($basename, 0, mb_strrpos($basename, '.'));
+	$thumb_path = dirname($video_path) . '/' . $CONFIG['thumb_pfx'] . $filename . '.jpg';
+	return $thumb_path;
+}
+
 function dkrn_make_video_thumb($video_path) {
 	/* we don't use the config setting for video thumb size because video
 	thumbs are used as the preview image for player, and thus must be much
@@ -184,12 +192,11 @@ function dkrn_make_video_thumb($video_path) {
 	$size = $w.'x'.$h;
 
 	// get thumb's name
-	$basename = basename($video_path);
-	$filename = mb_substr($basename, 0, mb_strrpos($basename, '.'));
-	$thumb_path = dirname($video_path) . '/' . $CONFIG['thumb_pfx'] . $filename . '.jpg';
+	$thumb_path = dkrn_get_video_thumb_name($video_path);
 	
 	$cmd = "ffmpeg -ss $time -an -i $video_path -an -r 1 -vframes 1 -s $size -y $thumb_path 2>&1";
 	exec($cmd, $output);
+	chmod($thumb_path, octdec($CONFIG['default_file_mode']));
 	return $thumb_path;
 	//return array($cmd, implode("\n", $output));
 }

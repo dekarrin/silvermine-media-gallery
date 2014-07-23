@@ -29,6 +29,7 @@ define('UTIL_PHP', true);
 
 require('include/init.inc.php');
 require('include/picmgmt.inc.php');
+require_once('include/video_convert.inc.php');
 require_once('include/comics.inc.php');
 require_once('include/album_subdirs.inc.php');
 
@@ -240,6 +241,22 @@ $tasks = array(
 		'. $lang_util_php['update_number'] . ' <input type="text" name="mp4_numpics" value="'.$defpicnum.'" size="5" class="textinput" /> '.$lang_util_php['update_option'].'<br />
 		<input type="checkbox" name="mp4_autorefresh" id="mp4_autorefresh" checked="checked" value="1" class="checkbox" /><label for="mp4_autorefresh">'.$lang_util_php['autorefresh'].'</label>'
 	),
+
+	'get_video_thumbs' => array(
+		'get_video_thumbs',
+		'Create video thumbnails','
+				Generates thumbnails for all videos that don\'t yet have one.<br />
+		'. $lang_util_php['update_number'] . ' <input type="text" name="vid_thumbs_numpics" value="'.$defpicnum.'" size="5" class="textinput" /> '.$lang_util_php['update_option'].'<br />
+                <input type="checkbox" name="vid_thumbs_autorefresh" id="vid_thumbs_autorefresh" checked="checked" value="1" class="checkbox" /><label for="vid_thumbs_autorefresh">'.$lang_util_php['autorefresh'].'</label>'
+	),
+
+	'get_all_video_thumbs' => array(
+		'get_all_video_thumbs',
+		'Regenerate video thumbnails','
+				Generates thumbnails for all videos. Any existing thumbnails will be deleted.<br />
+		'. $lang_util_php['update_number'] . ' <input type="text" name="all_vid_thumbs_numpics" value="'.$defpicnum.'" size="5" class="textinput" /> '.$lang_util_php['update_option'].'<br />
+                <input type="checkbox" name="all_vid_thumbs_autorefresh" id="all_vid_thumbs_autorefresh" checked="checked" value="1" class="checkbox" /><label for="all_vid_thumbs_autorefresh">'.$lang_util_php['autorefresh'].'</label>'
+	),
 );
 
 if ($superCage->post->keyExists('action') && $matches = $superCage->post->getMatched('action', '/^[A-Za-z_]+$/')) {
@@ -423,6 +440,134 @@ function filename_to_title()
     } // end while
 
     echo '<br />' . $LINEBREAK . sprintf($lang_util_php['titles_updated'], $file_count) . '<br />' . $LINEBREAK;
+}
+
+function dkrn_start_album_op_page($caller, $title, $prefix = '') {
+	// TODO: make all custom operations use this and dkrn_end_album_op_page().
+	global $CONFIG, $icon_array, $lang_util_php;
+	$form_prefix = (!empty($prefix)) ? $prefix . '_' : '';
+	$superCage = Inspekt::makeSuperCage();
+	if ($superCage->post->keyExists('albumid')) {
+		$albumid = $superCage->post->getInt('albumid');
+	} else if ($superCage->get->keyExists('albumid')) {
+		$albumid = $superCage->get->getInt('albumid');
+	} else {
+		$albumid = 0;
+	}
+	$albstr = $albumid ? "WHERE P.aid = $albumid" : '';
+	if ($superCage->post->keyExists($form_prefix . 'autorefresh')) {
+		$autorefresh = $superCage->post->getInt($form_prefix . 'autorefresh');
+	} else if ($superCage->get->keyExists($form_prefix . 'autorefresh')) {
+		$autorefresh = $superCage->get->getInt($form_prefix . 'autorefresh');
+	} else {
+		$autorefresh = '';
+	}
+	if ($superCage->post->keyExists($form_prefix . 'numpics')) {
+		$numpics = $superCage->post->getInt($form_prefix . 'numpics');
+	} else if ($superCage->get->keyExists($form_prefix . 'numpics')) {
+		$numpics = $superCage->get->getInt($form_prefix . 'numpics');
+	}
+	if ($superCage->post->keyExists('startpic')) {
+		$startpic = $superCage->post->getInt('startpic');
+	} else if ($superCage->get->keyExists('startpic')) {
+		$startpic = $superCage->get->getInt('startpic');
+	} else {
+		$startpic = 0;
+	}
+
+	print '<a name="admin_tool_"' . $caller . '></a>';
+	starttable('100%', $icon_array['util'] . $title);
+	$result = cpg_db_query("SELECT P.pid, P.aid, P.filepath, P.filename FROM {$CONFIG['TABLE_PICTURES']} AS P $albstr LIMIT $startpic, $numpics");
+	$count = mysql_num_rows($result);
+	return array($result, $count, $numpics, $startpic, $autorefresh, $albumid);
+}
+
+function dkrn_end_album_op_page($caller, $title, $prefix, $count, $numpics, $startpic, $autorefresh, $albumid) {
+	global $CONFIG, $lang_util_php, $icon_array;
+	$prefix = (!empty($prefix)) ? $prefix . '_' : '';
+	if ($count == $numpics) {
+		$startpic += $numpics;
+		list($timestamp, $form_token) = getFormToken();
+		if ($autorefresh) {
+			echo <<< EOT
+			<meta http-equiv="refresh" content="1; URL=util.php?{$prefix}numpics={$numpics}&startpic={$startpic}&albumid={$albumid}&{$prefix}autorefresh={$autorefresh}&action={$caller}&form_token={$form_token}&timestamp={$timestamp}#admin_tool_{$caller}">
+EOT;
+		} else {
+			print <<< EOT
+			<tr>
+				<td class="tablef">
+					<form action="util.php#admin_tool_{$caller}" method="post">
+						<input type="hidden" name="action" value="{$caller}" />
+						<input type="hidden" name="{$prefix}numpics" value="{$numpics}" />
+						<input type="hidden" name="startpic" value="{$startpic}" />
+						<input type="hidden" name="albumid" value="{$albumid}" />
+						<input type="hidden" name="{$prefix}autorefresh" value="{$autorefresh}" />
+						<button type="submit" class="button" name="submit" id="submit" value="{$lang_util_php['continue']}">{$lang_util_php['continue']} {$icon_array['continue']}</button>
+						<input type="hidden" name="form_token" value="{$form_token}" />
+						<input type="hidden" name="timestamp" value="{$timestamp}" />
+					</form>
+				</td>
+			</tr>
+EOT;
+		}
+	} else {
+		echo '<tr><td class="tablef">'.$title.'</td></tr>';
+	}
+	endtable();
+}
+
+function get_all_video_thumbs() {
+	global $CONFIG, $icon_array, $lang_util_php;
+	list($result, $count, $numpics, $startpic, $autorefresh, $albumid) = dkrn_start_album_op_page('get_all_video_thumbs', 'Generating thumbnails...', 'all_vid_thumbs');
+	$loopCounter = 0;
+	$tablestyle = 'tableb';
+	while ($row = mysql_fetch_assoc($result)) {
+		$loopCounter++;
+		if ($loopCounter % 2 == 0) {
+			$tablestyle .= ' tableb_alternate';
+		} else {
+			$tablestyle = 'tableb';
+		}
+// logic starts here (see move_uploaded_to_subdirs())
+		echo '<tr><td class="'.$tablestyle.'">';
+		$pid = $row['pid'];
+		$movie_file = $CONFIG['fullpath'] . $row['filepath'] . $row['filename'];
+		$movie_thumb = dkrn_get_video_thumb_name($movie_file);
+		dkrn_make_video_thumb($movie_file);
+		echo $icon_array['ok'] . ' <tt>' . $row['filename'] . '</tt> ' . $lang_util_php['updated_successfully'] . '.';
+		echo '</td></tr>';
+// logic ends here (see move_uploaded_to_subdirs())
+	}
+	dkrn_end_album_op_page('get_all_video_thumbs', 'Thumbnail generation complete.', 'all_vid_thumbs', $count, $numpics, $startpic, $autorefresh, $albumid);
+}
+
+function get_video_thumbs() {
+	global $CONFIG, $icon_array, $lang_util_php;
+	list($result, $count, $numpics, $startpic, $autorefresh, $albumid) = dkrn_start_album_op_page('get_video_thumbs', 'Generating thumbnails...', 'vid_thumbs');
+	$loopCounter = 0;
+	$tablestyle = 'tableb';
+	while ($row = mysql_fetch_assoc($result)) {
+		$loopCounter++;
+		if ($loopCounter % 2 == 0) {
+			$tablestyle .= ' tableb_alternate';
+		} else {
+			$tablestyle = 'tableb';
+		}
+// logic starts here (see move_uploaded_to_subdirs())
+		echo '<tr><td class="'.$tablestyle.'">';
+		$pid = $row['pid'];
+		$movie_file = $CONFIG['fullpath'] . $row['filepath'] . $row['filename'];
+		$movie_thumb = dkrn_get_video_thumb_name($movie_file);
+		if (file_exists($movie_thumb)) {
+			echo $icon_array['cancel'] . ' <tt>' . $row['filename'] . '</tt> already has a thumbnail.';
+		} else {
+			dkrn_make_video_thumb($movie_file);
+			echo $icon_array['ok'] . ' <tt>' . $row['filename'] . '</tt> ' . $lang_util_php['updated_successfully'] . '.';
+		}
+		echo '</td></tr>';
+// logic ends here (see move_uploaded_to_subdirs())
+	}
+	dkrn_end_album_op_page('get_video_thumbs', 'Thumbnail generation complete.', 'vid_thumbs', $count, $numpics, $startpic, $autorefresh, $albumid);
 }
 
 
