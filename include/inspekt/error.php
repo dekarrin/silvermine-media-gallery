@@ -51,7 +51,7 @@ class Inspekt_Error {
 	 *
 	 * @static
 	 */
-	function raiseError($msg, $type=E_USER_WARNING) {
+	static function raiseError($msg, $type=E_USER_WARNING) {
 		/*if (version_compare( PHP_VERSION, '5', '<' )) {
 			Inspekt_Error::raiseErrorPHP4($msg, $type);
 		} else {
@@ -69,7 +69,7 @@ class Inspekt_Error {
 	 *
 	 * @static
 	 */
-	function raiseErrorPHP4 ($msg, $type=NULL) {
+	static function raiseErrorPHP4 ($msg, $type=NULL) {
 
 		if (isset($type)) {
 			trigger_error($msg);

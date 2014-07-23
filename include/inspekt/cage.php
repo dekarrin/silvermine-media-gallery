@@ -48,7 +48,7 @@ class Inspekt_Cage
      *
      * @var array
      */
-    var $_source = NULL;
+    private static $_source = NULL;
 
 
     /**
@@ -72,7 +72,7 @@ class Inspekt_Cage
      *
      * @static
      */
-    function Factory(&$source, $strict = TRUE) {
+    public static function Factory(&$source, $strict = TRUE) {
 
         if (!is_array($source)) {
             Inspekt_Error::raiseError('$source is not an array', E_USER_ERROR);
@@ -97,7 +97,7 @@ class Inspekt_Cage
      * @see Factory()
      * @param array $newsource
      */
-    function _setSource(&$newsource) {
+    private function _setSource(&$newsource) {
 
         if (!is_array($newsource)) {
             Inspekt_Error::raiseError('$source is not an array', E_USER_ERROR);
