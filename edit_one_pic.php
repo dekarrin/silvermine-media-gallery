@@ -83,6 +83,7 @@ function process_post_data()
     $user2 = cpgSanitizeUserTextInput($superCage->post->getEscaped('user2'));
     $user3 = cpgSanitizeUserTextInput($superCage->post->getEscaped('user3'));
     $user4 = cpgSanitizeUserTextInput($superCage->post->getEscaped('user4'));
+	$is_collection = $superCage->post->keyExists('is_collection') ? $superCage->post->getInt('is_collection') : 0;
 
     $galleryicon = $superCage->post->getInt('galleryicon');
     $isgalleryicon = ($galleryicon == $pid);
@@ -154,6 +155,7 @@ function process_post_data()
     $update .= ", user2 = '{$user2}'";
     $update .= ", user3 = '{$user3}'";
     $update .= ", user4 = '{$user4}'";
+	$update .= ", collection = '{$is_collection}'";
 
     if ($isgalleryicon && $pic['category'] > FIRST_USER_CAT) {
         $sql = "UPDATE {$CONFIG['TABLE_PICTURES']} SET galleryicon = 0 WHERE owner_id = {$pic['owner_id']}";
@@ -347,6 +349,7 @@ $thumb_url = get_pic_url($CURRENT_PIC, 'thumb');
 $thumb_link = 'displayimage.php?pid='.$CURRENT_PIC['pid'];
 $filename = htmlspecialchars($CURRENT_PIC['filename']);
 $filepath = htmlspecialchars($CURRENT_PIC['filepath']);
+$is_collection_checked = ($CURRENT_PIC['collection'] == '1') ? 'checked="checked"' : '';
 
 $THUMB_ROWSPAN = 7;
 if ($CONFIG['user_field1_name'] != '') {
@@ -436,6 +439,15 @@ print <<< EOT
             <br />
         </td>
     </tr>
+
+	<tr>
+	        <td class="tableb" style="white-space: nowrap;">
+			{$icon_array['file_info']}{$lang_common['is_collection']}
+	        </td>
+		<td width="100%" class="tableb" valign="top">
+			<input type="checkbox" value="1" $is_collection_checked name="is_collection" />
+		</td>
+	</tr>
 EOT;
 
 form_alb_list_box();

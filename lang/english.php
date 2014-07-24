@@ -135,6 +135,7 @@ $lang_common['username_if_blank'] = 'Unknown coward'; // cpg1.5
 $lang_common['albums_no_category'] = 'Albums with no category'; // cpg1.5
 $lang_common['personal_albums'] = '* Personal albums'; // cpg1.5
 $lang_common['select_album'] = 'Select Album'; // cpg1.5
+$lang_common['is_collection'] = 'Is a Collection'; // smg1.0
 $lang_common['ok'] = 'OK'; // cpg1.5
 $lang_common['status'] = 'Status'; // cpg1.5
 $lang_common['apply_changes'] = 'Apply changes'; // cpg1.5
