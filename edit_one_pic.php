@@ -439,15 +439,6 @@ print <<< EOT
             <br />
         </td>
     </tr>
-
-	<tr>
-	        <td class="tableb" style="white-space: nowrap;">
-			{$icon_array['file_info']}{$lang_common['is_collection']}
-	        </td>
-		<td width="100%" class="tableb" valign="top">
-			<input type="checkbox" value="1" $is_collection_checked name="is_collection" />
-		</td>
-	</tr>
 EOT;
 
 form_alb_list_box();
@@ -468,6 +459,15 @@ print <<<EOT
             <input type="text" style="width: 100%" name="title" maxlength="255" value="{$CURRENT_PIC['title']}" class="textinput" />
         </td>
     </tr>
+
+	<tr>
+	        <td class="tableb" style="white-space: nowrap;">
+			{$icon_array['file_info']}{$lang_common['is_collection']}
+	        </td>
+		<td width="100%" class="tableb" valign="top">
+			<input type="checkbox" value="1" $is_collection_checked name="is_collection" />
+		</td>
+	</tr>
     <tr>
         <td class="tableb" style="white-space: nowrap;">
             {$icon_array['file_name']}{$lang_common['filename']}
