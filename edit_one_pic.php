@@ -293,6 +293,11 @@ function process_post_data()
     }
 } // end function process_post_data
 
+function form_col_list_box($aid) {
+	global $lang_common, $icon_array;
+
+EOT
+}
 
 function form_alb_list_box()
 {
@@ -468,6 +473,11 @@ print <<<EOT
 			<input type="checkbox" value="1" $is_collection_checked name="is_collection" />
 		</td>
 	</tr>
+EOT;
+
+form_col_list_box($CURRENT_PIC['aid']);
+
+print <<<EOT
     <tr>
         <td class="tableb" style="white-space: nowrap;">
             {$icon_array['file_name']}{$lang_common['filename']}
