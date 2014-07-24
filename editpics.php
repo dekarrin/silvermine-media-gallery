@@ -149,6 +149,7 @@ $data = array(
     array($icon_array['file_info'] . $lang_editpics_php['pic_info'], '', 3),
     array($icon_array['album'] . $lang_common['album'], 'aid', 1),
     array($icon_array['title'] . $lang_common['title'], 'title', 0, 255),
+	array($icon_array['file_info'] . $lang_common['is_collection'], 'collection', 4),
     array($icon_array['description'] . $captionLabel, 'caption', 2, $CONFIG['max_img_desc_length']),
     array($icon_array['keyword'] . $keywordLabel, 'keywords', 0, 255),
     array($CONFIG['user_field1_name'], 'user1', 0, 255),
@@ -228,6 +229,7 @@ function process_post_data()
         $user2       = get_post_var('user2', $pid);
         $user3       = get_post_var('user3', $pid);
         $user4       = get_post_var('user4', $pid);
+	$collection  = false;
 
         $delete = false;
         $reset_vcount = false;
@@ -235,6 +237,10 @@ function process_post_data()
         $del_comments = false;
 
         $isgalleryicon = ($galleryicon === $pid);
+
+	if ($superCage->post->keyExists('collection' . $pid)) {
+		$collection = $superCage->post->getInt('collection' . $pid);
+	}
 
         if ($superCage->post->keyExists('delete' . $pid)) {
             $delete = $superCage->post->getInt('delete' . $pid);
@@ -284,6 +290,7 @@ function process_post_data()
         $update .= ", user2 = '$user2'";
         $update .= ", user3 = '$user3'";
         $update .= ", user4 = '$user4'";
+	$update .= ", collection = '$collection'";
 
         if ($isgalleryicon && $pic['category'] > FIRST_USER_CAT) {
             cpg_db_query("UPDATE {$CONFIG['TABLE_PICTURES']} SET galleryicon = 0 WHERE owner_id = {$pic['owner_id']}");
@@ -588,6 +595,24 @@ function form_alb_list_box($text, $name)
 EOT;
 }
 
+function form_checkbox($text, $name)
+{
+	global $CURRENT_PIC, $row_style_class;
+	$checked = $CURRENT_PIC[$name] == '1' ? 'checked="checked"' : '';
+	$name .= $CURRENT_PIC['pid'];
+
+	echo <<<EOT
+	<tr>
+		<td class="$row_style_class" valign="top" style="white-space: nowrap;">
+			$text
+		</td>
+		<td class="$row_style_class" valign="top">
+			<input type="checkbox" value="1" $checked name="$name" id="$name" />
+		</td>
+	</tr>
+EOT;
+}
+
 function form_textarea($text, $name, $max_length)
 {
     global $ALBUM_DATA, $CURRENT_PIC, $row_style_class;
@@ -655,6 +680,10 @@ function create_form(&$data)
             case 3 :
                 form_pic_info($element[0]);
                 break;
+
+	case 4:
+		form_checkbox($element[0], $element[1]);
+		break;
 
             default:
                 cpg_die(CRITICAL_ERROR, 'Invalid action for form creation', __FILE__, __LINE__);
