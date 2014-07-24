@@ -1265,10 +1265,10 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
                 && in_array($album, $USER_DATA['allowed_albums'])) {
             $approved = '';
         } else {
-            $approved = GALLERY_ADMIN_MODE ? '' : 'AND approved=\'YES\'';
+            $approved = GALLERY_ADMIN_MODE ? '' : 'AND approved=\'1\'';
         }
 
-        $approved = GALLERY_ADMIN_MODE ? '' : 'AND approved=\'YES\'';
+        $approved = GALLERY_ADMIN_MODE ? '' : 'AND approved=\'1\'';
 
         // Note: Use a second variable, $pic_count, since $count is passed by reference
         // and having it defined as static in the function may be problematic
@@ -1865,7 +1865,7 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
         mysql_free_result($result);
 
         // For 'lastalb' album, only use approved photos for album thumbnails
-        $approved = 'AND approved=\'YES\'';
+        $approved = 'AND approved=\'1\'';
 
         // Preparation for check if album thumbnail exists
         $album_thumbs = array();
@@ -2069,7 +2069,7 @@ function get_pic_pos($album, $pid)
             $keyword = '';
         }
 
-        $approved = GALLERY_ADMIN_MODE ? '' : 'AND approved=\'YES\'';
+        $approved = GALLERY_ADMIN_MODE ? '' : 'AND approved=\'1\'';
 
         $result = cpg_db_query("SELECT filename, title, pid, position, ctime FROM {$CONFIG['TABLE_PICTURES']} WHERE pid = $pid");
 

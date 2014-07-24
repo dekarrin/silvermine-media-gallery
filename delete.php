@@ -280,12 +280,12 @@ function delete_user($key) {
         print '<td class="tableb" width="25%">';
 
         if ($superCage->get->keyExists('delete_comments')) {
-            $delete_comments_choice = $superCage->get->getAlpha('delete_comments');
+            $delete_comments_choice = $superCage->get->getDigits('delete_comments');
         } elseif ($superCage->post->keyExists('delete_comments')) {
-            $delete_comments_choice = $superCage->post->getAlpha('delete_comments');
+            $delete_comments_choice = $superCage->post->getDigits('delete_comments');
         }
 
-        if ($delete_comments_choice == 'yes') {
+        if ($delete_comments_choice == '1') {
 
             cpg_db_query("DELETE FROM {$CONFIG['TABLE_COMMENTS']} WHERE author_id = '$key'");
 
@@ -316,12 +316,12 @@ function delete_user($key) {
         print '<td class="tableb" width="25%">';
 
         if ($superCage->get->keyExists('delete_files')) {
-            $delete_files_choice = $superCage->get->getAlpha('delete_files');
+            $delete_files_choice = $superCage->get->getDigits('delete_files');
         } elseif ($superCage->post->keyExists('delete_files')) {
-            $delete_files_choice = $superCage->post->getAlpha('delete_files');
+            $delete_files_choice = $superCage->post->getDigits('delete_files');
         }
 
-        if ($delete_files_choice == 'yes') {
+        if ($delete_files_choice == '1') {
 
             cpg_db_query("DELETE FROM {$CONFIG['TABLE_PICTURES']} WHERE owner_id = '$key'");
 

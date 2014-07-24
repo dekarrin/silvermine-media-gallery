@@ -377,9 +377,9 @@ case 'album_update':
     $thumb = $superCage->post->getInt('thumb');
     $visibility = $superCage->post->getInt('visibility');
 
-    $uploads = $superCage->post->getAlpha('uploads') == '1' ? '1' : '0';
-    $comments = $superCage->post->getAlpha('comments') == '1' ? '1' : '0';
-    $votes = $superCage->post->getAlpha('votes') == '1' ? '1' : '0';
+    $uploads = $superCage->post->getDigits('uploads') == '1' ? '1' : '0';
+    $comments = $superCage->post->getDigits('comments') == '1' ? '1' : '0';
+    $votes = $superCage->post->getDigits('votes') == '1' ? '1' : '0';
 
     // Get the old alb_password before update
     $result = cpg_db_query("SELECT alb_password FROM {$CONFIG['TABLE_ALBUMS']} WHERE aid = $aid");

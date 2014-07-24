@@ -631,12 +631,12 @@ EOT;
         echo <<<EOT
                               </select>
                             <select name="delete_files" size="1" class="listbox" style="display:none">
-                                <option value="no">{$lang_usermgr_php['delete_files_no']}</option>
-                                <option value="yes">{$lang_usermgr_php['delete_files_yes']}</option>
+                                <option value="0">{$lang_usermgr_php['delete_files_no']}</option>
+                                <option value="1">{$lang_usermgr_php['delete_files_yes']}</option>
                             </select>
                             <select name="delete_comments" size="1" class="listbox" style="display:none">
-                                <option value="no">{$lang_usermgr_php['delete_comments_no']}</option>
-                                <option value="yes">{$lang_usermgr_php['delete_comments_yes']}</option>
+                                <option value="0">{$lang_usermgr_php['delete_comments_no']}</option>
+                                <option value="1">{$lang_usermgr_php['delete_comments_yes']}</option>
                             </select>
                             <button type="submit" class="button" name="go" value="{$lang_usermgr_php['submit']}" style="display:none">{$icon_array['ok']}{$lang_usermgr_php['submit']}</button>
                         </td>
@@ -988,7 +988,7 @@ function update_user($user_id)
     $profile4 = $superCage->post->getEscaped('user_profile4');
     $profile5 = $superCage->post->getEscaped('user_profile5');
     $profile6 = $superCage->post->getEscaped('user_profile6');
-    $user_active = $superCage->post->getAlpha('user_active');
+    $user_active = $superCage->post->getDigits('user_active');
     $user_group = $superCage->post->getInt('user_group');
     $group_list = $superCage->post->keyExists('group_list') ? $superCage->post->getInt('group_list') : '';
 

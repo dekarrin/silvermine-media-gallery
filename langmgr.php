@@ -60,7 +60,7 @@ if ($superCage->post->keyExists('submit')) {
     $posted_lang_id_array = $superCage->post->getEscaped('lang_id');
     foreach ($posted_lang_id_array as $posted_lang_id) {
         // Create the query
-        if ($superCage->post->getAlpha('new_'.$posted_lang_id) == '1') {
+        if ($superCage->post->getDigits('new_'.$posted_lang_id) == '1') {
             $query = "INSERT INTO `".$CONFIG['TABLE_LANGUAGE']. "` ( `lang_id` , `english_name` , `native_name` , `custom_name` , `flag` , `available` , `enabled` , `complete` ) VALUES (";
             $query .= "'".$posted_lang_id."', ";
             $query .= "'".$superCage->post->getEscaped('english_name_'.$posted_lang_id)."', ";
@@ -71,17 +71,17 @@ if ($superCage->post->keyExists('submit')) {
             } else {
                 $query .= "'', ";
             }
-            if ($superCage->post->getAlpha('available_'.$posted_lang_id) == '1') {
+            if ($superCage->post->getDigits('available_'.$posted_lang_id) == '1') {
                 $query .= "'1', ";
             } else {
                 $query .= "'0', ";
             }
-            if ($superCage->post->getAlpha('enable_'.$posted_lang_id) == '1') {
+            if ($superCage->post->getDigits('enable_'.$posted_lang_id) == '1') {
                 $query .= "'1', ";
             } else {
                 $query .= "'0', ";
             }
-            if ($superCage->post->getAlpha('complete_'.$posted_lang_id) == '1') {
+            if ($superCage->post->getDigits('complete_'.$posted_lang_id) == '1') {
                 $query .= "'1', ";
             } else {
                 $query .= "'0', ";
@@ -96,17 +96,17 @@ if ($superCage->post->keyExists('submit')) {
             if ($superCage->post->getAlpha('flag_'.$posted_lang_id) != '' && $superCage->post->getAlpha('flag_'.$posted_lang_id) != $lang_langmgr_php['pick_a_flag']) {
                 $query .= "`flag` = '".$superCage->post->getAlpha('flag_'.$posted_lang_id)."', ";
             }
-            if ($superCage->post->getAlpha('available_'.$posted_lang_id) == '1') {
+            if ($superCage->post->getDigits('available_'.$posted_lang_id) == '1') {
                 $query .= "`available` = '1', ";
             } else {
                 $query .= "`available` = '0', ";
             }
-            if ($superCage->post->getAlpha('enable_'.$posted_lang_id) == '1') {
+            if ($superCage->post->getDigits('enable_'.$posted_lang_id) == '1') {
                 $query .= "`enabled` = '1', ";
             } else {
                 $query .= "`enabled` = '0', ";
             }
-            if ($superCage->post->getAlpha('complete_'.$posted_lang_id) == '1') {
+            if ($superCage->post->getDigits('complete_'.$posted_lang_id) == '1') {
                 $query .= "`complete` = '1', ";
             } else {
                 $query .= "`complete` = '0', ";
@@ -122,7 +122,7 @@ if ($superCage->post->keyExists('submit')) {
     $submit_default_id = $superCage->post->getEscaped('is_default');
     if ($submit_default_id != DEFAULT_LANGUAGE) { // only write the change if the submit default language differs from the current default language
         // Check if the "new" default language is enabled in the first place
-        if ($superCage->post->getAlpha('enable_'.$submit_default_id) == '1') {
+        if ($superCage->post->getDigits('enable_'.$submit_default_id) == '1') {
             $CONFIG['lang'] = $CONFIG['lang_config'];
             cpg_config_set('lang', $submit_default_id);
             $CONFIG['default_lang'] = $submit_default_id;

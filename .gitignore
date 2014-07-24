@@ -21,3 +21,6 @@ manga_downloader/status.txt
 # All log files
 logs/*.log
 logs/*.log.php
+
+# Vim files
+*.swp

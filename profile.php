@@ -664,8 +664,8 @@ EOT;
         <input type="hidden" name="id" value="u{$user_id}" />
         <input type="hidden" name="action" value="delete" />
         <input type="hidden" name="what" value="user" />
-        <input type="hidden" name="delete_files" value="no" />
-        <input type="hidden" name="delete_comments" value="no" />
+        <input type="hidden" name="delete_files" value="0" />
+        <input type="hidden" name="delete_comments" value="0" />
         <script type="text/javascript">
           document.write('<button type="submit" class="button" name="delete_submit" id="delete_submit" value="{$lang_register_php['delete_my_account']}" disabled="disabled" onclick="return confirmUserDelete(this);" />{$icon_array['delete']}{$lang_register_php['delete_my_account']}</button>');
         </script>

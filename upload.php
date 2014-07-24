@@ -972,19 +972,19 @@ EOT;
 
         if ($result !== true && $result !== 2) {
             // The file could not be placed.
-            $file_placement = 'no';
+            $file_placement = '0';
         } else {
             $CURRENT_PIC_DATA['url_prefix'] = 0;
             // The file was placed successfully.
-            $file_placement = 'yes';
+            $file_placement = '1';
             $thumb_url = get_pic_url($CURRENT_PIC_DATA, 'thumb');
         }
     } else {
         // The file was not placed successfully.
-        $file_placement = 'no';
+        $file_placement = '0';
     }
 
-    if ($file_placement == 'yes') {
+    if ($file_placement == '1') {
         // The previous picture was placed successfully.
         echo "success". ($PIC_NEED_APPROVAL ? '1' : '0') . "|" . $thumb_url;
     } else {

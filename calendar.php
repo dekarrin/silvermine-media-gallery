@@ -35,7 +35,7 @@ class MyCalendar extends Calendar {
 
         $date = sprintf('%d-%02d-%02d', $year, $month, $day);
 
-        $sql = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p WHERE approved = 'YES' AND DATE(FROM_UNIXTIME(ctime)) = '$date' $FORBIDDEN_SET";
+        $sql = "SELECT COUNT(*) FROM {$CONFIG['TABLE_PICTURES']} AS p WHERE approved = '1' AND DATE(FROM_UNIXTIME(ctime)) = '$date' $FORBIDDEN_SET";
         $result = cpg_db_query($sql);
         list($nb_pics) = mysql_fetch_row($result);
 

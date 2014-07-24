@@ -286,7 +286,7 @@ if ($superCage->get->keyExists('cat') && $superCage->get->getInt('cat') == USER_
             $sql .= "FROM {$CONFIG[\'TABLE_ALBUMS\']} AS a ";
             $sql .= "INNER JOIN {$this->usertable} as u on u.{$f[\'user_id\']} = a.category - " . FIRST_USER_CAT . " ";
             $sql .= "INNER JOIN {$CONFIG[\'TABLE_PICTURES\']} AS p ON p.aid = a.aid ";
-            $sql .= "WHERE ((isnull(approved) or approved=\'YES\') AND category > " . FIRST_USER_CAT . ") $forbidden_with_icon ";
+            $sql .= "WHERE ((isnull(approved) or approved=\'1\') AND category > " . FIRST_USER_CAT . ") $forbidden_with_icon ";
             if ($l = $getLetter) $sql .= "AND UPPER({$f[\'username\']}) LIKE \'$l%\' ";
             $sql .= "GROUP BY category ";
             $sql .= "ORDER BY category ";
@@ -308,7 +308,7 @@ if ($superCage->get->keyExists('cat') && $superCage->get->getInt('cat') == USER_
             $sql  = "SELECT category - 10000 as user_id ";
             $sql .= "FROM {$CONFIG[\'TABLE_ALBUMS\']} AS a ";
             $sql .= "INNER JOIN {$CONFIG[\'TABLE_PICTURES\']} AS p ON p.aid = a.aid ";
-            $sql .= "WHERE ((isnull(approved) or approved=\"YES\") ";
+            $sql .= "WHERE ((isnull(approved) or approved=\"1\") ";
             $sql .= "AND category > " . FIRST_USER_CAT . ") $forbidden_with_icon GROUP BY category ";
             $sql .= "LIMIT $lower_limit, $users_per_page ";
 
@@ -345,7 +345,7 @@ if ($superCage->get->keyExists('cat') && $superCage->get->getInt('cat') == USER_
             $sql .= "MAX(galleryicon) as gallery_pid ";
             $sql .= "FROM {$CONFIG[\'TABLE_ALBUMS\']} AS a ";
             $sql .= "INNER JOIN {$CONFIG[\'TABLE_PICTURES\']} AS p ON p.aid = a.aid ";
-            $sql .= "WHERE ((isnull(approved) or approved=\'YES\') AND category > " . FIRST_USER_CAT . ") $forbidden_with_icon GROUP BY category ";
+            $sql .= "WHERE ((isnull(approved) or approved=\'1\') AND category > " . FIRST_USER_CAT . ") $forbidden_with_icon GROUP BY category ";
             $sql .= "ORDER BY category ";
 
             $result = cpg_db_query($sql);

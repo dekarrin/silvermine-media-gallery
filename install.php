@@ -1824,7 +1824,7 @@ function createAdmin()
         . " user_regdate, user_group_list, user_email, user_profile1, user_profile2, user_profile3, "
         . " user_profile4, user_profile5, user_profile6, user_actkey ) "
         . "VALUES "
-        . "(1, 'YES', '{$config['admin_username']}', "
+        . "(1, '1', '{$config['admin_username']}', "
         . " md5('{$config['admin_password']}'), NOW(), NOW(), '', "
         . " '{$config['admin_email']}', '', '', '', '', '', '', '');\n";
 

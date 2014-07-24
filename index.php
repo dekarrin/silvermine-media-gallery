@@ -810,7 +810,7 @@ function list_albums()
 
     $disp_album_count = count($alb_thumbs);
 
-    $approved = 'AND approved=\'YES\'';
+    $approved = 'AND approved=\'1\'';
     $forbidden_set_string = ((count($FORBIDDEN_SET_DATA) > 0) ? ' AND aid NOT IN (' . implode(', ', $FORBIDDEN_SET_DATA) . ')' : '');
 
     foreach ($alb_stats as $key => $value) {
@@ -1034,7 +1034,7 @@ function list_cat_albums($cat, $catdata)
 
     foreach ($catdata['subalbums'] as $aid => $album) {
 
-        $approved = ' AND approved=\'YES\'';
+        $approved = ' AND approved=\'1\'';
         $forbidden_set_string = ((count($FORBIDDEN_SET_DATA) > 0) ? ' AND aid NOT IN (' . implode(', ', $FORBIDDEN_SET_DATA) . ')' : '');
         $keyword = ($album['keyword'] ? "AND (keywords like '%".addslashes($album['keyword'])."%' $forbidden_set_string)" : '');
         if ($CONFIG['link_pic_count'] == 1 || $album['pic_count'] == 0) {
