@@ -2611,6 +2611,8 @@ $lang_media_capture_php['form_add_btn'] = 'Add Capture';
 $lang_media_capture_php['form_edit_btn'] = 'Update';
 $lang_media_capture_php['form_del_btn'] = 'Delete';
 $lang_media_capture_php['capture_btn'] = 'Start Capture';
+$lang_media_capture_php['reset_btn'] = 'Restart Capture';
 $lang_media_capture_php['capture_started'] = 'Capture process started.';
+$lang_media_capture_php['capture_reset'] = 'Capture process reset.';
 }
 ?>

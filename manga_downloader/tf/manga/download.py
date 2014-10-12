@@ -326,6 +326,7 @@ class FakkuJSON(JSONGetter):
 		while url[-1] in map(str, range(10)):
 			url = url[:-1]
 		url = url.replace('#page=', '')
+		self.__metaCache = None
 		super().setBaseURL(url)
 
 	def getPageImageURL(self, pageNum):

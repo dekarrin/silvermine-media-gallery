@@ -11,9 +11,6 @@ SITE_ROOT = '/srv/http/'
 
 CONFIG_FILE = SITE_ROOT + "manga_downloader/manga.cfg" # location, relative to this file, of the config file
 
-f = open(SITE_ROOT + 'manga_downloader/status.txt', 'w')
-f.close()
-
 def out(stuff):
 	f = open(SITE_ROOT + 'manga_downloader/status.txt', 'a')
 	f.write(str(stuff) + "\n")
@@ -105,11 +102,14 @@ def zipManga(outputDir, title):
 	cbz.rename = True
 	cbz.addAll(imagePath)
 	cbz.close()
-	
-try:
-	main()
-except KeyboardInterrupt:
-	pass
-except Exception as e:
-	out(e)
+
+if __name__ == "__main__":
+	try:
+		f = open(SITE_ROOT + 'manga_downloader/status.txt', 'w')
+		f.close()
+		main()
+	except KeyboardInterrupt:
+		pass
+	except Exception as e:
+		out(e)
 
