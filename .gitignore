@@ -4,6 +4,7 @@ albums/conversions/*
 albums/direct/videos/*
 albums/direct/games/*
 albums/userpics/*
+comics/*.cbz
 
 # Gallery config
 include/config.inc.php

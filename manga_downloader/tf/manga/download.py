@@ -221,7 +221,7 @@ class GalleryDownloader:
 		"""
 		if self.__lastDownloaded == self.__pageCount:
 			raise StopIteration
-		out("\rDownloading page %d of %d..." % (self.__currentPage, self.__pageCount))
+		out("Downloading page %d of %d..." % (self.__currentPage, self.__pageCount))
 		imageData = None
 		errors = 0
 		while True:  # try it five times at most.
