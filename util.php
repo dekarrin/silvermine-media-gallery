@@ -95,9 +95,9 @@ $keyword_replace2 = sprintf(
 
 
 define('COMICS_DIR', 'comics');
-function get_comic_file() {
+function dkrn_get_comic_file() {
 	$files = scandir(COMICS_DIR);
-	if (count($files) == 3) {
+	if (count($files) == 3) { // exclude ., .., and index.php
 		return '';
 	} else {
 		$uploading = '.';
@@ -109,10 +109,17 @@ function get_comic_file() {
 	}
 }
 
-$comic_convert_file = get_comic_file();
+function dkrn_get_comics_count() {
+	$files = scandir(COMICS_DIR);
+	return count($files) - 3; // exclude ., .., and index.php
+}
+
+$comic_convert_file = dkrn_get_comic_file();
 $comic_convert_from = '<span style="color:red;">No comic files detected.</span>';
 if (!empty($comic_convert_file)) {
-	$comic_convert_from = "Will upload comic '$comic_convert_file'.";
+	$comic_convert_from = '<i>Comics: ' . dkrn_get_comics_count() . '</i>';
+	$comic_convert_from .= '<br />' . 'Will upload comic: ';
+	$comic_convert_from .= $comic_convert_file;
 }
 
 
