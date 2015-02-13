@@ -47,7 +47,7 @@ function custom_thumb_page_start() {
                 cpg_die(ERROR, $lang_errors['invalid_form_token'], __FILE__, __LINE__);
             }
 
-            $fileupload = $superCage->files->_source['fileupload'];
+            $fileupload = $superCage->files->getRaw('fileupload');
 
             if ($fileupload['error']) {
                 load_template();

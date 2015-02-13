@@ -73,7 +73,10 @@ if ($superCage->get->keyExists('album') && $superCage->get->getAlpha('album') ==
     $search_params = $USER['search'];
 } else {
     //put all original $_POST vars in $search_params, don't know if this could be used???
-    $search_params = $superCage->post->_source;
+    //$search_params = $superCage->post->_source;
+	// It can't. Do NOT use it, Inspekt EXPLICITLY stated this.
+	
+	$search_params = array('params' => $superCage->post->getRaw("params"));
 }
 
 

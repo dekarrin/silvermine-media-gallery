@@ -3754,6 +3754,7 @@ function& cpg_lang_var($varname, $index = null)
 
 function cpg_debug_output()
 {
+	define('CPG_DEBUG_OUTPUT',1);
     global $USER, $USER_DATA, $CONFIG, $cpg_time_start, $query_stats, $queries, $lang_cpg_debug_output, $CPG_PHP_SELF, $superCage, $CPG_PLUGINS, $LINEBREAK;
     if ($CONFIG['performance_timestamp'] == 0 || (date('Y-m-d', $CONFIG['performance_timestamp']) < date('Y-m-d'))) {
         // The metering data in the config table are outdated, let's write fresh values.
@@ -3825,15 +3826,15 @@ EOT;
     echo $debug_separate;
     echo "GET :";
     echo $debug_underline;
-    echo htmlentities(print_r($superCage->get->_source, true));
+    echo htmlentities(print_r($superCage->get->getSource(), true));
     echo $debug_separate;
     echo "POST :";
     echo $debug_underline;
-    echo htmlentities(print_r($superCage->post->_source, true));
+    echo htmlentities(print_r($superCage->post->getSource(), true));
     echo $debug_separate;
     echo "COOKIE :";
     echo $debug_underline;
-    echo htmlentities(print_r($superCage->cookie->_source, true));
+    echo htmlentities(print_r($superCage->cookie->getSource(), true));
     echo $debug_separate;
 
     if ($superCage->cookie->keyExists('PHPSESSID')) {
