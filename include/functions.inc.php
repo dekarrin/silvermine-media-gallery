@@ -3755,7 +3755,7 @@ function& cpg_lang_var($varname, $index = null)
 function cpg_debug_output()
 {
 	define('CPG_DEBUG_OUTPUT',1);
-    global $USER, $USER_DATA, $CONFIG, $cpg_time_start, $query_stats, $queries, $lang_cpg_debug_output, $CPG_PHP_SELF, $superCage, $CPG_PLUGINS, $LINEBREAK;
+    global $CURRENT_PIC_DATA, $USER, $USER_DATA, $CONFIG, $cpg_time_start, $query_stats, $queries, $lang_cpg_debug_output, $CPG_PHP_SELF, $superCage, $CPG_PLUGINS, $LINEBREAK;
     if ($CONFIG['performance_timestamp'] == 0 || (date('Y-m-d', $CONFIG['performance_timestamp']) < date('Y-m-d'))) {
         // The metering data in the config table are outdated, let's write fresh values.
         // Currently happens each day. To extend the metering period to a whole week,
@@ -3819,6 +3819,10 @@ EOT;
     echo "USER DATA:";
     echo $debug_underline;
     echo htmlentities(print_r($USER_DATA, true));
+    echo $debug_separate;
+    echo "CURRENT_PIC_DATA:";
+    echo $debug_underline;
+    echo isset($CURRENT_PIC_DATA) ? htmlentities(print_r($CURRENT_PIC_DATA, true)) : "(no data)\n";
     echo $debug_separate;
     echo "Queries:";
     echo $debug_underline;
