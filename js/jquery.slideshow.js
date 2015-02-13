@@ -35,6 +35,7 @@ $(document).ready(function(){
 		if (PiCount > 1) {
 			switch (kcode) {
 				case 37: // left arrow
+					pauseSlideShow();
 					showPrevSlide();
 					break;
 				case 39: // right arrow
@@ -43,6 +44,7 @@ $(document).ready(function(){
 				case 32: // space bar
 					if (Paused) {
 						runSlideShow();
+						showNextSlide();
 					} else {
 						pauseSlideShow();
 					}
