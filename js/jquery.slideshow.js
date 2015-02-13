@@ -21,6 +21,40 @@
 
 $(document).ready(function(){
 
+	$(document).keydown(function(e) {
+		if (!e) {
+			e = window.event;
+		}
+		var kcode = 0;
+		if (e.which) {
+			kcode = e.which;
+		} else if (e.keyCode) {
+			kcode = e.keyCode;
+		}
+		var propogate = false;
+		if (PiCount > 1) {
+			switch (kcode) {
+				case 37: // left arrow
+					showPrevSlide();
+					break;
+				case 39: // right arrow
+					showNextSlide();
+					break;
+				case 32: // space bar
+					if (Paused) {
+						runSlideShow();
+					} else {
+						pauseSlideShow();
+					}
+					break;
+				default:
+					propogate = true;
+					break;
+			}
+		}
+		return propogate;
+	});
+
         /** set variable from php  */
         var Time    =   js_vars.Time;
         var pos     =   js_vars.position;
@@ -36,6 +70,8 @@ $(document).ready(function(){
 	var ActualHeight = 0;
 	var DisplayWidth = 0;
 	var DisplayHeight = 0;
+	var Paused = false;
+	var SwitchingSlide = false;
 
         /** create a Image object */
         var i = new Image();
@@ -69,18 +105,44 @@ $(document).ready(function(){
             
         /** set time to run slideshow */
         function runSlideShow(){
+		Paused = false;
          timer =    setTimeout( showNextSlide,Time);
         }
+
+	function pauseSlideShow() {
+		Paused = true;
+		clearTimeout(timer);
+	}
+
+	function showNextSlide() {
+		if (!SwitchingSlide) {
+			SwitchingSlide = true;
+			pos = parseInt(pos) + 1;
+			if (pos == (PiCount)) {
+				pos = 0;
+			}
+			showSlide(pos);
+		}
+	}
+
+	function showPrevSlide() {
+		if (!SwitchingSlide) {
+			SwitchingSlide = true;
+			pos = parseInt(pos) - 1;
+			if (pos == -1) {
+				pos = PiCount - 1;
+			}
+			showSlide(pos);
+		}
+	}
     
-        function showNextSlide(){
+        function showSlide(slide_pos){
             
              /** clear time out */
             clearTimeout(timer);
             
             /** now load a image */         
-            pos = parseInt(pos) + 1;
-            if (pos  == (PiCount)){ pos=0; }
-            loadImage(pos);
+            loadImage(slide_pos);
                         
             var temp = i.src;
             
@@ -116,11 +178,13 @@ $(document).ready(function(){
                 $("#title").html(Title);
                 /** set Pid to temp */
                 PidTemp = Pid; 
+		SwitchingSlide = false;
 
-            
-            //now set time to loaded image.
-            runSlideShow();
-            //}
+            if (!Paused) {
+            	//now set time to loaded image.
+            	runSlideShow();
+            	//}
+	    }
         }       
     }
 
