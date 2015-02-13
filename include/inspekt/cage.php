@@ -48,8 +48,18 @@ class Inspekt_Cage
      *
      * @var array
      */
-    private static $_source = NULL;
+    private $_source = NULL;
 
+	/**
+	 * This is very very bad! Don't use this method ever unless called specifically from within the
+	 * cpg_debug_output() function!
+	 *
+	 * @return The source
+	 */
+	function getSource() {
+		if (!defined('CPG_DEBUG_OUTPUT')) die('Not in proper context...');
+		return $this->_source;
+	}
 
     /**
      *
