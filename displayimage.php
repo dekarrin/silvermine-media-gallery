@@ -463,6 +463,8 @@ if ($superCage->get->keyExists('fullsize')) {
 
     $slideshow = $superCage->get->getInt('slideshow');
     set_js_var('run_slideshow', 'true');
+	set_js_var("Pic_width", $CURRENT_PIC_DATA['pwidth']);
+	set_js_var("Pic_height", $CURRENT_PIC_DATA['pheight']);
     display_slideshow($pos);
 
 } else {

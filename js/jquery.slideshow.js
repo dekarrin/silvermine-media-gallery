@@ -66,10 +66,10 @@ $(document).ready(function(){
         var Title   =   "";
 	var ShuffleSeed = js_vars.ShuffleSeed;
 	var startPos = js_vars.position;
-	var ActualWidth = 0;
-	var ActualHeight = 0;
-	var DisplayWidth = 0;
-	var DisplayHeight = 0;
+	var ActualWidth = js_vars.Pic_width;
+	var ActualHeight = js_vars.Pic_height;
+	var DisplayWidth = $('#showImage').width();
+	var DisplayHeight = $('#showImage').height();
 	var Paused = false;
 	var SwitchingSlide = false;
 
@@ -135,6 +135,33 @@ $(document).ready(function(){
 			showSlide(pos);
 		}
 	}
+
+	function switchImageRez() {
+		if (isFullScreen()) {
+			var dims = calcFsImageSize();
+			$('#showImage').width(dims.width);
+			$('#showImage').height(dims.height);
+			$('#showImage').attr({className: ''});
+		} else {
+			$('#showImage').width(DisplayWidth);
+			$('#showImage').height(DisplayHeight);
+			$('#showImage').attr({className: 'image'});
+		}
+	}
+
+	function calcFsImageSize() {
+		var sheight = screen.height;
+		var swidth = screen.width;
+		var pheight = ActualHeight;
+		var pwidth = ActualWidth;
+		var pratio = pwidth / pheight;
+		var sratio = swidth / sheight;
+		var usewidth = (pratio >= sratio); // img is longer or equal
+		var scalefactor = (usewidth) ? (swidth / pwidth) : (sheight / pheight);
+		var newWidth = Math.round(pwidth * scalefactor);
+		var newHeight = Math.round(pheight * scalefactor);
+		return {width: newWidth, height: newHeight};
+	}
     
         function showSlide(slide_pos){
             
@@ -148,18 +175,9 @@ $(document).ready(function(){
             
             i.onload = function() {
 		if (isFullScreen()) {
-			var sheight = screen.height;
-			var swidth = screen.width;
-			var pheight = ActualHeight;
-			var pwidth = ActualWidth;
-			var pratio = pwidth / pheight;
-			var sratio = swidth / sheight;
-			var usewidth = (pratio >= sratio); // img is longer or equal
-			var scalefactor = (usewidth) ? (swidth / pwidth) : (sheight / pheight);
-			var newWidth = Math.round(pwidth * scalefactor);
-			var newHeight = Math.round(pheight * scalefactor);
-			i.height = newHeight;
-			i.width = newWidth;
+			var dims = calcFsImageSize();
+			i.height = dims.height;
+			i.width = dims.width;
 			$("#showImage").attr({className: ''});
 		} else {
 			$("#showImage").attr({className: 'image'});
@@ -201,39 +219,40 @@ $(document).ready(function(){
         }
     });
 	function isFullScreen() {
-		return (document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen);
+		return (document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen || document.msFullScreen);
 	}
 
 	function goFullScreen(element) {
 		if (element.requestFullScreen) {
 			element.requestFullScreen();
 		} else if (element.mozRequestFullScreen) {
-			element.mozRequestFullScreen();
+			var container = document.createElement("div");
+			$(container).attr("id", "mozFsImgContainer");
+			$(element).before(container);
+			$(element).remove();
+			$(container).append(element);
+			container.mozRequestFullScreen();
 		} else if (element.webkitRequestFullScreen) {
 			element.webkitRequestFullScreen();
+		} else if (element.msRequestFullScreen) {
+			element.msRequestFullScreen();
 		}
 	}
 
-/*	$(document).bind('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
-		if (isFullScreen()) {
-			var sheight = screen.height;
-			var swidth = screen.width;
-			var pheight = ActualHeight;
-			var pwidth = ActualWidth;
-			var pratio = pwidth / pheight;
-			var sratio = swidth / sheight;
-			var usewidth = (pratio >= sratio); // img is longer or equal
-			var scalefactor = (usewidth) ? (swidth / pwidth) : (sheight / pheight);
-			var newWidth = Math.round(pwidth * scalefactor);
-			var newHeight = Math.round(pheight * scalefactor);
-			$("#showImage").attr({height: newHeight, width: newWidth, className: ''});
-		} else {
-			$("#showImage").attr({height: DisplayHeight, width: DisplayWidth, className: 'image'});
+	$(document).bind('webkitfullscreenchange fullscreenchange msfullscreenchange', function() {
+		switchImageRez();
+	});
+	$(document).bind('mozfullscreenchange', function() {
+		if (!isFullScreen()) {
+			var img = $('#mozFsImgContainer img')[0];
+			$(img).remove();
+			$('#mozFsImgContainer').before(img);
+			$('#mozFsImgContainer').remove();
 		}
-	});*/
+		switchImageRez();
+	});
 
 	document.getElementById('fullscreen-ss').onclick = function() {
 		goFullScreen(document.getElementById('showImage'));
-		document.getElementById('showImage').webkitRequestFullScreen();
 	};
 });
