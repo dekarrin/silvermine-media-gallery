@@ -2434,6 +2434,10 @@ $lang_util_php['keyword_replace_before'] = 'Before conversion, replace %s with %
 $lang_util_php['keyword_replace_after'] = 'After conversion, replace %s with %s'; // cpg1.5
 $lang_util_php['keyword_replace_values'] = array('_'=>'underscore', '-'=>'hyphen', '~'=>'tilde'); // cpg1.5
 $lang_util_php['keyword_explanation'] = 'This will convert the keyword separator for all your files from one value to another value. See the help documentation for details.'; // cpg1.5
+$lang_util_php['restart_converter'] = 'Restart video converter daemon';
+$lang_util_php['restart_converter_explanation'] = 'Continue the conversion that was in progress before daemon terminated.';
+$lang_util_php['converter_starting'] = 'Restarting video converter daemon...';
+$lang_util_php['converter_restarted'] = 'Successfully restarted video converter daemon';
 }
 
 // ------------------------------------------------------------------------- //
@@ -2611,6 +2615,8 @@ $lang_media_capture_php['form_add_btn'] = 'Add Capture';
 $lang_media_capture_php['form_edit_btn'] = 'Update';
 $lang_media_capture_php['form_del_btn'] = 'Delete';
 $lang_media_capture_php['capture_btn'] = 'Start Capture';
+$lang_media_capture_php['reset_btn'] = 'Restart Capture';
 $lang_media_capture_php['capture_started'] = 'Capture process started.';
+$lang_media_capture_php['capture_reset'] = 'Capture process reset.';
 }
 ?>

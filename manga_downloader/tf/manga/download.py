@@ -18,30 +18,18 @@ import os
 import time
 import random
 import logging
+import json
 
-REGEX_TARGET_GROUP = 1
-
-E_HENTAI_URL_REGEX = '^http://g\.e-hentai\.org/'
-THE_DOUJIN_URL_REGEX = '^http://thedoujin\.com/'
-
-"""Patterns use groups. The actual target is in the predefined target group."""
-E_HENTAI_NEXT_PAGE_URL_REGEX = ' / <span>\d+</span></div><a href="([^"]+)"'
-E_HENTAI_IMAGE_URL_REGEX = '<img src="([^"]+)" style'
-E_HENTAI_PAGE_COUNT_REGEX = ' / <span>(\d+)'
-E_HENTAI_NEXT_LINK_PREFIX = ''
-
-THE_DOUJIN_NEXT_PAGE_URL_REGEX = '<a href="([^"]+)" id="image-link">'
-THE_DOUJIN_IMAGE_URL_REGEX = '<img src="([^"]+)" id="image"'
-THE_DOUJIN_PAGE_COUNT_REGEX = '(\d+)">&raquo;'
-THE_DOUJIN_NEXT_LINK_PREFIX = 'http://thedoujin.com'
 
 ANTI_FLOOD = 3
 ANTI_OVERLOAD = 2
 MAX_ERRORS = 10
 TIMEOUT = 15
 
+SITE_ROOT = '/srv/http/'
+
 def out(stuff):
-	f = open('/www/manga_downloader/status.txt', 'a')
+	f = open(SITE_ROOT + 'manga_downloader/status.txt', 'a')
 	f.write(stuff + "\n")
 	f.close()
 
@@ -83,8 +71,8 @@ class Downloader:
 		self.__resetErrorTracking()
 		while data is None:
 			try:
-				response = urllib.request.urlopen(self.__url, None,
-												self.__timeout)
+				request = urllib.request.Request(self.__url, None, {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'})
+				response = urllib.request.urlopen(request, None, self.__timeout)
 				data = response.read()
 			except socket.timeout:
 				self.__resetErrorTracking()
@@ -179,6 +167,13 @@ class TextDownloader(Downloader):
 		text = data.decode(self.__encoding)
 		return text
 
+def get_site(url):
+	global SITE_DATA
+	for site in SITE_DATA:
+		data = SITE_DATA[site]
+		if re.match(data['url_regex'], url) is not None:
+			return data
+	return None
 
 class GalleryDownloader:
 	
@@ -190,22 +185,22 @@ class GalleryDownloader:
 		Arguments:
 		url -- the url of the first page of the gallery.
 		"""
+		self.__jsonGetter = None
 		self.__pageUrl = url
 		self.__currentPage = 1
 		self.__pageCount = None
 		self.__imageUrl = None
 		self.__lastDownloaded = None
 		self.__pageContent = None
-		if re.match(E_HENTAI_URL_REGEX, url) is not None:
-			self.__nextPageUrlRegex = E_HENTAI_NEXT_PAGE_URL_REGEX
-			self.__imageUrlRegex = E_HENTAI_IMAGE_URL_REGEX
-			self.__pageCountRegex = E_HENTAI_PAGE_COUNT_REGEX
-			self.__nextLinkPrefix = E_HENTAI_NEXT_LINK_PREFIX
-		elif re.match(THE_DOUJIN_URL_REGEX, url) is not None:
-			self.__nextPageUrlRegex = THE_DOUJIN_NEXT_PAGE_URL_REGEX
-			self.__imageUrlRegex = THE_DOUJIN_IMAGE_URL_REGEX
-			self.__pageCountRegex = THE_DOUJIN_PAGE_COUNT_REGEX
-			self.__nextLinkPrefix = THE_DOUJIN_NEXT_LINK_PREFIX
+		site = get_site(url)
+		if site is not None:
+			self.__nextPageUrlRegex = site['next_page_url_regex']
+			self.__imageUrlRegex = site['image_url_regex']
+			self.__pageCountRegex = site['page_count_regex']
+			self.__nextLinkPrefix = site['next_link_prefix']
+			if site['json'] is not None:
+				self.__jsonGetter = site['json']
+				self.__jsonGetter.setBaseURL(url)
 		else:
 			raise StandardError("Invalid URL")
 	
@@ -231,9 +226,13 @@ class GalleryDownloader:
 		errors = 0
 		while True:  # try it five times at most.
 			try:
-				self.__downloadPage()
-				self.__extractNextPageUrl()
-				self.__extractImageUrl()
+				if self.__jsonGetter is not None:
+					self.__imageUrl = self.__jsonGetter.getPageImageURL(self.__currentPage)
+					self.__lastDownloaded = self.__currentPage
+				else:
+					self.__downloadPage()
+					self.__extractNextPageUrl()
+					self.__extractImageUrl()
 				imageData = self.__downloadImage()
 			except DownloadError as e:
 				errors += 1
@@ -253,8 +252,11 @@ class GalleryDownloader:
 	def __downloadMetadata(self):
 		"""Download the current comic page and extract metadata from it."""
 		out("Downloading metadata...")
-		self.__downloadPage()
-		self.__extractPageCount()
+		if self.__jsonGetter is not None:
+			self.__pageCount = self.__jsonGetter.getPageCount()
+		else:
+			self.__downloadPage()
+			self.__extractPageCount()
 		
 	def __downloadPage(self):
 		"""Download the page specified by the current url and cache it.
@@ -295,3 +297,77 @@ class GalleryDownloader:
 		m = re.search(self.__pageCountRegex, self.__pageContent)
 		self.__pageCount = int(m.group(REGEX_TARGET_GROUP))
 
+class JSONGetter:
+
+	def __init__(self):
+		pass
+
+	def getPageImageURL(self, pageNum):
+		pass
+
+	def getPageCount(self):
+		pass
+
+	def setBaseURL(self, baseURL):
+		self.__baseURL = baseURL
+
+	def getBaseURL(self):
+		return self.__baseURL
+
+class FakkuJSON(JSONGetter):
+
+	def __init__(self):
+		super().__init__()
+		self.__metaCache = None
+
+	def setBaseURL(self, baseURL):
+		url = baseURL.replace('http://www.fakku.net', 'https://www.fakku.net')
+		url = url.replace('https://www.fakku.net', 'https://api.fakku.net')
+		while url[-1] in map(str, range(10)):
+			url = url[:-1]
+		url = url.replace('#page=', '')
+		self.__metaCache = None
+		super().setBaseURL(url)
+
+	def getPageImageURL(self, pageNum):
+		self.__getMeta()
+		return self.__metaCache['pages'][str(pageNum)]['image']
+
+	def getPageCount(self):
+		self.__getMeta()
+		return self.__metaCache['content']['content_pages']
+
+	def __getMeta(self):
+		if self.__metaCache is None:
+			td = TextDownloader("utf-8", TIMEOUT, ANTI_FLOOD, ANTI_OVERLOAD, MAX_ERRORS)
+			self.__metaCache = json.loads(td.download(self.getBaseURL()))
+
+REGEX_TARGET_GROUP = 1
+
+"""Patterns use groups. The actual target is in the predefined target group."""
+SITE_DATA = {
+  'e_hentai': {
+    'url_regex': '^https?://g\.e-hentai\.org/',
+    'next_page_url_regex': ' / <span>\d+</span></div><a href="([^"]+)"',
+    'image_url_regex': '<img src="([^"]+)" style',
+    'page_count_regex': ' / <span>(\d+)',
+    'next_link_prefix': '',
+    'json': None,
+  },
+  'the_doujin': {
+    'url_regex': '^https?://thedoujin\.com/',
+    'next_page_url_regex': '<a href="([^"]+)" id="image-link">',
+    'image_url_regex': '<img src="([^"]+)" id="image"',
+    'page_count_regex': '(\d+)">&raquo;',
+    'next_link_prefix': 'http://thedoujin.com',
+    'json': None,
+  },
+  'fakku': {
+    'url_regex': '^https?://www\.fakku\.net/',
+    'next_page_url_regex': None,
+    'image_url_regex': None,
+    'page_count_regex': None,
+    'next_link_prefix': None,
+    'json': FakkuJSON(),
+  },
+}

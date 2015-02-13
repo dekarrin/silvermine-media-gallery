@@ -103,6 +103,8 @@ $CURRENT_CAT_NAME   = '';
 $CAT_LIST           = '';
 $LINEBREAK          = "\r\n"; // For compatibility both on Windows as well as *nix
 
+$SMG_SITE_ROOT = realpath(dirname($CPG_PHP_SELF));
+
 // Define some constants
 define('USER_GAL_CAT', 1);
 define('FIRST_USER_CAT', 10000);
