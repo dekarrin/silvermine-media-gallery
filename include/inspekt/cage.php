@@ -48,7 +48,7 @@ class Inspekt_Cage
      *
      * @var array
      */
-    private static $_source = NULL;
+    private $_source = NULL;
 
 
     /**
