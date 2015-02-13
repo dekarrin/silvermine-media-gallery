@@ -24,3 +24,6 @@ logs/*.log.php
 
 # Vim files
 *.swp
+
+# Python cache files
+*.pyc
