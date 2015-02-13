@@ -93,6 +93,8 @@ if ($superCage->get->keyExists('search')) {
     $album = 'search';
 }
 
+js_include('js/thumbnails.keyboard_nav.js');
+
 $page = $superCage->get->testInt('page') ? max($superCage->get->getInt('page'), 1) : 1;
 
 $breadcrumb = '';
