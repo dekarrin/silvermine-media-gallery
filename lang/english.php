@@ -2619,4 +2619,8 @@ $lang_media_capture_php['reset_btn'] = 'Restart Capture';
 $lang_media_capture_php['capture_started'] = 'Capture process started.';
 $lang_media_capture_php['capture_reset'] = 'Capture process reset.';
 }
+
+if (defined('MISSING_PHP')) {
+$lang_missing_php['page_title'] = 'Missing Files';
+}
 ?>
