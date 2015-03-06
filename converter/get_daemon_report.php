@@ -4,8 +4,8 @@ if (defined('IN_COPPERMINE')) {
 }
 define('IN_COPPERMINE', true);
 
-include 'include/init.inc.php';
-include 'include/video_convert.php';
+require 'include/init.inc.php';
+require 'include/video_convert.php';
 
 $result = cpg_db_query("SELECT cid,error_message FROM {$CONFIG['TABLE_CONVERSIONS']}");
 while ($row = mysql_fetch_assoc($result)) {
