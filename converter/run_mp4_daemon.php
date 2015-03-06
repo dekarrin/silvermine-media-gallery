@@ -7,9 +7,9 @@ if(defined('IN_COPPERMINE')) {
 define('LOCK_FILE', 'converter/dekky_mp4_daemon.lock');
 define('IN_COPPERMINE', true);
 
-include 'include/init.inc.php';
-include_once 'include/upload_functs.php';
-include_once 'include/picmgmt.inc.php';
+require 'include/init.inc.php';
+require_once 'include/upload_functs.php';
+require_once 'include/picmgmt.inc.php';
 
 ini_set('error_reporting', 22527);
 ini_set('log_errors', 'On');
