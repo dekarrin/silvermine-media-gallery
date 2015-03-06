@@ -5,29 +5,33 @@ if (defined('IN_COPPERMINE')) {
 define('IN_COPPERMINE', true);
 
 require 'include/init.inc.php';
-error_reporting(E_ALL);
-require 'include/video_convert.php';
+error_reporting(E_ALL & E_STRICT);
 
-$result = cpg_db_query("SELECT cid,error_message FROM {$CONFIG['TABLE_CONVERSIONS']}");
-$rows = mysql_num_rows($result);
-echo "$rows conversions:\n\n";
+require_once 'include/video_convert.inc.php';
+
+$result = cpg_db_query("SELECT cid,data,status,error_message,already_exists,pid FROM {$CONFIG['TABLE_CONVERSIONS']}");
 while ($row = mysql_fetch_assoc($result)) {
-	echo $row['cid'] . ":\n";
+	echo $row['cid'] . ': ';
+	if ($row['already_exists'] == 1) {
+		echo 'Conversion of PID ' . $row['pid'] . "\n";
+	} else {
+		echo "New conversion\n";
+	}
 	switch ($row['status']) {
 		case CONVERT_STATUS_MOVING:
-			echo 'Moving';
+			echo "Moving\n";
 			break;
 		case CONVERT_STATUS_READY:
-			echo 'Ready';
+			echo "Ready\n";
 			break;
 		case CONVERT_STATUS_SUCCESS:
-			echo 'Successful';
+			echo "Successful\n";
 			break;
 		case CONVERT_STATUS_FAILURE:
-			echo 'Failed - ' . $row['error_message'];
+			echo 'Failed - ' . $row['error_message'] . "\n";
 			break;
 	}
-	echo "\n\n\n";
+	echo "\n\n---------------------------------------------\n\n";
 }
 mysql_free_result($result);
 ?>
