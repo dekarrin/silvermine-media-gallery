@@ -683,7 +683,7 @@ $template_thumb_view_title_row = <<<EOT
 <!-- BEGIN admin_buttons -->
                     <div class="buttonlist">
                         <ul>
-                            <li><a href="edit_one_pic.php?aid={ALBUM_ID}&what=collection&action=new" title="{COLLECTION_LNK}"><span>{COLLECTION_ICO}</span></a></li>
+                            <li><a href="edit_one_pic.php?aid={ALBUM_ID}&what=new_collection" title="{COLLECTION_LNK}"><span>{COLLECTION_ICO}</span></a></li>
                             <li><a href="modifyalb.php?album={ALBUM_ID}" title="{MODIFY_LNK}"><span>{MODIFY_ICO}</span></a></li>
                             <li><a href="index.php?cat={CAT_ID}" title="{PARENT_CAT_LNK}"><span>{PARENT_CAT_ICO}</span></a></li>
                             <li><a href="editpics.php?album={ALBUM_ID}" title="{EDIT_PICS_LNK}"><span>{EDIT_PICS_ICO}</span></a></li>

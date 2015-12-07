@@ -339,10 +339,23 @@ if ($superCage->post->keyExists('apply_changes')) {
     process_post_data();
 }
 
+$what = 'picture';
+if ($superCage->get->keyExists('what')) {
+	$what = $superCage->get->getRaw('what');
+}
+
+$is_collection = ($what == 'new_collection' || $CURRENT_PIC['is_collection'] == '1');
+
 $result = cpg_db_query("SELECT *, p.title AS title, p.votes AS votes FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = '$pid'");
 
 $CURRENT_PIC = mysql_fetch_assoc($result);
 mysql_free_result($result);
+
+// now inject into current pic if we're making a new album
+if ($what == 'new_collection' && $superCage->get->keyExists('aid')) {
+	$CURRENT_PIC['aid'] = $superCage->get->getInt('aid');
+	$CURRENT_PIC['approved'] = 0;
+}
 
 if (!(GALLERY_ADMIN_MODE || $CURRENT_PIC['category'] == FIRST_USER_CAT + USER_ID || ($CONFIG['users_can_edit_pics'] && $CURRENT_PIC['owner_id'] == USER_ID)) || !USER_ID) {
     cpg_die(ERROR, $lang_errors['access_denied'], __FILE__, __LINE__);
@@ -377,7 +390,16 @@ set_js_var('private_need_approval', $USER_DATA['priv_upl_need_approval']);
 set_js_var('public_can_edit_pics',  $public_can_edit_pics);
 set_js_var('pic_currently_public',  $CURRENT_PIC['category'] < FIRST_USER_CAT ? 1 : 0);
 
-pageheader($lang_editpics_php['edit_pic']);
+
+if ($what == 'new_collection') {
+	$pagetitle = $lang_editpics_php['new_collection'];
+} else if ($what == 'collection') {
+	$pagetitle = $lang_editpics_php['edit_collection'];
+} else {
+	$pagetitle = $lang_editpics_php['edit_pic'];
+}
+
+pageheader($pagetitle);
 
 if ($superCage->post->keyExists('apply_changes')) {
     starttable('100%', cpg_fetch_icon('info', 2) . $lang_common['information'], 1);
@@ -398,7 +420,7 @@ echo <<<EOT
 <input type="hidden" name="id" value="{$CURRENT_PIC['pid']}" />
 EOT;
 
-starttable("100%", cpg_fetch_icon('edit', 2) . $lang_editpics_php['edit_pic'], 3);
+starttable("100%", cpg_fetch_icon('edit', 2) . $pagetitle, 3);
 
 if (!is_movie($CURRENT_PIC['filename'])) {
     $pic_info = sprintf($lang_editpics_php['pic_info_str'], $CURRENT_PIC['pwidth'], $CURRENT_PIC['pheight'], ($CURRENT_PIC['filesize'] >> 10), $CURRENT_PIC['hits'], $CURRENT_PIC['votes']);
@@ -412,7 +434,9 @@ if (defined('UPLOAD_APPROVAL_MODE')) {
     }
 }
 
-print <<< EOT
+if ($what != 'new_collection') {
+
+    print <<< EOT
 
     <tr>
         <td class="tableh2" colspan="3">
@@ -442,6 +466,7 @@ print <<< EOT
         </td>
     </tr>
 EOT;
+}
 
 form_alb_list_box();
 
@@ -462,6 +487,9 @@ print <<<EOT
         </td>
     </tr>
 
+EOT;
+if ($what != 'new_collection') {
+	print <<<EOT
     <tr>
         <td class="tableb" style="white-space: nowrap;">
             {$icon_array['file_name']}{$lang_common['filename']}
@@ -471,6 +499,10 @@ print <<<EOT
             <input type="text" name="filename" maxlength="255" size="40" value="{$CURRENT_PIC['filename']}" class="textinput" />
         </td>
     </tr>
+EOT;
+}
+
+print <<<EOT
     <tr>
         <td class="tableb" valign="top" style="white-space: nowrap;">
             {$icon_array['description']}{$lang_editpics_php['desc']}$captionLabel
@@ -491,6 +523,7 @@ print <<<EOT
 EOT;
 
 if (GALLERY_ADMIN_MODE) {
+    $CURRENT_PIC['approved'] = ($what == 'new_collection') ? '1' : '0';
 
     $checkYes = ($CURRENT_PIC['approved'] == '1') ? 'checked="checked"' : '';
     $checkNo = ($CURRENT_PIC['approved'] == '0') ? 'checked="checked"' : '';
@@ -598,6 +631,9 @@ print <<<EOT
                         <input type="checkbox" name="galleryicon" id="galleryicon" {$isgalleryicon_selected}{$isgalleryicon_disabled}value="{$CURRENT_PIC['pid']}" class="checkbox" />
                         <label for="galleryicon">{$lang_editpics_php['gallery_icon']}</label>
                     </td>
+EOT;
+if ($what != 'new_collection') {
+	print <<<EOT
                     <td width="20%" align="center">
                         <input type="checkbox" name="read_exif" id="read_exif" value="1" class="checkbox" />
                         <label for="read_exif">{$icon_array['exif']}{$lang_editpics_php['read_exif']}</label>
@@ -614,6 +650,10 @@ print <<<EOT
                         <input type="checkbox" name="del_comments" id="del_comments" value="1" class="checkbox" />
                         <label for="del_comments">{$icon_array['delete_comments']}{$lang_editpics_php['del_comm']}</label>
                     </td>
+EOT;
+}
+
+print <<<EOT
                 </tr>
             </table>
         </td>
