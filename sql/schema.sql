@@ -257,6 +257,7 @@ CREATE TABLE CPG_pictures (
   pic_hdr_ip tinytext,
   lasthit_ip tinytext,
   position INT(11) NOT NULL default '0',
+  is_collection tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY  (pid),
   KEY owner_id (owner_id),
   KEY pic_hits (hits),
@@ -265,6 +266,26 @@ CREATE TABLE CPG_pictures (
   KEY pic_aid (aid, pid),
   guest_token varchar(32) default ''
 ) COMMENT='Used to store data about individual pics';
+# --------------------------------------------------------
+
+#
+# Table structure for table CPG_sub_pictures
+#
+CREATE TABLE CPG_sub_pictures (
+  sid int(11) NOT NULL auto_increment,
+  pid int(11) NOT NULL DEFAULT '0',
+  filepath varchar(255) NOT NULL,
+  filename varchar(255) NOT NULL,
+  filesize int(11) NOT NULL DEFAULT '0',
+  total_filesize int(11) NOT NULL DEFAULT '0',
+  pwidth smallint(6) NOT NULL DEFAULT '0',
+  pheight smallint(6) NOT NULL DEFAULT '0',
+  mtime datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  ctime int(11) NOT NULL DEFAULT '0',
+  title varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (sid),
+  KEY aid (aid)
+) COMMENT='Stores items that are part of collections';
 # --------------------------------------------------------
 
 #

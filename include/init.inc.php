@@ -151,6 +151,7 @@ if (function_exists('mb_internal_encoding')) {
 }
 
 $CONFIG['TABLE_PICTURES']      = $CONFIG['TABLE_PREFIX'].'pictures';
+$CONFIG['TABLE_SUB_PICTURES']  = $CONFIG['TABLE_PREFIX'].'sub_pictures';
 $CONFIG['TABLE_ALBUMS']        = $CONFIG['TABLE_PREFIX'].'albums';
 $CONFIG['TABLE_COMMENTS']      = $CONFIG['TABLE_PREFIX'].'comments';
 $CONFIG['TABLE_CATEGORIES']    = $CONFIG['TABLE_PREFIX'].'categories';
