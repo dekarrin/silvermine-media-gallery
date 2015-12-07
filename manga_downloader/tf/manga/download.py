@@ -370,4 +370,12 @@ SITE_DATA = {
     'next_link_prefix': None,
     'json': FakkuJSON(),
   },
+  'pururin': {
+    'url_regex': '^https?://pururin\.com/',
+    'next_page_url_regex': '<a class="image-next" href="([^"]+)"',
+    'image_url_regex': '<img class="b" src="([^"]+)" alt',
+    'page_count_regex': '</select> of (\d+)</label>',
+    'next_link_prefix': 'http://pururin.com',
+    'json': None,
+  }
 }
