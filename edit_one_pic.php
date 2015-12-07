@@ -295,8 +295,8 @@ function process_post_data()
 
 function form_col_list_box($aid) {
 	global $lang_common, $icon_array;
-
-EOT
+echo <<< EOT
+EOT;
 }
 
 function form_alb_list_box()

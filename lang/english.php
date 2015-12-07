@@ -146,6 +146,7 @@ $lang_common['edit_files'] = 'Edit files'; // cpg1.5
 $lang_common['thumbnail_view'] = 'Thumbnail view'; // cpg1.5
 $lang_common['album_manager'] = 'Album Manager'; // cpg1.5
 $lang_common['more'] = 'more'; // cpg1.5
+$lang_common['add_collection'] = 'Add New Collection'; // smg1.0
 
 // ------------------------------------------------------------------------- //
 // File theme.php

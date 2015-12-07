@@ -683,6 +683,7 @@ $template_thumb_view_title_row = <<<EOT
 <!-- BEGIN admin_buttons -->
                     <div class="buttonlist">
                         <ul>
+                            <li><a href="edit_one_pic.php?aid={ALBUM_ID}&what=collection&action=new" title="{COLLECTION_LNK}"><span>{COLLECTION_ICO}</span></a></li>
                             <li><a href="modifyalb.php?album={ALBUM_ID}" title="{MODIFY_LNK}"><span>{MODIFY_ICO}</span></a></li>
                             <li><a href="index.php?cat={CAT_ID}" title="{PARENT_CAT_LNK}"><span>{PARENT_CAT_ICO}</span></a></li>
                             <li><a href="editpics.php?album={ALBUM_ID}" title="{EDIT_PICS_LNK}"><span>{EDIT_PICS_ICO}</span></a></li>
@@ -2891,6 +2892,8 @@ function theme_display_thumbnails(&$thumb_list, $nbThumb, $album_name, $aid, $ca
                 '{CAT_ID}'     => ($cat > 0 ? $cat : $CURRENT_ALBUM_DATA['category']),
                 '{MODIFY_LNK}'     => $lang_common['album_properties'],
                 '{MODIFY_ICO}'     => cpg_fetch_icon('modifyalb', 1),
+		'{COLLECTION_LNK}' => $lang_common['add_collection'],
+		'{COLLECTION_ICO}' => cpg_fetch_icon('add', 1),
                 '{PARENT_CAT_LNK}' => $lang_common['parent_category'],
                 '{PARENT_CAT_ICO}' => cpg_fetch_icon('category', 1),
                 '{EDIT_PICS_LNK}'  => $lang_common['edit_files'],
