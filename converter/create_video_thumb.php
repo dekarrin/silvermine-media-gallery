@@ -6,8 +6,8 @@ if(defined('IN_COPPERMINE')) {
 
 define('IN_COPPERMINE', true);
 
-include 'include/init.inc.php';
-include_once 'include/upload_functs.php';
+require 'include/init.inc.php';
+require_once 'include/upload_functs.php';
 
 ini_set('error_reporting', 22527);
 ini_set('log_errors', 'On');

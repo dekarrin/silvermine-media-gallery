@@ -4,6 +4,8 @@ albums/conversions/*
 albums/direct/videos/*
 albums/direct/games/*
 albums/userpics/*
+comics/*.cbz
+comics/*
 
 # Gallery config
 include/config.inc.php
@@ -24,3 +26,6 @@ logs/*.log.php
 
 # Vim files
 *.swp
+
+# Python compiled
+*.pyc

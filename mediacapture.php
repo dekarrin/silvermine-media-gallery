@@ -80,6 +80,12 @@ if ($superCage->post->keyExists('insert')) {
 
 $captures = cpg_db_fetch_rowset(cpg_db_query("SELECT * FROM {$CONFIG['TABLE_CAPTURES']}"));
 
+if ($superCage->post->keyExists('reset')) {
+	`kill -9 $(ps aux | grep "$(cat manga_downloader/download_manga.sh | sed -e 's/2>&1 //g' -e 's/ &//g')" | awk '{print $2}' )`;
+	`manga_downloader/download_manga.sh > logs/media_capture.log 2>&1 & echo $!`;
+	msg_box($lang_common['information'], $lang_media_capture_php['capture_reset']);
+}
+
 if ($superCage->post->keyExists('export')) {
 	$dl_cfg = '';
 	foreach ($captures as $cap) {
@@ -88,10 +94,11 @@ if ($superCage->post->keyExists('export')) {
 		$url = $cap['url'];
 		$dl_cfg .= "$author-$title $url\n";
 	}
-	file_put_contents('/www/manga_downloader/manga.cfg', $dl_cfg);
-	`/www/manga_downloader/download_manga.sh > /www/logs/media_capture.log 2>&1 & echo $!`;
+	file_put_contents('manga_downloader/manga.cfg', $dl_cfg);
+	`manga_downloader/download_manga.sh > logs/media_capture.log 2>&1 & echo $!`;
 	cpg_db_query('DELETE FROM '.$CONFIG['TABLE_CAPTURES'].' WHERE 1');
 	msg_box($lang_common['information'], $lang_media_capture_php['capture_started']);
+	$captures = cpg_db_fetch_rowset(cpg_db_query("SELECT * FROM {$CONFIG['TABLE_CAPTURES']}"));
 }
 
 echo '<form action="'.$CPG_PHP_SELF.'" method="post"><input type="hidden" name="insert" value="1">';
@@ -101,13 +108,23 @@ echo '<tr><td width="25%"><input type="text" name="title" /></td><td width="25%"
 endtable();
 echo '</form><hr />';
 
-exec('tac /www/manga_downloader/status.txt', $status);
+exec('tac manga_downloader/status.txt', $status);
 
-echo '<textarea style="height:100px;width:600px">';
+echo '<textarea style="height:100px;width:600px" id="status">';
 foreach ($status as $line) {
 	echo $line . "\n";
 }
-echo '</textarea><hr />';
+echo '</textarea><script type="text/javascript">
+function on_status_data(data, status, jqXHR) {
+	$(\'#status\').val(data);
+}
+
+function get_status_data() {
+	$.get(\'dl_status.php\', null, on_status_data);
+}
+
+setInterval(get_status_data, 500);
+</script><form action="'.$CPG_PHP_SELF.'" method="post"><input type="hidden" name="reset" value="1" /><input type="submit" value="'.$lang_media_capture_php['reset_btn'].'" /></form><hr />';
 
 if (count($captures) > 0) {
 	echo '<form action="'.$CPG_PHP_SELF.'" method="post"><input type="hidden" name="export" value="1" /><input type="submit" value="'.$lang_media_capture_php['capture_btn'].'" /></form><hr />';

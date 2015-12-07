@@ -407,7 +407,6 @@ if ($superCage->get->keyExists('msg_id')) {
 }
 
 
-
 /** if slideshow is has a key or ajax_show has a key then run jquery.slideshow.js */
 if ($superCage->get->keyExists('slideshow') || $superCage->get->keyExists('ajax_show')) {
     js_include('js/jquery.slideshow.js');
@@ -455,12 +454,17 @@ if (isset($CURRENT_PIC_DATA)) {
 if ($superCage->get->keyExists('fullsize')) {
 
     $CURRENT_PIC_DATA = mysql_fetch_assoc(cpg_db_query("SELECT * FROM {$CONFIG['TABLE_PICTURES']} AS p " . "WHERE pid='$pid' $FORBIDDEN_SET"));
+	if (!is_movie($CURRENT_PIC_DATA['filename'])) {
+		js_include('js/displayimage.keyboard_nav.js');
+	}
     theme_display_fullsize_pic();
 
 } elseif ($superCage->get->keyExists('slideshow')) {
 
     $slideshow = $superCage->get->getInt('slideshow');
     set_js_var('run_slideshow', 'true');
+	set_js_var("Pic_width", $CURRENT_PIC_DATA['pwidth']);
+	set_js_var("Pic_height", $CURRENT_PIC_DATA['pheight']);
     display_slideshow($pos);
 
 } else {
@@ -468,7 +472,9 @@ if ($superCage->get->keyExists('fullsize')) {
     if (!$pos && !$pid) {
         cpg_die(ERROR, $lang_errors['non_exist_ap'], __FILE__, __LINE__);
     }
-
+	if (!is_movie($CURRENT_PIC_DATA['filename'])) {
+		js_include('js/displayimage.keyboard_nav.js');
+	}
     $picture_title = $CURRENT_PIC_DATA['title'] ? $CURRENT_PIC_DATA['title'] : strtr(preg_replace("/(.+)\..*?\Z/", "\\1", htmlspecialchars($CURRENT_PIC_DATA['filename'])), "_", " ");
 
     $nav_menu = theme_html_img_nav_menu();

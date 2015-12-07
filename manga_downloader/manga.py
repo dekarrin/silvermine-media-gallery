@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 import os
 import logging
@@ -5,14 +7,13 @@ import logging
 import tf.manga.download
 import tf.manga.archive
 
-CONFIG_FILE = "/www/manga_downloader/manga.cfg" # location, relative to this file, of the config file
+SITE_ROOT = '/srv/http/'
 
-f = open('/www/manga_downloader/status.txt', 'w')
-f.close()
+CONFIG_FILE = SITE_ROOT + "manga_downloader/manga.cfg" # location, relative to this file, of the config file
 
 def out(stuff):
-	f = open('/www/manga_downloader/status.txt', 'a')
-	f.write(stuff + "\n")
+	f = open(SITE_ROOT + 'manga_downloader/status.txt', 'a')
+	f.write(str(stuff) + "\n")
 	f.close()
 
 def main():
@@ -79,14 +80,15 @@ def readConfig():
 		manga['url'] = parts[1]
 		mangaList.append(manga)
 	return mangaList
-
+import traceback
 def downloadAllManga(galleryList, outputDir):
 	for g in galleryList:
 		out("Downloading %s" % (g['title']))
 		try:
 			downloadGallery(g, outputDir)
 		except tf.manga.download.DownloadError as e:
-			out("Cannot download comic")
+			tr = traceback.format_exc()
+			out("Cannot download comic: " + str(e) + tr )
 		else:
 			zipManga(outputDir, g['title'])
 			cleanUp(outputDir, g['title'])
@@ -100,11 +102,14 @@ def zipManga(outputDir, title):
 	cbz.rename = True
 	cbz.addAll(imagePath)
 	cbz.close()
-	
-try:
-	main()
-except KeyboardInterrupt:
-	pass
-except Exception as e:
-	out(e)
+
+if __name__ == "__main__":
+	try:
+		f = open(SITE_ROOT + 'manga_downloader/status.txt', 'w')
+		f.close()
+		main()
+	except KeyboardInterrupt:
+		pass
+	except Exception as e:
+		out(e)
 

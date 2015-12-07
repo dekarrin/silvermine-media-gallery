@@ -95,9 +95,9 @@ $keyword_replace2 = sprintf(
 
 
 define('COMICS_DIR', 'comics');
-function get_comic_file() {
+function dkrn_get_comic_file() {
 	$files = scandir(COMICS_DIR);
-	if (count($files) == 3) {
+	if (count($files) == 3) { // exclude ., .., and index.php
 		return '';
 	} else {
 		$uploading = '.';
@@ -109,10 +109,17 @@ function get_comic_file() {
 	}
 }
 
-$comic_convert_file = get_comic_file();
+function dkrn_get_comics_count() {
+	$files = scandir(COMICS_DIR);
+	return count($files) - 3; // exclude ., .., and index.php
+}
+
+$comic_convert_file = dkrn_get_comic_file();
 $comic_convert_from = '<span style="color:red;">No comic files detected.</span>';
 if (!empty($comic_convert_file)) {
-	$comic_convert_from = "Will upload comic '$comic_convert_file'.";
+	$comic_convert_from = '<i>Comics: ' . dkrn_get_comics_count() . '</i>';
+	$comic_convert_from .= '<br />' . 'Will upload comic: ';
+	$comic_convert_from .= $comic_convert_file;
 }
 
 
@@ -257,6 +264,11 @@ $tasks = array(
 		'. $lang_util_php['update_number'] . ' <input type="text" name="all_vid_thumbs_numpics" value="'.$defpicnum.'" size="5" class="textinput" /> '.$lang_util_php['update_option'].'<br />
                 <input type="checkbox" name="all_vid_thumbs_autorefresh" id="all_vid_thumbs_autorefresh" checked="checked" value="1" class="checkbox" /><label for="all_vid_thumbs_autorefresh">'.$lang_util_php['autorefresh'].'</label>'
 	),
+
+	'restart_converter' => array(
+		'restart_converter',
+		$lang_util_php['restart_converter'],'
+				'.$lang_util_php['restart_converter_explanation']),
 );
 
 if ($superCage->post->keyExists('action') && $matches = $superCage->post->getMatched('action', '/^[A-Za-z_]+$/')) {
@@ -568,6 +580,16 @@ function get_video_thumbs() {
 // logic ends here (see move_uploaded_to_subdirs())
 	}
 	dkrn_end_album_op_page('get_video_thumbs', 'Thumbnail generation complete.', 'vid_thumbs', $count, $numpics, $startpic, $autorefresh, $albumid);
+}
+
+function restart_converter() {
+	global $CONFIG, $icon_array, $lang_util_php;
+
+	starttable('100%', $icon_array['util'] . $lang_util_php['converter_starting']);
+	`php converter/run_mp4_daemon.php > /dev/null 2>&1 &`;
+	echo '<tr><td class="tablef">' . $lang_util_php['converter_restarted'] . '</td></tr>';
+	endtable();
+
 }
 
 
