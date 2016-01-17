@@ -633,11 +633,15 @@ print <<<EOT
                     </td>
 EOT;
 if ($what != 'new_collection') {
-	print <<<EOT
+	if ($what != 'collection') {
+		print <<<EOT
                     <td width="20%" align="center">
                         <input type="checkbox" name="read_exif" id="read_exif" value="1" class="checkbox" />
                         <label for="read_exif">{$icon_array['exif']}{$lang_editpics_php['read_exif']}</label>
                     </td>
+EOT;
+	}
+	print <<<EOT
                     <td width="20%" align="center">
                         <input type="checkbox" name="reset_vcount" id="reset_vcount" value="1" class="checkbox" />
                         <label for="reset_vcount">{$icon_array['reset_views']}{$lang_editpics_php['reset_view_count']} ({$CURRENT_PIC['hits']})</label>
