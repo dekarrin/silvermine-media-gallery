@@ -1189,6 +1189,7 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             'filesize',
             'ctime',
             'r.title',
+		'is_collection'
         );
 
     } else {
@@ -1205,7 +1206,8 @@ function get_pic_data($album, &$count, &$album_name, $limit1=-1, $limit2=-1, $se
             'r.title',
             'r.keywords',
             'r.votes',
-            'pic_rating'
+            'pic_rating',
+		'is_collection'
         );
 
         //if ($CONFIG['views_in_thumbview']) {

@@ -78,6 +78,8 @@ function sanitize_data(&$value, $key)
 function html_picture_menu()
 {
     global $lang_display_image_php, $CURRENT_PIC_DATA, $CURRENT_ALBUM_DATA, $CONFIG;
+	$pic_type = ($CURRENT_PIC_DATA['is_collection'] == '1') ? 'collection' : 'picture';
+
 
     if ((USER_ADMIN_MODE && $CURRENT_ALBUM_DATA['category'] == FIRST_USER_CAT + USER_ID) || ($CONFIG['users_can_edit_pics'] && $CURRENT_PIC_DATA['owner_id'] == USER_ID && USER_ID != 0) || GALLERY_ADMIN_MODE) {
 
@@ -90,7 +92,7 @@ function html_picture_menu()
     <div class="buttonlist align_right">
 		<ul>
 			<li><a href="javascript:;" onclick="return MM_openBrWindow('pic_editor.php?id={$CURRENT_PIC_DATA['pid']}','Crop_Picture','scrollbars=yes,toolbar=no,status=yes,resizable=yes')"><span>{$rotate_icon}{$lang_display_image_php['crop_pic']}</span></a></li>
-			<li><a href="edit_one_pic.php?id={$CURRENT_PIC_DATA['pid']}&amp;what=picture"><span>{$edit_icon}{$lang_display_image_php['edit_pic']}</span></a></li>
+			<li><a href="edit_one_pic.php?id={$CURRENT_PIC_DATA['pid']}&amp;what={$pic_type}"><span>{$edit_icon}{$lang_display_image_php['edit_pic']}</span></a></li>
 			<li><a href="delete.php?id={$CURRENT_PIC_DATA['pid']}&amp;what=picture&amp;form_token={$form_token}&amp;timestamp={$timestamp}" onclick="return confirm('{$lang_display_image_php['confirm_del']}'); return false; "><span class="last">{$delete_icon}{$lang_display_image_php['del_pic']}</span></a></li>
 		</ul>
 	</div>

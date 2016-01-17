@@ -218,14 +218,14 @@ function process_post_data()
     }
 
 	if ($what == 'new_collection') {
-		$keys = '';
-		$values = '';
+		$keys = array();
+		$values = array();
 		foreach ($collection_pic as $k => $v) {
-			$keys .= "$k,";
-			$values .= "'$v',";
+			$keys[] = $k;
+			$values[] = "'$v'";
 		}
-		$keys = '(' . substr($keys, 0, strlen($keys) - 1) . ')';
-		$values = '(' . substr($values, 0, strlen($values) - 1) . ')';
+		$keys = '(' . implode(', ', $keys) . ')';
+		$values = '(' . implode(', ', $values) . ')';
 		$query = "INSERT INTO {$CONFIG['TABLE_PICTURES']} $keys VALUES $values;";
 		cpg_db_query($query);
 		$pid = cpg_db_last_insert_id();
@@ -395,14 +395,16 @@ if ($superCage->post->keyExists('apply_changes')) {
 $what = 'picture';
 if ($superCage->get->keyExists('what')) {
 	$what = $superCage->get->getRaw('what');
+} else if ($superCage->post->keyExists('what')) {
+	$what = $superCage->post->getRaw('what');
 }
 
-$is_collection = ($what == 'new_collection' || $CURRENT_PIC['is_collection'] == '1');
-
-$result = cpg_db_query("SELECT *, p.title AS title, p.votes AS votes FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = '$pid'");
+$result = cpg_db_query("SELECT *, is_collection, p.title AS title, p.votes AS votes FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = '$pid'");
 
 $CURRENT_PIC = mysql_fetch_assoc($result);
 mysql_free_result($result);
+
+$is_collection = ($what == 'new_collection' || $CURRENT_PIC['is_collection'] == '1');
 
 // now inject into current pic if we're making a new album
 if ($what == 'new_collection' && $superCage->get->keyExists('aid')) {
@@ -418,6 +420,7 @@ $thumb_url = get_pic_url($CURRENT_PIC, 'thumb');
 $thumb_link = 'displayimage.php?pid='.$CURRENT_PIC['pid'];
 $filename = htmlspecialchars($CURRENT_PIC['filename']);
 $filepath = htmlspecialchars($CURRENT_PIC['filepath']);
+$cur_title = htmlspecialchars($CURRENT_PIC['title']);
 
 $THUMB_ROWSPAN = 7;
 if ($CONFIG['user_field1_name'] != '') {
@@ -471,6 +474,7 @@ EOT;
 echo <<<EOT
 <form name="editonepicform" id="cpgform_editonepic" method="post" action="edit_one_pic.php">
 <input type="hidden" name="id" value="{$CURRENT_PIC['pid']}" />
+<input type="hidden" name="what" value="{$what}" />
 EOT;
 
 starttable("100%", cpg_fetch_icon('edit', 2) . $pagetitle, 3);
@@ -483,7 +487,13 @@ if (!is_movie($CURRENT_PIC['filename'])) {
 
 if (defined('UPLOAD_APPROVAL_MODE')) {
     if ($CURRENT_PIC['owner_id']) {
-        $pic_info .= ' - <a href="profile.php?uid=' . $CURRENT_PIC['owner_id'] . '">' . $cpg_udb->get_user_name($CURRENT_PIC['owner_id']) . '</a>';
+	die('fuck');
+	if (!empty($pic_info)) {
+		$pic_info .= ' - ';
+	} else {
+		$pic_info = '';
+	}
+        $pic_info .= '<a href="profile.php?uid=' . $CURRENT_PIC['owner_id'] . '">' . $cpg_udb->get_user_name($CURRENT_PIC['owner_id']) . '</a>';
     }
 }
 
@@ -493,7 +503,17 @@ if ($what != 'new_collection') {
 
     <tr>
         <td class="tableh2" colspan="3">
+EOT;
+    if ($is_collection) {
+	print <<<EOT
+            <strong>{$cur_title}</strong>
+EOT;
+    } else {
+	print <<<EOT
             <strong>{$filename}</strong>
+EOT;
+    }
+    print <<< EOT
             &nbsp;&nbsp;-&nbsp;&nbsp;
             <a href="modifyalb.php?album={$CURRENT_PIC['aid']}" class="admin_menu">
                 {$icon_array['album_properties']}{$lang_editpics_php['album_properties']}
@@ -717,7 +737,6 @@ print <<<EOT
     </tr>
     <tr>
         <td colspan="3" align="center" class="tablef">
-            <input type="hidden" name="what" value="{$what}" />
             <button type="submit" class="button" name="apply_changes" value="{$lang_common['apply_changes']}">{$icon_array['ok']}{$lang_common['apply_changes']}</button>
         </td>
     </tr>
