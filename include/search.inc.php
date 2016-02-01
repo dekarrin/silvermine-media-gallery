@@ -118,7 +118,13 @@ if ($search_string && isset($search_params['params'])) {
                                                 $fields = array();
                                                 if ($superCage->get->keyExists('album_title') || $superCage->get->keyExists('category_title') || array_key_exists('Manga', $media_types)) $albcat_terms[] = " LIKE '%$word%'";
                                                 foreach ($search_params['params'] as $param => $value) {
-                                                        if (in_array($param, $allowed)) $fields[] = "$param LIKE '%$word%'";
+                                                        if (in_array($param, $allowed)) {
+								if ($param == 'keywords') {
+									$fields[] = "$param RLIKE '[[:<:]]${word}[[:>:]]'";
+								} else {
+									$fields[] = "$param LIKE '%$word%'";
+								}
+							}
                                                 }
                                                 $sections[] = count($fields) ? '(' . implode(' OR ', $fields) . ')' : '';
                                         }
@@ -133,8 +139,7 @@ if ($search_string && isset($search_params['params'])) {
         $sql .= Inspekt::isInt($USER['search']['params']['older_than']) ? ' AND ( ctime < '.time().' - '.( $USER['search']['params']['older_than'] * 60*60*24).')' : '';
         $sql .=  " AND approved = '1' $FORBIDDEN_SET";
 
-	print_r($media_types);
-        if ($superCage->get->keyExists('album_title') || array_key_exists('Manga', $media_types)) {
+        if ($superCage->get->keyExists('album_title') || array_key_exists('Manga', $selected_media_types)) {
                 $album_query = "SELECT aid, title, description FROM `{$CONFIG['TABLE_ALBUMS']}` AS p"
                         ." WHERE (`title` " . implode(" $type `title` ",$albcat_terms) . ") ";
 		/**
