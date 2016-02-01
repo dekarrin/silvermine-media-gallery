@@ -596,7 +596,8 @@ print <<<EOT
 EOT;
 
 if (GALLERY_ADMIN_MODE) {
-    $CURRENT_PIC['approved'] = ($what == 'new_collection') ? '1' : '0';
+    $default_approved = array_key_exists('approved', $CURRENT_PIC) ? $CURRENT_PIC['approved'] : '0';
+    $CURRENT_PIC['approved'] = ($what == 'new_collection') ? '1' : $default_approved;
 
     $checkYes = ($CURRENT_PIC['approved'] == '1') ? 'checked="checked"' : '';
     $checkNo = ($CURRENT_PIC['approved'] == '0') ? 'checked="checked"' : '';
