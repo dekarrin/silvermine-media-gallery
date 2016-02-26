@@ -56,7 +56,7 @@ if ($superCage->get->keyExists('id')) {
  * FUNCTION DEFINITIONS
  * --------------------------------------------------------------------------*/
 
-function process_post_data()
+function process_post_data(&$what)
 {
     global $CONFIG, $USER_DATA, $lang_errors, $lang_editpics_php, $superCage;
 
@@ -74,7 +74,6 @@ function process_post_data()
 
     $pid = $superCage->post->getInt('id');
     $aid = $superCage->post->getInt('aid');
-    $what = $superCage->post->getRaw('what');
     $pwidth = $superCage->post->getInt('pwidth');
     $pheight = $superCage->post->getInt('pheight');
     $title = cpgSanitizeUserTextInput($superCage->post->getEscaped('title'));
@@ -99,7 +98,7 @@ function process_post_data()
 		$result = cpg_db_query("SELECT category, owner, aid FROM {$CONFIG['TABLE_ALBUMS']} WHERE aid = '$aid'");
 		$owner_key = 'owner';
 	} else {
-    		$result = cpg_db_query("SELECT category, owner_id, url_prefix, filepath, filename, pwidth, pheight, p.aid AS aid FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = '$pid'");
+		$result = cpg_db_query("SELECT category, owner_id, url_prefix, filepath, filename, pwidth, pheight, p.aid, AS aid FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = '$pid'");
 		$owner_key = 'owner_id';
 	}
     if (!mysql_num_rows($result)) {
@@ -388,10 +387,6 @@ EOT;
  * MAIN CODE
  * --------------------------------------------------------------------------*/
 
-if ($superCage->post->keyExists('apply_changes')) {
-    process_post_data();
-}
-
 $what = 'picture';
 if ($superCage->get->keyExists('what')) {
 	$what = $superCage->get->getRaw('what');
@@ -399,12 +394,20 @@ if ($superCage->get->keyExists('what')) {
 	$what = $superCage->post->getRaw('what');
 }
 
+if ($superCage->post->keyExists('apply_changes')) {
+    process_post_data($what);
+}
+
+
 $result = cpg_db_query("SELECT *, is_collection, p.title AS title, p.votes AS votes FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = '$pid'");
 
 $CURRENT_PIC = mysql_fetch_assoc($result);
 mysql_free_result($result);
 
 $is_collection = ($what == 'new_collection' || $CURRENT_PIC['is_collection'] == '1');
+if ($is_collection && $what != 'new_collection') {
+	$what = 'collection'; // don't allow user to mess this by changing the param
+}
 
 // now inject into current pic if we're making a new album
 if ($what == 'new_collection' && $superCage->get->keyExists('aid')) {
