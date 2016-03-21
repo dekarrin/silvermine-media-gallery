@@ -105,6 +105,7 @@ if ($search_string && isset($search_params['params'])) {
                 foreach ($split_search as $index => $string) {
                         if (($index & 1) && strlen($string)) {
                                 $fields = array();
+				$negative_fields = array();
                                 if ($superCage->get->keyExists('album_title') || $superCage->get->keyExists('category_title') || array_key_exists('Manga', $media_types)) $albcat_terms[] = " LIKE '%$string%'";
                                 foreach ($search_params['params'] as $param => $value) {
                                         if (in_array($param, $allowed)) $fields[] = "$param LIKE '%$string%'";
@@ -114,19 +115,37 @@ if ($search_string && isset($search_params['params'])) {
                                 $words = explode(' ', $string);
                                 foreach ($words as $word) {
                                         if (strlen($word)) {
+						$negative = mb_substr($word, 0, 1, 'utf-8') == '-';
                                                 $word = addslashes($word);
                                                 $fields = array();
-                                                if ($superCage->get->keyExists('album_title') || $superCage->get->keyExists('category_title') || array_key_exists('Manga', $media_types)) $albcat_terms[] = " LIKE '%$word%'";
+                                                if (($superCage->get->keyExists('album_title') || $superCage->get->keyExists('category_title') || array_key_exists('Manga', $media_types)) && !$negative) {
+							$albcat_terms[] = " LIKE '%$word%'";
+						}
                                                 foreach ($search_params['params'] as $param => $value) {
                                                         if (in_array($param, $allowed)) {
 								if ($param == 'keywords') {
-									$fields[] = "$param RLIKE '[[:<:]]${word}[[:>:]]'";
+									if ($negative) {
+										$word = mb_substr($word, 1, NULL, 'utf-8');
+										$negative_fields[] = "$param NOT RLIKE '[[:<:]]${word}[[:>:]]'";
+									} else {
+										$fields[] = "$param $negation RLIKE '[[:<:]]${word}[[:>:]]'";
+									}
 								} else {
 									$fields[] = "$param LIKE '%$word%'";
 								}
 							}
                                                 }
-                                                $sections[] = count($fields) ? '(' . implode(' OR ', $fields) . ')' : '';
+						$section_phrase = '';
+                                                if (count($fields)) {
+							$section_phrase = '((' . implode(' OR ', $fields) . ')';
+							if (count($negative_fields)) {
+								$section_phrase .= ' AND (' . implode(' AND ', $negative_fields) . ')';
+							}
+							$section_phrase .= ')';
+						} else if (count($negative_fields)) {
+							$section_phrase .= '(' . implode(' AND ', $negative_fields) . ')';
+						}
+						$sections[] = $section_phrase;
                                         }
                                 }
                         }
