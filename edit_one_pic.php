@@ -98,7 +98,7 @@ function process_post_data(&$what)
 		$result = cpg_db_query("SELECT category, owner, aid FROM {$CONFIG['TABLE_ALBUMS']} WHERE aid = '$aid'");
 		$owner_key = 'owner';
 	} else {
-		$result = cpg_db_query("SELECT category, owner_id, url_prefix, filepath, filename, pwidth, pheight, p.aid, AS aid FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = '$pid'");
+		$result = cpg_db_query("SELECT category, owner_id, url_prefix, filepath, filename, pwidth, pheight, p.aid AS aid FROM {$CONFIG['TABLE_PICTURES']} AS p INNER JOIN {$CONFIG['TABLE_ALBUMS']} AS a ON a.aid = p.aid WHERE pid = '$pid'");
 		$owner_key = 'owner_id';
 	}
     if (!mysql_num_rows($result)) {
@@ -409,6 +409,11 @@ if ($is_collection && $what != 'new_collection') {
 	$what = 'collection'; // don't allow user to mess this by changing the param
 }
 
+if ($what == 'collection') {
+	// get the collection information
+	$current_collection = cpg_db_query("SELECT COUNT(*) AS total_files, MAX(pwidth) AS pwidth, MAX(pheight) AS pheight, SUM(filesize) AS filesize, SUM(total_filesize) AS total_filesize FROM {$CONFIG['TABLE_SUB_PICTURES']} WHERE pid = {$CURRENT_PIC['pid']}");
+}
+
 // now inject into current pic if we're making a new album
 if ($what == 'new_collection' && $superCage->get->keyExists('aid')) {
 	$CURRENT_PIC['aid'] = $superCage->get->getInt('aid');
@@ -483,7 +488,12 @@ EOT;
 starttable("100%", cpg_fetch_icon('edit', 2) . $pagetitle, 3);
 
 if (!is_movie($CURRENT_PIC['filename'])) {
+	// CURRENTLY FIXING; TODO see above (current_collection)
+//	if ($is_collection) {
+//		$pic_info = 
+//	} else {
     $pic_info = sprintf($lang_editpics_php['pic_info_str'], $CURRENT_PIC['pwidth'], $CURRENT_PIC['pheight'], ($CURRENT_PIC['filesize'] >> 10), $CURRENT_PIC['hits'], $CURRENT_PIC['votes']);
+//	}
 } else {
     $pic_info = sprintf($lang_editpics_php['pic_info_str'], '<input type="text" name="pwidth" value="'.$CURRENT_PIC['pwidth'].'" size="5" maxlength="5" class="textinput" />', '<input type="text" name="pheight" value="'.$CURRENT_PIC['pheight'].'" size="5" maxlength="5" class="textinput" />', ($CURRENT_PIC['filesize'] >> 10), $CURRENT_PIC['hits'], $CURRENT_PIC['votes']);
 }
